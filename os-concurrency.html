@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OS, Concurrency &amp; Rate Limiting | Interview Prep</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<style>
+.arch-box { background:var(--bg-secondary); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:monospace; font-size:12px; color:var(--text-secondary); line-height:1.8; margin:12px 0; white-space:pre; overflow-x:auto; }
+.warn-box { background:rgba(248,81,73,.07); border:1px solid rgba(248,81,73,.25); border-radius:6px; padding:12px 14px; margin:10px 0; font-size:13px; color:var(--text-primary); }
+.warn-box strong { color:var(--accent-red); }
+.ok-box { background:rgba(63,185,80,.07); border:1px solid rgba(63,185,80,.25); border-radius:6px; padding:12px 14px; margin:10px 0; font-size:13px; color:var(--text-primary); }
+.ok-box strong { color:var(--accent-green); }
+.state-diagram { font-family:monospace; font-size:12px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:8px; padding:16px; margin:12px 0; color:var(--accent-cyan); line-height:2; overflow-x:auto; white-space:pre; }
+.inline-code { background:var(--bg-card); border:1px solid var(--border); padding:1px 6px; border-radius:3px; font-family:monospace; font-size:12px; color:var(--accent-cyan); }
+.section-jump { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px; }
+.jump-btn { background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:5px 14px; font-size:12px; color:var(--text-secondary); text-decoration:none; transition:all .15s; }
+.jump-btn:hover { border-color:var(--accent-blue); color:var(--accent-blue); }
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">IP</div>
+    <div><h2>Interview Prep</h2><p>Full Stack Reference</p></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Pages</div>
+    <a href="index.html" class="nav-link">Dashboard</a>
+    <a href="dsa.html" class="nav-link">DSA — Python</a>
+    <a href="oop-lld.html" class="nav-link">OOP &amp; LLD — Java</a>
+    <a href="system-design.html" class="nav-link">System Design</a>
+    <a href="kafka.html" class="nav-link">Kafka &amp; Messaging</a>
+    <a href="os-concurrency.html" class="nav-link active">OS &amp; Concurrency</a>
+    <a href="docker-aws.html" class="nav-link">Docker &amp; AWS</a>
+    <a href="networking-security.html" class="nav-link">Networking &amp; Security</a>
+    <a href="databases.html" class="nav-link">Databases — SQL &amp; NoSQL</a>
+    <a href="alation.html" class="nav-link">Alation Focus <span class="nav-badge">HOT</span></a>
+  </div>
+  <div class="sidebar-footer"><kbd>Cmd K</kbd> to search</div>
+</nav>
+
+<main class="main">
+<div class="topbar"><h1>OS, Concurrency &amp; Rate Limiting</h1>
+  <button class="topbar-search-btn" onclick="window._spotlightOpen && window._spotlightOpen()">Search topics... <kbd>Cmd K</kbd></button></div>
+<div class="content-area">
+
+<div class="section-header">
+  <h1>Operating Systems, Concurrency &amp; Rate Limiting</h1>
+  <p>Core OS internals, thread synchronization, Java &amp; Python concurrency patterns, and rate-limiting algorithms with real implementations.</p>
+</div>
+
+<div class="section-jump">
+  <a href="#os-fundamentals" class="jump-btn"> OS Fundamentals</a>
+  <a href="#memory" class="jump-btn"> Memory</a>
+  <a href="#sync" class="jump-btn"> Synchronization</a>
+  <a href="#java-concurrency" class="jump-btn"> Java Concurrency</a>
+  <a href="#python-concurrency" class="jump-btn"> Python Concurrency</a>
+  <a href="#rate-limiting" class="jump-btn">⏱ Rate Limiting</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 1: OS FUNDAMENTALS
+═══════════════════════════════════════════════ -->
+<div id="os-fundamentals" class="subsection">
+<div class="subsection-title">OS Fundamentals</div>
+
+<!-- Process vs Thread -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Process vs Thread</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th></th><th>Process</th><th>Thread</th></tr>
+      <tr><td><strong>Definition</strong></td><td>Independent program in execution</td><td>Lightweight unit of execution within a process</td></tr>
+      <tr><td><strong>Memory</strong></td><td>Own address space (heap, stack, code, data)</td><td>Shared heap with siblings; own stack</td></tr>
+      <tr><td><strong>Communication</strong></td><td>IPC (pipes, sockets, shared memory, signals)</td><td>Shared memory directly (needs synchronization)</td></tr>
+      <tr><td><strong>Context switch cost</strong></td><td>High (TLB flush, page table switch)</td><td>Low (same address space)</td></tr>
+      <tr><td><strong>Failure isolation</strong></td><td> Process crash doesn't affect others</td><td> Thread crash can kill entire process</td></tr>
+      <tr><td><strong>Creation cost</strong></td><td>Heavy (fork)</td><td>Light (clone)</td></tr>
+      <tr><td><strong>Use when</strong></td><td>Strong isolation needed (microservices, browser tabs)</td><td>Shared memory tasks (web server handling, GUI)</td></tr>
+    </table>
+    <div class="arch-box">Process Memory Layout:
+┌─────────────────────┐ High Address
+│   Stack (grows ↓)   │  → local vars, function frames
+├─────────────────────┤
+│         ...         │
+├─────────────────────┤
+│   Heap (grows ↑)    │  → malloc/new, dynamic allocation
+├─────────────────────┤
+│   BSS (uninit data) │  → global/static uninit vars
+├─────────────────────┤
+│   Data (init data)  │  → global/static init vars
+├─────────────────────┤
+│   Text (code)       │  → compiled instructions (read-only)
+└─────────────────────┘ Low Address
+
+Thread within Process:
+  Thread 1: own Stack + PC + registers
+  Thread 2: own Stack + PC + registers
+  Both share: Heap, Code, Data, File descriptors</div>
+    <div class="warn-box"><strong>Bottleneck:</strong> Too many threads → context switch overhead dominates. Use thread pools and async I/O instead of 1-thread-per-request for high concurrency.</div>
+  </div>
+</div>
+
+<!-- Process States & Scheduling -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Process/Thread States &amp; CPU Scheduling</h3>
+    <div class="tag-row"><span class="badge badge-tag">Core OS</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="state-diagram">Process States:
+NEW ──(admitted)──► READY ──(CPU assigned)──► RUNNING
+                      ▲                           │
+                      │                    (I/O or wait)
+                      │                           ▼
+                 (I/O done)                   WAITING
+                      │                           │
+                      └──────────────────────────┘
+                RUNNING ──(exit)──► TERMINATED</div>
+    <table>
+      <tr><th>Scheduling Algorithm</th><th>How</th><th>Pros</th><th>Cons</th></tr>
+      <tr><td>FCFS (First Come First Served)</td><td>Queue order</td><td>Simple, no starvation</td><td>Convoy effect — long job blocks all</td></tr>
+      <tr><td>SJF (Shortest Job First)</td><td>Shortest burst time first</td><td>Optimal average wait time</td><td>Starvation of long jobs; hard to predict burst</td></tr>
+      <tr><td>Round Robin</td><td>Time quantum (e.g. 10ms) per process, rotate</td><td>Fair, low response time</td><td>High context switch if quantum too small</td></tr>
+      <tr><td>Priority Scheduling</td><td>Highest priority first</td><td>Important tasks run first</td><td>Starvation of low priority</td></tr>
+      <tr><td>Multilevel Queue</td><td>Separate queues per priority class</td><td>Flexible, OS uses this</td><td>Complex</td></tr>
+      <tr><td>CFS (Linux)</td><td>Fair share of CPU time based on weight</td><td>Fair for all processes, used in Linux kernel</td><td>Complex implementation</td></tr>
+    </table>
+    <div class="callout callout-blue"><div class="callout-title">Linux CFS — Completely Fair Scheduler</div>Uses a red-black tree sorted by virtual runtime. Process with smallest vruntime runs next. Interactive processes get boosted (smaller vruntime increment).</div>
+  </div>
+</div>
+
+<!-- Context Switching -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Context Switching — What Happens?</h3>
+    <div class="tag-row"><span class="badge badge-tag">OS Internals</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="steps">
+      <div class="step"><div>CPU saves current process/thread state (PC, registers, stack pointer, flags) → PCB (Process Control Block)</div></div>
+      <div class="step"><div>Scheduler picks next process/thread to run</div></div>
+      <div class="step"><div>Load saved state from new process's PCB into CPU registers</div></div>
+      <div class="step"><div>For process switch: also switch virtual memory map (TLB flush — expensive!)</div></div>
+    </div>
+    <div class="warn-box"><strong>Cost:</strong> ~1-10μs per context switch. At 1000 threads switching 1000 times/sec = 1M switches/sec = possibly 10s of seconds just in overhead. This is why goroutines (Go), green threads, and async I/O exist.</div>
+    <div class="callout callout-orange"><div class="callout-title">User Space vs Kernel Threads</div>
+      <strong>Kernel threads (1:1)</strong>: OS manages, real parallelism, expensive context switch — Java threads<br>
+      <strong>Green threads (M:1)</strong>: Userspace scheduler, no true parallelism, fast switch — Python (old)<br>
+      <strong>Hybrid (M:N)</strong>: Many user threads → N kernel threads — Go goroutines, Kotlin coroutines
+    </div>
+  </div>
+</div>
+
+<!-- System Calls & Kernel/User Mode -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>System Calls, Kernel Mode vs User Mode</h3>
+    <div class="tag-row"><span class="badge badge-tag">OS Internals</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="grid-2">
+      <div class="concept-box">
+        <h4>User Mode</h4>
+        <ul>
+          <li>Restricted — cannot access hardware directly</li>
+          <li>Cannot access kernel memory</li>
+          <li>Application code runs here</li>
+          <li>Invalid instruction → trap (SIGSEGV)</li>
+        </ul>
+      </div>
+      <div class="concept-box">
+        <h4>Kernel Mode</h4>
+        <ul>
+          <li>Full hardware access</li>
+          <li>OS kernel runs here</li>
+          <li>Manages devices, memory, processes</li>
+          <li>Entered via system call (trap/interrupt)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="arch-box">System Call Flow:
+App calls read() → glibc wrapper → INT 0x80 / SYSCALL instruction
+  → CPU switches to kernel mode
+  → Kernel validates args, performs I/O
+  → Copies data to user buffer
+  → Returns to user mode
+  → App receives return value
+
+Common System Calls:
+  fork()   — create new process
+  exec()   — replace process image
+  open()   — open file descriptor
+  read()   — read from fd
+  write()  — write to fd
+  mmap()   — map memory
+  clone()  — create thread (Linux)
+  wait()   — wait for child process</div>
+    <div class="warn-box"><strong>Bottleneck:</strong> Frequent system calls = frequent mode switches = overhead. Use buffered I/O (stdio), large read/write batches, sendfile() for zero-copy to minimize syscall cost.</div>
+  </div>
+</div>
+
+<!-- I/O Models -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>I/O Models — Blocking, Non-blocking, Async</h3>
+    <div class="tag-row"><span class="badge badge-high">Critical for Interviews</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Model</th><th>How it works</th><th>Thread blocks?</th><th>Examples</th></tr>
+      <tr><td><strong>Blocking I/O</strong></td><td>Thread calls read(), waits until data arrives</td><td>Yes — entire thread blocked</td><td>Traditional Java IO, Python file reads</td></tr>
+      <tr><td><strong>Non-blocking I/O</strong></td><td>read() returns immediately with EAGAIN if no data; app polls</td><td>No — but burns CPU polling</td><td>O_NONBLOCK sockets</td></tr>
+      <tr><td><strong>I/O Multiplexing</strong></td><td>select()/poll()/epoll() monitors multiple fds; blocks until any ready</td><td>Yes — on epoll, not on I/O itself</td><td>Nginx, Redis, Node.js event loop</td></tr>
+      <tr><td><strong>Signal-driven I/O</strong></td><td>Kernel sends SIGIO when fd is ready</td><td>No</td><td>Rare in practice</td></tr>
+      <tr><td><strong>Async I/O (AIO)</strong></td><td>Request I/O, callback/future invoked when done; completely non-blocking</td><td>No</td><td>Python asyncio, Java NIO2, io_uring</td></tr>
+    </table>
+    <div class="callout callout-blue"><div class="callout-title">epoll vs select</div>
+      <strong>select</strong>: O(N) scan of all file descriptors, max 1024 fds<br>
+      <strong>epoll</strong>: O(1) event-driven, scales to millions of connections — used by Nginx, Redis, Node.js<br>
+      <strong>io_uring</strong> (Linux 5.1+): async I/O via shared ring buffer, near zero-copy, zero syscall overhead
+    </div>
+    <div class="arch-box">Nginx Event Loop (I/O Multiplexing with epoll):
+
+1 master process + N worker processes (= N CPU cores)
+Each worker: single-threaded + epoll event loop
+
+Worker:
+  while(true):
+    events = epoll_wait(fd_list)   // block until any connection has data
+    for event in events:
+      if event == new_connection: accept()
+      if event == data_ready:     read() → process → write()
+      if event == write_ready:    flush buffer
+
+→ Handles 10K+ concurrent connections with 1 thread!</div>
+  </div>
+</div>
+
+<!-- Signals and IPC -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>IPC — Inter-Process Communication</h3>
+    <div class="tag-row"><span class="badge badge-tag">OS</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>IPC Mechanism</th><th>Speed</th><th>Persistence</th><th>Use Case</th></tr>
+      <tr><td>Pipes (unnamed)</td><td>Fast</td><td>Ephemeral</td><td>Parent→child, shell pipe (cmd1 | cmd2)</td></tr>
+      <tr><td>Named Pipes (FIFO)</td><td>Fast</td><td>Ephemeral</td><td>Unrelated processes on same machine</td></tr>
+      <tr><td>Message Queues</td><td>Medium</td><td>Kernel-persisted</td><td>Structured messages, priority</td></tr>
+      <tr><td>Shared Memory</td><td>Fastest</td><td>Ephemeral</td><td>High-throughput data sharing, needs sync</td></tr>
+      <tr><td>Sockets (Unix domain)</td><td>Very fast</td><td>Ephemeral</td><td>Same-machine cross-process (Redis, nginx)</td></tr>
+      <tr><td>Sockets (TCP/UDP)</td><td>Network latency</td><td>Ephemeral</td><td>Cross-machine (microservices)</td></tr>
+      <tr><td>Signals</td><td>Instant</td><td>N/A</td><td>SIGTERM, SIGKILL, SIGUSR1 notifications</td></tr>
+      <tr><td>Memory-mapped files</td><td>Very fast</td><td>File-backed</td><td>Large data sharing, databases (LMDB)</td></tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- os-fundamentals -->
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 2: MEMORY MANAGEMENT
+═══════════════════════════════════════════════ -->
+<div id="memory" class="subsection">
+<div class="subsection-title">Memory Management</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Virtual Memory, Paging &amp; TLB</h3>
+    <div class="tag-row"><span class="badge badge-tag">Memory</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box">
+      <h4>Virtual Memory</h4>
+      <ul>
+        <li>Each process has its own virtual address space (e.g. 0 to 2⁴⁸ on x86-64)</li>
+        <li>OS + MMU translate virtual → physical addresses via page tables</li>
+        <li>Enables: isolation between processes, more memory than physical RAM (swap), copy-on-write</li>
+      </ul>
+    </div>
+    <div class="arch-box">Virtual → Physical Translation:
+Process 1 Virtual Address 0x7fff1000
+    → Page Table (per process)
+    → Page Frame Number (physical RAM address 0x3A00000)
+    → TLB caches recent translations (L1: ~1ns vs page table walk: ~100ns)
+
+Page Fault:
+  Access address not in RAM → OS Page Fault handler
+  → Load page from disk (swap) → 10ms+ cost!
+  → Resume process
+
+Copy-on-Write (fork):
+  fork() → child shares parent pages (read-only)
+  On write → OS copies just that page → each has own copy
+  → Fast fork() used by shell, Redis BGSAVE</div>
+    <table>
+      <tr><th>Concept</th><th>Detail</th></tr>
+      <tr><td>Page size</td><td>Usually 4KB. Huge pages: 2MB/1GB (reduce TLB misses for large datasets)</td></tr>
+      <tr><td>TLB miss</td><td>Must walk page table (~100ns). Hot pages in TLB (~1ns)</td></tr>
+      <tr><td>Thrashing</td><td>Too many processes, RAM full → constant page faults → system grinding halt</td></tr>
+      <tr><td>Swap</td><td>Pages evicted to disk. Swap access 1000x slower than RAM — avoid swap in production!</td></tr>
+      <tr><td>OOM Killer</td><td>Linux kills processes when RAM exhausted; use cgroups + limits in containers</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Heap vs Stack — Deep Dive</h3>
+    <div class="tag-row"><span class="badge badge-tag">Memory</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th></th><th>Stack</th><th>Heap</th></tr>
+      <tr><td>Allocation</td><td>Automatic (compiler) on function call</td><td>Manual (malloc/new) or GC-managed</td></tr>
+      <tr><td>Speed</td><td>Very fast (just move stack pointer)</td><td>Slower (allocator must find free block)</td></tr>
+      <tr><td>Size</td><td>Fixed per thread (default 512KB–8MB)</td><td>Limited only by RAM+swap</td></tr>
+      <tr><td>Lifetime</td><td>Function scope — freed on return</td><td>Until free()/GC collects</td></tr>
+      <tr><td>Thread-safe?</td><td> Each thread has own stack</td><td> Shared heap needs synchronization</td></tr>
+      <tr><td>Overflow</td><td>StackOverflowError (deep recursion)</td><td>OutOfMemoryError (too many objects)</td></tr>
+    </table>
+    <div class="warn-box"><strong>Memory Leak:</strong> Allocated heap memory never freed. In Java: objects held in static collections. In C: missing free(). Use heap profilers (jmap, async-profiler, valgrind).</div>
+    <div class="callout callout-blue"><div class="callout-title">Java Memory Model — Quick Reference</div>
+      <strong>Young Gen (Eden + S0 + S1)</strong>: New objects allocated here. Minor GC frequent, fast.<br>
+      <strong>Old Gen (Tenured)</strong>: Long-lived objects promoted here. Major GC (stop-the-world) is expensive.<br>
+      <strong>Metaspace</strong>: Class metadata (replaced PermGen in Java 8+).<br>
+      <strong>G1GC</strong>: Default Java 9+. Concurrent, low pause. For &lt;10ms pauses use ZGC/Shenandoah.
+    </div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>CPU Cache — L1/L2/L3, Cache Lines</h3>
+    <div class="tag-row"><span class="badge badge-tag">Performance</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Level</th><th>Size</th><th>Latency</th><th>Scope</th></tr>
+      <tr><td>L1 Cache</td><td>32-64 KB</td><td>~1 ns</td><td>Per core</td></tr>
+      <tr><td>L2 Cache</td><td>256 KB–2 MB</td><td>~5 ns</td><td>Per core</td></tr>
+      <tr><td>L3 Cache (LLC)</td><td>8–64 MB</td><td>~20 ns</td><td>Shared across cores</td></tr>
+      <tr><td>Main Memory (RAM)</td><td>GB–TB</td><td>~100 ns</td><td>Shared</td></tr>
+    </table>
+    <div class="callout callout-orange"><div class="callout-title">Cache Line &amp; False Sharing</div>
+      CPU loads/invalidates memory in 64-byte cache lines. If thread A writes x and thread B writes y, but x and y are on the <strong>same cache line</strong>, every write invalidates the other core's cache — <strong>false sharing</strong>. Fix: pad struct fields to 64 bytes, or <code>@Contended</code> in Java.
+    </div>
+    <div class="concept-box"><h4>Cache-Friendly Code</h4><ul>
+      <li>Access arrays sequentially (row-major order) — spatial locality</li>
+      <li>Reuse recently accessed data (temporal locality)</li>
+      <li>Avoid pointer-chasing linked lists in hot paths (random cache misses)</li>
+      <li>Structure of Arrays (SoA) vs Array of Structures (AoS) — SoA more cache-friendly for column access</li>
+    </ul></div>
+  </div>
+</div>
+
+</div><!-- memory -->
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 3: SYNCHRONIZATION
+═══════════════════════════════════════════════ -->
+<div id="sync" class="subsection">
+<div class="subsection-title">Synchronization Primitives</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Mutex, Semaphore, Monitor, Spinlock</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Primitive</th><th>What</th><th>Use Case</th><th>Trade-off</th></tr>
+      <tr><td><strong>Mutex</strong></td><td>Binary lock — only lock owner can unlock</td><td>Protect critical section; mutual exclusion</td><td>Only 1 thread at a time; sleeping threads</td></tr>
+      <tr><td><strong>Semaphore</strong></td><td>Counter-based: P() decrements, V() increments; blocks when 0</td><td>Limit concurrent access (N connections, N workers)</td><td>No ownership — any thread can signal</td></tr>
+      <tr><td><strong>Binary Semaphore</strong></td><td>Semaphore initialized to 1 (similar to mutex but no ownership)</td><td>Signaling between threads</td><td>Can be released by non-owner</td></tr>
+      <tr><td><strong>Monitor</strong></td><td>Mutex + condition variables bundled (wait/notify)</td><td>Java synchronized blocks, Producer-Consumer</td><td>High-level, can have spurious wakeups</td></tr>
+      <tr><td><strong>Spinlock</strong></td><td>Busy-wait loop until lock acquired (no sleep)</td><td>Very short critical sections (&lt;1μs), kernel code</td><td>Burns CPU while waiting</td></tr>
+      <tr><td><strong>RW Lock</strong></td><td>Multiple concurrent readers, exclusive writer</td><td>Read-heavy data structures (caches, configs)</td><td>Writer starvation possible</td></tr>
+    </table>
+    <div class="callout callout-blue"><div class="callout-title">Mutex vs Semaphore — Key Difference</div>
+    Mutex: ownership-based. Thread that locked must unlock. Used for mutual exclusion.<br>
+    Semaphore: signaling-based. Any thread can release. Used for resource counting or thread signaling.
+    </div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Deadlock — Conditions, Detection, Prevention</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="callout callout-red"><div class="callout-title">Coffman Conditions for Deadlock (ALL 4 must hold)</div>
+      1. <strong>Mutual Exclusion</strong> — resource can only be held by one thread<br>
+      2. <strong>Hold and Wait</strong> — thread holds one resource and waits for another<br>
+      3. <strong>No Preemption</strong> — resource can't be taken away forcefully<br>
+      4. <strong>Circular Wait</strong> — Thread A waits for B, B waits for A (or cycle)
+    </div>
+    <div class="arch-box">Classic Deadlock:
+Thread A: lock(mutex1) → try lock(mutex2) → blocks
+Thread B: lock(mutex2) → try lock(mutex1) → blocks
+→ DEADLOCK — both wait forever
+
+Prevention — Break Circular Wait:
+Always acquire locks in SAME ORDER (total ordering):
+Thread A: lock(mutex1) → lock(mutex2)
+Thread B: lock(mutex1) → lock(mutex2)   ← same order!
+→ Thread B waits for A to release mutex1 → no deadlock</div>
+    <table>
+      <tr><th>Strategy</th><th>How</th><th>Trade-off</th></tr>
+      <tr><td>Lock Ordering</td><td>Always acquire locks in consistent order</td><td>Must know all locks upfront</td></tr>
+      <tr><td>Timeout + Retry</td><td>tryLock(timeout) — back off and retry</td><td>May livelock (retry forever)</td></tr>
+      <tr><td>Lock-free / CAS</td><td>Atomic compare-and-swap, no locks</td><td>Complex, ABA problem</td></tr>
+      <tr><td>Banker's Algorithm</td><td>OS allocates resources only if safe state</td><td>Complex, needs advance resource declaration</td></tr>
+    </table>
+    <div class="warn-box"><strong>Livelock:</strong> Threads keep changing state in response to each other but make no progress (both step aside simultaneously). <br>
+    <strong>Starvation:</strong> Thread never gets CPU/resource (priority inversion — low-priority holds lock needed by high-priority).</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Producer-Consumer Problem</h3>
+    <div class="tag-row"><span class="badge badge-tag">Classic</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-java">// Java: Producer-Consumer with BlockingQueue (preferred approach)
+import java.util.concurrent.*;
+
+public class ProducerConsumer {
+    private static final BlockingQueue&lt;Integer&gt; queue = new LinkedBlockingQueue&lt;&gt;(10);
+
+    static class Producer implements Runnable {
+        public void run() {
+            for (int i = 0; i &lt; 100; i++) {
+                try {
+                    queue.put(i);  // blocks if queue full
+                    System.out.println("Produced: " + i);
+                } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+            }
+        }
+    }
+
+    static class Consumer implements Runnable {
+        public void run() {
+            while (true) {
+                try {
+                    int val = queue.take();  // blocks if queue empty
+                    System.out.println("Consumed: " + val);
+                    Thread.sleep(50);
+                } catch (InterruptedException e) { Thread.currentThread().interrupt(); break; }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        new Thread(new Producer()).start();
+        new Thread(new Consumer()).start();
+        new Thread(new Consumer()).start(); // multiple consumers
+    }
+}</code></pre>
+    <div class="concept-box"><h4>With explicit wait/notify (lower level)</h4>
+<pre style="font-size:11px; margin:0">synchronized(monitor) {
+    while (queue.isEmpty()) monitor.wait();   // always use while not if (spurious wakeup)
+    item = queue.poll();
+    monitor.notifyAll();                      // wake up producers
+}</pre>
+    </div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Race Conditions &amp; Memory Visibility</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="warn-box"><strong>Race Condition:</strong> Two threads access shared state concurrently and at least one writes. Result depends on execution order — undefined behavior.</div>
+<pre><code class="language-java">// BAD: Race condition — counter++ is NOT atomic
+// It's: read counter, increment, write counter — 3 steps!
+private int counter = 0;
+public void increment() { counter++; } // NOT THREAD SAFE
+
+// FIX 1: synchronized
+public synchronized void increment() { counter++; }
+
+// FIX 2: AtomicInteger (lock-free, CAS-based)
+private AtomicInteger counter = new AtomicInteger(0);
+public void increment() { counter.incrementAndGet(); }
+
+// Memory Visibility: volatile
+private volatile boolean running = true;  // write from one thread visible to all
+// Without volatile: thread may read stale cached value from register/L1 cache</code></pre>
+    <div class="callout callout-orange"><div class="callout-title">Java Memory Model — happens-before</div>
+      volatile write <strong>happens-before</strong> subsequent volatile read.<br>
+      Unlock <strong>happens-before</strong> subsequent lock.<br>
+      Thread.start() <strong>happens-before</strong> any action in started thread.<br>
+      Without happens-before: compiler/CPU can reorder instructions!
+    </div>
+  </div>
+</div>
+
+</div><!-- sync -->
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 4: JAVA CONCURRENCY
+═══════════════════════════════════════════════ -->
+<div id="java-concurrency" class="subsection">
+<div class="subsection-title">Java Concurrency</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Thread Lifecycle &amp; Thread Pool</h3>
+    <div class="tag-row"><span class="badge badge-tag">Java</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="state-diagram">Thread States:
+NEW ──(start())──► RUNNABLE ──(CPU)──► RUNNING
+                      ▲                    │
+                      │             (sleep/wait/I/O)
+                      │                    ▼
+                 (notify)              BLOCKED/WAITING
+                                           │
+                 RUNNABLE ◄────────────────┘
+RUNNING ──(run() returns)──► TERMINATED</div>
+<pre><code class="language-java">// Thread Pool: ALWAYS use instead of creating raw threads
+ExecutorService pool = Executors.newFixedThreadPool(
+    Runtime.getRuntime().availableProcessors() * 2  // rule of thumb for I/O-bound
+);
+
+// For CPU-bound tasks: nCPU cores
+// For I/O-bound tasks: nCPU * (1 + wait_time / compute_time), often 2x-10x cores
+
+// Submit tasks
+Future&lt;String&gt; future = pool.submit(() -&gt; {
+    Thread.sleep(1000);
+    return "result";
+});
+String result = future.get(); // blocks; use get(timeout, unit) in prod
+
+// Custom thread pool
+ThreadPoolExecutor executor = new ThreadPoolExecutor(
+    4,           // corePoolSize — always kept alive
+    16,          // maximumPoolSize — max threads
+    60L, TimeUnit.SECONDS,  // keepAliveTime for excess threads
+    new LinkedBlockingQueue&lt;&gt;(1000),  // work queue (bounded!)
+    new ThreadPoolExecutor.CallerRunsPolicy() // rejection policy
+);
+// Rejection policies: AbortPolicy(default), CallerRunsPolicy, DiscardPolicy, DiscardOldestPolicy
+
+// Always shutdown properly!
+pool.shutdown();
+pool.awaitTermination(5, TimeUnit.SECONDS);</code></pre>
+    <div class="warn-box"><strong>Bottleneck:</strong> Unbounded queue (LinkedBlockingQueue with no limit) → OOM under load. Always set a queue capacity and define rejection policy.</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Java Locks — ReentrantLock, ReadWriteLock, StampedLock</h3>
+    <div class="tag-row"><span class="badge badge-tag">Java</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-java">// ReentrantLock — more flexible than synchronized
+ReentrantLock lock = new ReentrantLock(true); // fair=true → FIFO order (prevents starvation)
+
+lock.lock();
+try {
+    // critical section
+} finally {
+    lock.unlock(); // ALWAYS in finally!
+}
+
+// tryLock with timeout (avoids deadlock)
+if (lock.tryLock(500, TimeUnit.MILLISECONDS)) {
+    try { /* ... */ } finally { lock.unlock(); }
+} else {
+    // couldn't acquire — handle gracefully
+}
+
+// ReadWriteLock: many readers OR one writer
+ReadWriteLock rwLock = new ReentrantReadWriteLock();
+// Multiple readers can hold read lock simultaneously
+rwLock.readLock().lock();
+try { return map.get(key); } finally { rwLock.readLock().unlock(); }
+
+// Exclusive write lock
+rwLock.writeLock().lock();
+try { map.put(key, val); } finally { rwLock.writeLock().unlock(); }
+
+// StampedLock (Java 8+): optimistic read without locking
+StampedLock sl = new StampedLock();
+long stamp = sl.tryOptimisticRead();
+int x = this.x; int y = this.y;           // read without lock
+if (!sl.validate(stamp)) {                 // check if write happened
+    stamp = sl.readLock();
+    try { x = this.x; y = this.y; } finally { sl.unlockRead(stamp); }
+}
+// ~3x faster than ReadWriteLock for read-heavy workloads</code></pre>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Atomic Classes &amp; Lock-Free Data Structures</h3>
+    <div class="tag-row"><span class="badge badge-tag">Java</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-java">// Atomic types — based on CPU CAS (Compare-And-Swap) instruction
+AtomicInteger counter = new AtomicInteger(0);
+counter.incrementAndGet();                    // atomic i++
+counter.compareAndSet(expected, newVal);      // CAS — update only if current == expected
+counter.getAndUpdate(x -&gt; x * 2);
+
+AtomicLong, AtomicBoolean, AtomicReference&lt;T&gt;
+
+// LongAdder — better than AtomicLong under high contention
+// Maintains per-CPU-stripe counters, sums on read
+LongAdder adder = new LongAdder();
+adder.increment();  // contention spread across stripes
+long total = adder.sum(); // slightly less precise but much faster
+
+// ConcurrentHashMap — segment-level locking (Java 8: CAS + synchronized per bucket)
+ConcurrentHashMap&lt;String, Integer&gt; map = new ConcurrentHashMap&lt;&gt;();
+map.putIfAbsent(key, 0);
+map.compute(key, (k, v) -&gt; v == null ? 1 : v + 1); // atomic update
+
+// CopyOnWriteArrayList — writes create new copy; reads never block
+// Good for: event listener lists (rare writes, many reads)
+CopyOnWriteArrayList&lt;Listener&gt; listeners = new CopyOnWriteArrayList&lt;&gt;();</code></pre>
+    <div class="warn-box"><strong>ABA Problem:</strong> CAS checks if value is still A, but it may have changed A→B→A. Use AtomicStampedReference (version counter) to solve.</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>CompletableFuture &amp; Async Pipelines</h3>
+    <div class="tag-row"><span class="badge badge-tag">Java</span><span class="badge badge-tag">Modern</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-java">// CompletableFuture — non-blocking async composition
+CompletableFuture&lt;User&gt; userFuture = CompletableFuture.supplyAsync(
+    () -&gt; userService.findById(userId),  // runs on ForkJoinPool.commonPool()
+    customExecutor                        // or specify your executor
+);
+
+// Chain operations (no blocking!)
+CompletableFuture&lt;String&gt; result = userFuture
+    .thenApply(user -&gt; user.getEmail())           // transform
+    .thenCompose(email -&gt; sendEmail(email))        // chain another async op
+    .thenAccept(res -&gt; log.info("Sent: " + res))  // side effect, returns Void
+    .exceptionally(ex -&gt; { log.error(ex); return null; }); // error handling
+
+// Run multiple in parallel, wait for all
+CompletableFuture&lt;User&gt;    cf1 = CompletableFuture.supplyAsync(() -&gt; getUser(id));
+CompletableFuture&lt;Profile&gt; cf2 = CompletableFuture.supplyAsync(() -&gt; getProfile(id));
+
+CompletableFuture.allOf(cf1, cf2).thenRun(() -&gt; {
+    User user = cf1.join();
+    Profile profile = cf2.join();
+    // both ready here
+});
+
+// First one to complete wins
+CompletableFuture.anyOf(cf1, cf2).thenAccept(result -&gt; { /* handle */ });
+
+// With timeout (Java 9+)
+cf1.orTimeout(2, TimeUnit.SECONDS)
+   .exceptionally(ex -&gt; DEFAULT_USER);</code></pre>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Virtual Threads — Java 21 (Project Loom)</h3>
+    <div class="tag-row"><span class="badge badge-tag">Java 21</span><span class="badge badge-tag">Modern</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="callout callout-green"><div class="callout-title">What are Virtual Threads?</div>JVM-managed lightweight threads. Millions can exist simultaneously. When virtual thread blocks on I/O, underlying OS thread (carrier) is freed for other virtual threads. No more async/callback hell.</div>
+<pre><code class="language-java">// Create virtual threads — Java 21
+Thread.ofVirtual().start(() -&gt; {
+    // blocking I/O here doesn't waste OS thread!
+    String result = httpClient.get("https://api.example.com/data");
+});
+
+// Virtual thread executor — best for I/O-bound server workloads
+ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+// Submit 100,000 tasks — no problem, each gets own virtual thread
+for (int i = 0; i &lt; 100_000; i++) {
+    executor.submit(() -&gt; processRequest()); // cheap!
+}
+
+// Spring Boot 3.2+: enable virtual threads
+// application.properties: spring.threads.virtual.enabled=true</code></pre>
+    <table>
+      <tr><th></th><th>Platform Threads</th><th>Virtual Threads</th></tr>
+      <tr><td>Count</td><td>~1K–10K max practical</td><td>Millions possible</td></tr>
+      <tr><td>Memory</td><td>~1MB stack each</td><td>~few KB stack each</td></tr>
+      <tr><td>Blocking I/O</td><td>Wastes OS thread</td><td>OS thread freed, remounted</td></tr>
+      <tr><td>CPU-bound</td><td>Same as virtual</td><td>No advantage over platform threads</td></tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- java-concurrency -->
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 5: PYTHON CONCURRENCY
+═══════════════════════════════════════════════ -->
+<div id="python-concurrency" class="subsection">
+<div class="subsection-title">Python Concurrency</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>The GIL — What It Is and Why It Matters</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="callout callout-red"><div class="callout-title">GIL — Global Interpreter Lock</div>CPython has a mutex (GIL) that only allows ONE thread to execute Python bytecode at a time. This means Python threads <strong>cannot achieve true CPU parallelism</strong> for Python code. I/O operations release the GIL.</div>
+    <table>
+      <tr><th>Task Type</th><th>Best Tool</th><th>Why</th></tr>
+      <tr><td>I/O bound (network, file)</td><td>threading or asyncio</td><td>GIL released during I/O; threads work well</td></tr>
+      <tr><td>CPU bound</td><td>multiprocessing</td><td>Separate processes = separate GILs = true parallelism</td></tr>
+      <tr><td>Mixed / many connections</td><td>asyncio</td><td>Single-threaded but non-blocking, high concurrency</td></tr>
+      <tr><td>C extensions</td><td>threading</td><td>C code can release GIL explicitly</td></tr>
+    </table>
+    <div class="callout callout-green"><div class="callout-title">GIL Removed in Python 3.13+</div>Experimental "free-threaded" CPython (PEP 703). Disabling GIL allows true multi-threaded CPU parallelism. Still evolving — not default yet.</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>threading, multiprocessing, asyncio — When to Use What</h3>
+    <div class="tag-row"><span class="badge badge-tag">Python</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this)">threading</button>
+      <button class="tab-btn" onclick="switchTab(this)">multiprocessing</button>
+      <button class="tab-btn" onclick="switchTab(this)">asyncio</button>
+    </div>
+    <div class="tab-pane active">
+<pre><code class="language-python">import threading, time, requests
+from concurrent.futures import ThreadPoolExecutor
+
+# I/O bound: fetching multiple URLs concurrently
+urls = ["https://api1.com", "https://api2.com", "https://api3.com"]
+
+def fetch(url):
+    r = requests.get(url, timeout=5)  # GIL released during network I/O
+    return r.status_code
+
+# ThreadPoolExecutor — recommended over raw threading
+with ThreadPoolExecutor(max_workers=10) as executor:
+    results = list(executor.map(fetch, urls))  # parallel fetches
+
+# Synchronization
+lock = threading.Lock()
+shared_counter = 0
+
+def safe_increment():
+    global shared_counter
+    with lock:  # context manager — auto releases on exception too
+        shared_counter += 1
+
+# threading.Event for signaling
+event = threading.Event()
+def worker():
+    event.wait()  # blocks until event.set() called
+    print("Go!")
+
+t = threading.Thread(target=worker)
+t.start()
+time.sleep(1)
+event.set()  # unblock worker</code></pre>
+    </div>
+    <div class="tab-pane">
+<pre><code class="language-python">from multiprocessing import Pool, Process, Queue, Manager
+import os
+
+# CPU bound: parallel number crunching
+def compute(n):
+    return sum(i * i for i in range(n))
+
+# Process pool — separate GIL per process = real parallelism
+with Pool(processes=os.cpu_count()) as pool:
+    results = pool.map(compute, [10**6, 10**6, 10**6, 10**6])
+
+# Sharing data between processes
+manager = Manager()
+shared_dict = manager.dict()   # proxy object, safe across processes
+
+q = Queue()  # inter-process queue
+
+def producer(q):
+    for i in range(5):
+        q.put(i)
+    q.put(None)  # sentinel
+
+def consumer(q):
+    while True:
+        item = q.get()
+        if item is None: break
+        print(f"Got: {item}")
+
+p1 = Process(target=producer, args=(q,))
+p2 = Process(target=consumer, args=(q,))
+p1.start(); p2.start()
+p1.join(); p2.join()</code></pre>
+    </div>
+    <div class="tab-pane">
+<pre><code class="language-python">import asyncio, aiohttp
+
+# asyncio: single-threaded, non-blocking, cooperative multitasking
+# Best for: many concurrent I/O operations (HTTP, DB, file)
+
+async def fetch(session, url):
+    async with session.get(url) as response:
+        return await response.text()  # yield control while waiting
+
+async def main():
+    urls = ["https://api1.com", "https://api2.com", "https://api3.com"]
+    async with aiohttp.ClientSession() as session:
+        # Run all fetches concurrently — NOT parallel, but concurrent!
+        tasks = [fetch(session, url) for url in urls]
+        results = await asyncio.gather(*tasks)   # wait for all
+        # asyncio.gather with return_exceptions=True to not fail on first error
+
+# Run event loop
+asyncio.run(main())
+
+# asyncio Semaphore — limit concurrent operations
+sem = asyncio.Semaphore(10)  # max 10 concurrent requests
+async def rate_limited_fetch(url):
+    async with sem:  # blocks if 10 already in flight
+        return await fetch(session, url)
+
+# asyncio Queue — async producer-consumer
+queue = asyncio.Queue(maxsize=100)
+async def producer():
+    await queue.put(item)  # blocks if full
+
+async def consumer():
+    item = await queue.get()  # blocks if empty
+    queue.task_done()</code></pre>
+    </div>
+    <div class="warn-box"><strong>Common asyncio mistake:</strong> Calling blocking code inside async function blocks the entire event loop! Use <span class="inline-code">loop.run_in_executor()</span> to offload blocking calls to a thread pool.</div>
+  </div>
+</div>
+
+</div><!-- python-concurrency -->
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 6: RATE LIMITING
+═══════════════════════════════════════════════ -->
+<div id="rate-limiting" class="subsection">
+<div class="subsection-title">Rate Limiting</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Rate Limiting Algorithms — Deep Dive</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Algorithm</th><th>How It Works</th><th>Pros</th><th>Cons</th><th>Best For</th></tr>
+      <tr><td><strong>Fixed Window Counter</strong></td><td>Count requests per window (e.g. 100 req/min). Window resets at :00, :01...</td><td>Simple, O(1), low memory</td><td>Boundary burst: 100 req at :59 + 100 at :01 = 200 in 2 seconds</td><td>Simple APIs, rough limits</td></tr>
+      <tr><td><strong>Sliding Window Log</strong></td><td>Keep timestamp log; count entries within last N seconds</td><td>Precise — truly N req per N seconds</td><td>High memory: O(N) per user, N = max requests</td><td>Low-volume, high precision</td></tr>
+      <tr><td><strong>Sliding Window Counter</strong></td><td>Current window count + (prev window count × remaining fraction)</td><td>Memory efficient, ~accurate, no boundary burst</td><td>Approximation — slightly off at window edge</td><td>General purpose, high traffic</td></tr>
+      <tr><td><strong>Token Bucket</strong></td><td>Bucket holds max N tokens. Tokens added at rate R/sec. Request costs 1 token.</td><td>Allows controlled bursts (up to bucket size)</td><td>Burst can exceed per-second rate</td><td>APIs that need burst allowance (CDN, mobile)</td></tr>
+      <tr><td><strong>Leaky Bucket</strong></td><td>Requests queued; processed at fixed rate R/sec (queue leaks at constant rate)</td><td>Smooth, constant output rate</td><td>Queue can fill → requests dropped or delayed</td><td>Egress rate limiting, network QoS</td></tr>
+    </table>
+
+    <div class="grid-2">
+      <div class="concept-box">
+        <h4>Token Bucket — Visual</h4>
+        <div class="arch-box" style="margin:0;font-size:11px">Bucket capacity: 10 tokens
+Refill rate: 1 token/second
+
+t=0:  tokens=10, request arrives → consume 1 → tokens=9
+t=0:  5 more requests → tokens=4
+t=1:  refill → tokens=5, request → tokens=4
+t=0:  10 requests burst → consume all 10 → tokens=0
+next: requests REJECTED until refill</div>
+      </div>
+      <div class="concept-box">
+        <h4>Sliding Window Counter</h4>
+        <div class="arch-box" style="margin:0;font-size:11px">Window: 1 min, limit: 100 req
+At time :45 of current minute:
+  prev_window_count = 84
+  curr_window_count = 36
+  weight = (60-45)/60 = 0.25
+
+  estimate = 84×0.25 + 36 = 57
+  → allow (57 &lt; 100)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Redis Rate Limiting — Production Implementations</h3>
+    <div class="tag-row"><span class="badge badge-tag">Code</span><span class="badge badge-high">Important</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this)">Fixed Window (Redis)</button>
+      <button class="tab-btn" onclick="switchTab(this)">Sliding Window Log</button>
+      <button class="tab-btn" onclick="switchTab(this)">Token Bucket (Lua)</button>
+      <button class="tab-btn" onclick="switchTab(this)">Java Middleware</button>
+    </div>
+    <div class="tab-pane active">
+<pre><code class="language-python"># Fixed Window Counter with Redis
+import redis, time
+
+r = redis.Redis()
+
+def is_allowed_fixed_window(user_id: str, limit: int = 100, window_sec: int = 60) -> bool:
+    # Key includes current window timestamp to auto-expire
+    window_key = f"rl:fw:{user_id}:{int(time.time() // window_sec)}"
+    
+    # Atomic pipeline: INCR + EXPIRE
+    pipe = r.pipeline()
+    pipe.incr(window_key)
+    pipe.expire(window_key, window_sec)
+    results = pipe.execute()
+    
+    current_count = results[0]
+    return current_count &lt;= limit
+
+# Usage in API handler
+def api_handler(user_id: str):
+    if not is_allowed_fixed_window(user_id, limit=100):
+        raise RateLimitError("429 Too Many Requests")
+    # ... handle request</code></pre>
+    </div>
+    <div class="tab-pane">
+<pre><code class="language-python"># Sliding Window Log with Redis Sorted Set
+import redis, time
+
+r = redis.Redis()
+
+def is_allowed_sliding_log(user_id: str, limit: int = 100, window_sec: int = 60) -> bool:
+    key = f"rl:swl:{user_id}"
+    now = time.time()
+    window_start = now - window_sec
+    
+    pipe = r.pipeline()
+    # Remove old entries outside window
+    pipe.zremrangebyscore(key, '-inf', window_start)
+    # Count remaining entries in window
+    pipe.zcard(key)
+    # Add current request with timestamp as score
+    pipe.zadd(key, {str(now): now})
+    # Set key expiry (cleanup)
+    pipe.expire(key, window_sec + 1)
+    results = pipe.execute()
+    
+    count_after_prune = results[1]
+    return count_after_prune &lt; limit  # check BEFORE adding current request
+
+# NOTE: This is not fully atomic — use Lua script for strict correctness</code></pre>
+    </div>
+    <div class="tab-pane">
+<pre><code class="language-python"># Token Bucket via Redis Lua script — ATOMIC
+import redis
+
+r = redis.Redis()
+
+TOKEN_BUCKET_LUA = """
+local key = KEYS[1]
+local now = tonumber(ARGV[1])
+local capacity = tonumber(ARGV[2])
+local refill_rate = tonumber(ARGV[3])  -- tokens per second
+local tokens_requested = tonumber(ARGV[4])
+
+local data = redis.call('HMGET', key, 'tokens', 'last_refill')
+local tokens = tonumber(data[1]) or capacity
+local last_refill = tonumber(data[2]) or now
+
+-- Calculate how many tokens to add since last refill
+local elapsed = math.max(0, now - last_refill)
+local new_tokens = math.min(capacity, tokens + elapsed * refill_rate)
+
+-- Check if we have enough tokens
+if new_tokens >= tokens_requested then
+    new_tokens = new_tokens - tokens_requested
+    redis.call('HMSET', key, 'tokens', new_tokens, 'last_refill', now)
+    redis.call('EXPIRE', key, 3600)
+    return 1  -- allowed
+else
+    redis.call('HMSET', key, 'tokens', new_tokens, 'last_refill', now)
+    redis.call('EXPIRE', key, 3600)
+    return 0  -- denied
+end
+"""
+
+token_bucket_script = r.register_script(TOKEN_BUCKET_LUA)
+
+def is_allowed_token_bucket(user_id: str, capacity=10, refill_rate=1) -> bool:
+    key = f"rl:tb:{user_id}"
+    result = token_bucket_script(
+        keys=[key],
+        args=[time.time(), capacity, refill_rate, 1]
+    )
+    return result == 1</code></pre>
+    </div>
+    <div class="tab-pane">
+<pre><code class="language-java">// Rate Limiting Middleware in Java (Spring Boot Filter)
+@Component
+public class RateLimitFilter extends OncePerRequestFilter {
+    private final StringRedisTemplate redis;
+    private static final int LIMIT = 100;
+    private static final int WINDOW_SECONDS = 60;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest req,
+                                    HttpServletResponse res,
+                                    FilterChain chain) throws IOException, ServletException {
+        String userId = extractUserId(req); // from JWT or API key
+        String key = "rl:" + userId + ":" + (System.currentTimeMillis() / 1000 / WINDOW_SECONDS);
+        
+        Long count = redis.opsForValue().increment(key);
+        if (count == 1) {
+            redis.expire(key, WINDOW_SECONDS, TimeUnit.SECONDS);
+        }
+        
+        // Set rate limit headers (good practice)
+        res.setHeader("X-RateLimit-Limit", String.valueOf(LIMIT));
+        res.setHeader("X-RateLimit-Remaining", String.valueOf(Math.max(0, LIMIT - count)));
+        
+        if (count > LIMIT) {
+            res.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+            res.setHeader("Retry-After", String.valueOf(WINDOW_SECONDS));
+            res.getWriter().write("{\"error\": \"Rate limit exceeded\"}");
+            return;
+        }
+        
+        chain.doFilter(req, res);
+    }
+}</code></pre>
+    </div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Distributed Rate Limiting — Design &amp; Trade-offs</h3>
+    <div class="tag-row"><span class="badge badge-tag">System Design</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">Distributed Rate Limiting:
+
+Request → Load Balancer → API Server (any node)
+                               ↓
+                        Redis Cluster (shared state)
+                        - key: user_id:window
+                        - value: request count
+                        ↓
+                   All nodes see same counters
+                   → consistent rate enforcement
+
+Without shared state:
+  3 servers, limit=100
+  Each server: limit=100 → user can make 300 requests!
+  OR each server limit=33 → user may be blocked at 33 if on same server</div>
+    <table>
+      <tr><th>Approach</th><th>Consistency</th><th>Latency Added</th><th>Failure Mode</th></tr>
+      <tr><td>Centralized Redis</td><td>Strong</td><td>~1ms Redis RTT</td><td>Redis down = limit enforcement fails</td></tr>
+      <tr><td>Redis Cluster</td><td>Strong (with slot ownership)</td><td>~1ms</td><td>High availability</td></tr>
+      <tr><td>Local (per-node) + gossip sync</td><td>Eventual</td><td>None</td><td>Slight over-limit possible</td></tr>
+      <tr><td>Sticky sessions (LB routes same user to same node)</td><td>Strong per-user</td><td>None</td><td>Node down = user reset</td></tr>
+    </table>
+    <div class="warn-box"><strong>Trade-off:</strong> Strict distributed rate limiting adds ~1ms Redis latency to every request. For very high-throughput APIs, use local counters with periodic sync or token bucket approximation.</div>
+    <div class="callout callout-orange"><div class="callout-title">Rate Limit Headers (RFC 6585)</div>
+      <code>X-RateLimit-Limit: 100</code> — max requests<br>
+      <code>X-RateLimit-Remaining: 43</code> — remaining in window<br>
+      <code>X-RateLimit-Reset: 1716825600</code> — Unix timestamp when window resets<br>
+      <code>Retry-After: 30</code> — seconds until next allowed request (on 429)
+    </div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Rate Limiting in Real Systems — Design Interview Guide</h3>
+    <div class="tag-row"><span class="badge badge-high">Interview</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="steps">
+      <div class="step"><div><strong>Requirements:</strong> What kind? Per-user, per-IP, per-API-key, per-endpoint? Hard or soft limit? What on violation: drop, queue, degrade?</div></div>
+      <div class="step"><div><strong>Algorithm:</strong> Token bucket (burst-friendly) for user-facing APIs. Sliding window counter for strict enforcement. Leaky bucket for egress smoothing.</div></div>
+      <div class="step"><div><strong>Storage:</strong> Redis for distributed. In-memory for single-node. Lua scripts for atomicity (no race condition between read-check-write).</div></div>
+      <div class="step"><div><strong>Where to enforce:</strong> API Gateway (centralized, easiest) → Service mesh (sidecar) → Individual service (fine-grained). Multiple layers = defense in depth.</div></div>
+      <div class="step"><div><strong>Client handling:</strong> Return 429, Retry-After header. Client uses exponential backoff + jitter. Don't immediately retry = thundering herd.</div></div>
+      <div class="step"><div><strong>Monitoring:</strong> Track rate limit hits per user/endpoint. Alert on sudden spike = scraper/DDoS. Dashboard shows top offenders.</div></div>
+    </div>
+    <div class="concept-box"><h4>Multi-Tier Rate Limiting</h4><ul>
+      <li><strong>L1 — IP level:</strong> 1000 req/min per IP (CDN/WAF, stops DDoS)</li>
+      <li><strong>L2 — API key:</strong> 100 req/min per API key (stops abuse)</li>
+      <li><strong>L3 — User:</strong> 60 req/min per user account (fair use)</li>
+      <li><strong>L4 — Endpoint:</strong> /login: 5 req/min (prevent brute force)</li>
+    </ul></div>
+  </div>
+</div>
+
+</div><!-- rate-limiting -->
+
+</div><!-- content-area -->
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="main.js"></script>
+<script src="search-data.js"></script>
+<script src="search.js"></script>
+</body>
+</html>

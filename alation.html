@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alation Focus  | Interview Prep</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<style>
+.arch-box { background:var(--bg-secondary); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:monospace; font-size:12px; color:var(--text-secondary); line-height:1.8; margin:12px 0; white-space:pre; overflow-x:auto; }
+.hot-badge { display:inline-flex; align-items:center; gap:4px; background:rgba(248,81,73,.15); border:1px solid rgba(248,81,73,.4); color:var(--accent-red); padding:3px 10px; border-radius:12px; font-size:11px; font-weight:700; }
+.q-card { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; margin-bottom:12px; overflow:hidden; }
+.q-header { padding:12px 16px; cursor:pointer; display:flex; align-items:center; gap:10px; font-size:13.5px; font-weight:600; transition:background .15s; user-select:none; }
+.q-header:hover { background:var(--bg-hover); }
+.q-body { padding:0 16px; max-height:0; overflow:hidden; transition:max-height .3s ease, padding .2s; font-size:13px; color:var(--text-secondary); }
+.q-body.open { max-height:1200px; padding:14px 16px; }
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">IP</div>
+    <div><h2>Interview Prep</h2><p>Full Stack Reference</p></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Pages</div>
+    <a href="index.html" class="nav-link">Dashboard</a>
+    <a href="dsa.html" class="nav-link">DSA — Python</a>
+    <a href="oop-lld.html" class="nav-link">OOP &amp; LLD — Java</a>
+    <a href="system-design.html" class="nav-link">System Design</a>
+    <a href="kafka.html" class="nav-link">Kafka &amp; Messaging</a>
+    <a href="os-concurrency.html" class="nav-link">OS &amp; Concurrency</a>
+    <a href="docker-aws.html" class="nav-link">Docker &amp; AWS</a>
+    <a href="networking-security.html" class="nav-link">Networking &amp; Security</a>
+    <a href="databases.html" class="nav-link">Databases — SQL &amp; NoSQL</a>
+    <a href="alation.html" class="nav-link active">Alation Focus <span class="nav-badge">HOT</span></a>
+  </div>
+  <div class="sidebar-footer"><kbd>Cmd K</kbd> to search</div>
+</nav>
+
+<main class="main">
+<div class="topbar"><h1>Alation Focus</h1>
+  <button class="topbar-search-btn" onclick="window._spotlightOpen && window._spotlightOpen()">Search topics... <kbd>Cmd K</kbd></button></div>
+<div class="content-area">
+<div class="section-header">
+  <h1>Alation-Specific Preparation</h1>
+  <p>Company overview, most-asked problems, domain knowledge, and interview checklist.</p>
+</div>
+
+<!-- ═══ COMPANY OVERVIEW ═══ -->
+<div class="subsection">
+<div class="subsection-title">Alation — Company Overview</div>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header"><h3>What is Alation?</h3></div>
+    <div class="card-body">
+      <div class="concept-box">
+        <h4>Core Product: Data Catalog</h4>
+        <ul>
+          <li>Enterprise data catalog &amp; data intelligence platform</li>
+          <li>Helps organizations <strong>discover, understand, and govern</strong> their data</li>
+          <li>Like "Google for your company's data" — search all tables, columns, reports</li>
+          <li>Data lineage: track where data came from and how it transforms</li>
+          <li>Collaboration: data stewards annotate metadata, others consume it</li>
+          <li>Connects to: Snowflake, Redshift, BigQuery, Oracle, MySQL, S3, Tableau, etc.</li>
+        </ul>
+      </div>
+      <div class="callout callout-blue">
+        <div class="callout-title">Tech Stack (Known)</div>
+        Python (backend services), React (frontend), PostgreSQL, Elasticsearch, Kafka, Redis, Kubernetes, AWS
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>Domain Concepts to Know</h3></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Term</th><th>Meaning</th></tr>
+        <tr><td><strong>Metadata</strong></td><td>Data about data (schema, owner, tags, description, usage stats)</td></tr>
+        <tr><td><strong>Data Lineage</strong></td><td>Graph of data transformations: table A joins B → creates C</td></tr>
+        <tr><td><strong>Data Steward</strong></td><td>Person responsible for data quality/documentation</td></tr>
+        <tr><td><strong>Data Governance</strong></td><td>Policies about who can see/use what data</td></tr>
+        <tr><td><strong>Catalog Object</strong></td><td>Any indexed entity: table, column, query, report, user</td></tr>
+        <tr><td><strong>Endorsement</strong></td><td>User certifies a dataset as trustworthy</td></tr>
+        <tr><td><strong>Column-level Lineage</strong></td><td>Which source columns feed into each target column</td></tr>
+        <tr><td><strong>Data Quality</strong></td><td>Metrics: completeness, accuracy, freshness, uniqueness</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ MOST ASKED DSA ═══ -->
+<div class="subsection">
+<div class="subsection-title">Most Asked DSA at Alation</div>
+
+<div class="callout callout-red">
+  <div class="callout-title"> Prioritize These Topics</div>
+  Based on interview reports: <strong>Graph BFS/DFS</strong>, <strong>LRU Cache</strong>, <strong>Clone Graph</strong>, <strong>Trie operations</strong>, <strong>Sliding Window</strong>, <strong>Top-K with Heap</strong>, <strong>DP (Coin Change, LCS)</strong>
+</div>
+
+<div class="grid-2">
+<!-- Graph problems -->
+<div class="card">
+  <div class="card-header"><h3> Graph Problems <span class="hot-badge"> HOT</span></h3></div>
+  <div class="card-body">
+    <div class="concept-box"><h4>Why Graph for Alation?</h4><ul>
+      <li>Data lineage is a <strong>DAG</strong> (Directed Acyclic Graph)</li>
+      <li>Table relationships = graph nodes + edges</li>
+      <li>Impact analysis = DFS/BFS on lineage graph</li>
+    </ul></div>
+    <table>
+      <tr><th>Problem</th><th>Pattern</th></tr>
+      <tr><td>Clone Graph</td><td>BFS + HashMap</td></tr>
+      <tr><td>Course Schedule</td><td>Topological Sort (Cycle Detection)</td></tr>
+      <tr><td>Number of Islands</td><td>DFS/BFS + visited</td></tr>
+      <tr><td>Word Ladder</td><td>BFS Shortest Path</td></tr>
+      <tr><td>All Paths from Source to Target</td><td>DFS Backtracking</td></tr>
+      <tr><td>Find if Path Exists in Graph</td><td>BFS/Union-Find</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- Design problems -->
+<div class="card">
+  <div class="card-header"><h3> Design Problems <span class="hot-badge"> HOT</span></h3></div>
+  <div class="card-body">
+    <table>
+      <tr><th>Problem</th><th>Key Concept</th></tr>
+      <tr><td>LRU Cache</td><td>OrderedDict or DLL+HashMap</td></tr>
+      <tr><td>LFU Cache</td><td>Two HashMaps + min frequency tracker</td></tr>
+      <tr><td>Design Search Autocomplete</td><td>Trie with top-K</td></tr>
+      <tr><td>Implement Trie (Prefix Tree)</td><td>Node with children dict + is_end</td></tr>
+      <tr><td>Design Hit Counter</td><td>Sliding window / deque</td></tr>
+      <tr><td>Design File System</td><td>Trie / HashMap of paths</td></tr>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- LFU Cache (special) -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>LFU Cache — Hard Design Problem</h3>
+    <div class="tag-row"><span class="badge badge-hard">Hard</span><span class="badge badge-tag">Design</span><span class="badge badge-tag">Two HashMaps</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-python">from collections import defaultdict, OrderedDict
+
+class LFUCache:
+    def __init__(self, capacity):
+        self.cap = capacity
+        self.min_freq = 0
+        self.key_val = {}           # key -> value
+        self.key_freq = {}          # key -> freq
+        self.freq_keys = defaultdict(OrderedDict)  # freq -> OrderedDict of keys
+
+    def _update_freq(self, key):
+        freq = self.key_freq[key]
+        self.key_freq[key] = freq + 1
+        del self.freq_keys[freq][key]
+        if not self.freq_keys[freq] and freq == self.min_freq:
+            self.min_freq += 1
+        self.freq_keys[freq + 1][key] = None
+
+    def get(self, key):
+        if key not in self.key_val:
+            return -1
+        self._update_freq(key)
+        return self.key_val[key]
+
+    def put(self, key, value):
+        if self.cap &lt;= 0: return
+        if key in self.key_val:
+            self.key_val[key] = value
+            self._update_freq(key)
+        else:
+            if len(self.key_val) &gt;= self.cap:
+                # Evict least frequent (oldest if tie)
+                evict_key, _ = self.freq_keys[self.min_freq].popitem(last=False)
+                del self.key_val[evict_key]
+                del self.key_freq[evict_key]
+            self.key_val[key] = value
+            self.key_freq[key] = 1
+            self.freq_keys[1][key] = None
+            self.min_freq = 1</code></pre>
+  </div>
+</div>
+
+<!-- Trie -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Trie (Prefix Tree) — Implement &amp; Use</h3>
+    <div class="tag-row"><span class="badge badge-medium">Medium</span><span class="badge badge-tag">Trie</span><span class="badge badge-tag">Search</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-python">class TrieNode:
+    def __init__(self):
+        self.children = {}  # char -> TrieNode
+        self.is_end = False
+        self.count = 0  # number of strings ending here
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end = True
+        node.count += 1
+
+    def search(self, word):
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return node.is_end
+
+    def startsWith(self, prefix):
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return True
+
+    def autocomplete(self, prefix):
+        """Return all words with given prefix"""
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return []
+            node = node.children[char]
+        results = []
+        self._dfs(node, prefix, results)
+        return results
+
+    def _dfs(self, node, path, results):
+        if node.is_end:
+            results.append(path)
+        for char, child in node.children.items():
+            self._dfs(child, path + char, results)</code></pre>
+  </div>
+</div>
+
+</div><!-- end DSA -->
+
+<!-- ═══ LLD FOR ALATION ═══ -->
+<div class="subsection">
+<div class="subsection-title">LLD Problems — Alation Domain</div>
+
+<!-- Metadata Catalog LLD -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Design Metadata Catalog System (LLD)</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span><span class="badge badge-tag">Alation Core</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="callout callout-red"><div class="callout-title">If Asked "Design a Data Catalog LLD"</div>This is Alation's product. Knowing the domain deeply will impress the interviewer.</div>
+<pre><code class="language-java">// Core Entities
+enum ObjectType { DATABASE, SCHEMA, TABLE, COLUMN, QUERY, REPORT, DASHBOARD }
+
+class CatalogObject {
+    private long id;
+    private ObjectType type;
+    private String name;
+    private String description;
+    private String owner;
+    private List&lt;Tag&gt; tags;
+    private Map&lt;String, String&gt; customFields;
+    private LocalDateTime createdAt, updatedAt;
+    private User steward;
+}
+
+class Tag {
+    private long id;
+    private String name;
+    private String color;
+}
+
+// Table Metadata
+class TableMetadata extends CatalogObject {
+    private String databaseName;
+    private String schemaName;
+    private List&lt;ColumnMetadata&gt; columns;
+    private long rowCount;
+    private LocalDateTime lastModified;
+    private String location;  // e.g., S3 path for data lake
+    private EndorsementStatus endorsement;
+    private List&lt;String&gt; popularQueries;
+}
+
+class ColumnMetadata extends CatalogObject {
+    private String dataType;
+    private boolean nullable;
+    private boolean isPrimaryKey;
+    private boolean isForeignKey;
+    private String referencedTable;
+    private SensitivityLevel sensitivity;  // PII, sensitive, public
+}
+
+// Data Lineage Graph
+class LineageNode {
+    private CatalogObject object;
+    private List&lt;LineageEdge&gt; upstreamEdges;   // where data comes from
+    private List&lt;LineageEdge&gt; downstreamEdges; // where data goes to
+}
+
+class LineageEdge {
+    private LineageNode source;
+    private LineageNode target;
+    private String transformationSQL;
+    private String jobName;  // ETL job that created this edge
+    private LocalDateTime capturedAt;
+}
+
+// Catalog Service
+class CatalogService {
+    private Map&lt;Long, CatalogObject&gt; objectStore;
+    private SearchEngine searchEngine;  // wraps Elasticsearch
+    private LineageGraph lineageGraph;
+
+    // Search across all metadata
+    public List&lt;CatalogObject&gt; search(SearchQuery query) {
+        return searchEngine.search(query.getKeyword(), query.getFilters());
+    }
+
+    // Get upstream lineage (where does this table get data from?)
+    public List&lt;LineageNode&gt; getUpstreamLineage(long tableId, int depth) {
+        LineageNode node = lineageGraph.getNode(tableId);
+        return lineageGraph.bfsUpstream(node, depth);
+    }
+
+    // Impact analysis: if table X changes, what breaks?
+    public List&lt;CatalogObject&gt; getDownstreamImpact(long tableId) {
+        LineageNode node = lineageGraph.getNode(tableId);
+        return lineageGraph.dfsDownstream(node);
+    }
+
+    // Add custom description/tag
+    public void annotate(long objectId, String userId, Annotation annotation) {
+        CatalogObject obj = objectStore.get(objectId);
+        obj.addAnnotation(annotation);
+        searchEngine.reindex(obj);  // update search index
+        auditLog(userId, "ANNOTATE", objectId);
+    }
+}
+
+// Lineage Graph using BFS/DFS
+class LineageGraph {
+    private Map&lt;Long, LineageNode&gt; nodes;
+
+    public List&lt;CatalogObject&gt; bfsUpstream(LineageNode start, int maxDepth) {
+        List&lt;CatalogObject&gt; result = new ArrayList&lt;&gt;();
+        Queue&lt;LineageNode&gt; queue = new LinkedList&lt;&gt;();
+        Set&lt;Long&gt; visited = new HashSet&lt;&gt;();
+        queue.offer(start);
+        int depth = 0;
+        while (!queue.isEmpty() &amp;&amp; depth &lt; maxDepth) {
+            int size = queue.size();
+            for (int i = 0; i &lt; size; i++) {
+                LineageNode curr = queue.poll();
+                for (LineageEdge edge : curr.getUpstreamEdges()) {
+                    LineageNode upstream = edge.getSource();
+                    if (!visited.contains(upstream.getId())) {
+                        visited.add(upstream.getId());
+                        result.add(upstream.getObject());
+                        queue.offer(upstream);
+                    }
+                }
+            }
+            depth++;
+        }
+        return result;
+    }
+}</code></pre>
+  </div>
+</div>
+
+</div><!-- end LLD -->
+
+<!-- ═══ INTERVIEW Q&A ═══ -->
+<div class="subsection">
+<div class="subsection-title">Common Interview Questions &amp; Answers</div>
+
+<div class="q-card">
+  <div class="q-header" onclick="toggleQ(this)">
+    <span></span>
+    <span>Q: How would you design the search feature for a data catalog?</span>
+    <span class="toggle-icon" style="margin-left:auto">▶</span>
+  </div>
+  <div class="q-body">
+    <strong>Answer framework:</strong>
+    <div class="steps" style="margin-top:10px">
+      <div class="step"><div><strong>Clarify</strong>: What types of objects? Tables, columns, reports? Real-time or batch? How many objects?</div></div>
+      <div class="step"><div><strong>Search Engine</strong>: Elasticsearch with custom analyzer. Index: table name, description, column names, tags, owner, data types</div></div>
+      <div class="step"><div><strong>Ranking</strong>: Boost by: endorsement score, usage frequency, how recently updated, user's team</div></div>
+      <div class="step"><div><strong>Faceted Search</strong>: Filter by data source, owner, data type, tags, sensitivity level</div></div>
+      <div class="step"><div><strong>Autocomplete</strong>: Trie or Elasticsearch suggest API on table/column names</div></div>
+      <div class="step"><div><strong>Indexing</strong>: When metadata changes (Kafka event) → Elasticsearch consumer updates index</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="q-card">
+  <div class="q-header" onclick="toggleQ(this)">
+    <span></span>
+    <span>Q: Explain how data lineage can be represented and queried efficiently.</span>
+    <span class="toggle-icon" style="margin-left:auto">▶</span>
+  </div>
+  <div class="q-body">
+    <p><strong>Data lineage as a DAG (Directed Acyclic Graph):</strong></p>
+    <ul style="padding-left:18px;margin-top:8px">
+      <li>Nodes = catalog objects (tables, columns, ETL jobs, reports)</li>
+      <li>Edges = transformations/dependencies with metadata (SQL, job name, timestamp)</li>
+      <li>Direction: from source to destination</li>
+    </ul>
+    <p style="margin-top:8px"><strong>Storage:</strong></p>
+    <ul style="padding-left:18px">
+      <li>Graph DB (Neo4j) for complex traversal queries</li>
+      <li>Or: adjacency list in PostgreSQL for simpler setups</li>
+    </ul>
+    <p style="margin-top:8px"><strong>Queries:</strong></p>
+    <ul style="padding-left:18px">
+      <li><strong>Upstream lineage</strong>: BFS/DFS backwards from target node</li>
+      <li><strong>Downstream impact</strong>: BFS/DFS forwards from source node</li>
+      <li><strong>Column-level lineage</strong>: Track which source columns map to target columns</li>
+      <li>Neo4j Cypher: <code>MATCH (t:Table {id:123})-[:FEEDS_INTO*1..5]-&gt;(d) RETURN d</code></li>
+    </ul>
+  </div>
+</div>
+
+<div class="q-card">
+  <div class="q-header" onclick="toggleQ(this)">
+    <span></span>
+    <span>Q: How would you handle real-time metadata updates at scale?</span>
+    <span class="toggle-icon" style="margin-left:auto">▶</span>
+  </div>
+  <div class="q-body">
+    <div class="steps" style="margin-top:10px">
+      <div class="step"><div><strong>CDC (Change Data Capture)</strong>: Use Debezium to stream DB transaction logs → Kafka</div></div>
+      <div class="step"><div><strong>Event Sourcing</strong>: Every metadata change is an event (SchemaChanged, OwnerUpdated, TagAdded)</div></div>
+      <div class="step"><div><strong>Kafka Topics</strong>: Separate topics per entity type, partitioned by entity ID for ordering</div></div>
+      <div class="step"><div><strong>Consumer Groups</strong>: Search indexer, lineage updater, notification service each have their own group → process independently</div></div>
+      <div class="step"><div><strong>Consistency</strong>: Eventual consistency is acceptable — search index may be seconds behind</div></div>
+      <div class="step"><div><strong>Idempotency</strong>: Each consumer is idempotent — safe to replay events if processing fails</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="q-card">
+  <div class="q-header" onclick="toggleQ(this)">
+    <span></span>
+    <span>Q: Design a system to detect when a dataset has not been refreshed in 24 hours (data freshness alert).</span>
+    <span class="toggle-icon" style="margin-left:auto">▶</span>
+  </div>
+  <div class="q-body">
+    <p><strong>Approach:</strong></p>
+    <ul style="padding-left:18px;margin-top:8px">
+      <li>Store last_refreshed_at timestamp in catalog metadata DB</li>
+      <li>Scheduled job (cron every 30 min) queries: SELECT * FROM tables WHERE expected_refresh = 'daily' AND last_refreshed_at &lt; NOW() - INTERVAL '24 hours'</li>
+      <li>Stale datasets → publish to Kafka topic "freshness-alerts"</li>
+      <li>Notification worker consumes → sends email/Slack to data owner</li>
+      <li>Idempotency: track which alerts were sent (alert_sent_at column) to avoid duplicate alerts</li>
+      <li>Scale: with millions of tables, partition alerts by owner team for parallel processing</li>
+    </ul>
+  </div>
+</div>
+
+<div class="q-card">
+  <div class="q-header" onclick="toggleQ(this)">
+    <span></span>
+    <span>Q: What OOP design would you use for a metadata connector system (supporting MySQL, Snowflake, BigQuery)?</span>
+    <span class="toggle-icon" style="margin-left:auto">▶</span>
+  </div>
+  <div class="q-body">
+<pre><code class="language-java">// Abstract Connector (Template Method pattern)
+abstract class MetadataConnector {
+    // Template Method — defines the algorithm skeleton
+    public final List&lt;TableMetadata&gt; crawl() {
+        connect();
+        authenticate();
+        List&lt;TableMetadata&gt; metadata = fetchMetadata();
+        disconnect();
+        return metadata;
+    }
+
+    protected abstract void connect();
+    protected abstract void authenticate();
+    protected abstract List&lt;TableMetadata&gt; fetchMetadata();
+    protected abstract void disconnect();
+    public abstract String getConnectorType();
+}
+
+class SnowflakeConnector extends MetadataConnector {
+    private String account, username, password;
+    protected void connect()    { /* JDBC connection */ }
+    protected void authenticate() { /* OAuth or password auth */ }
+    protected List&lt;TableMetadata&gt; fetchMetadata() {
+        // Query INFORMATION_SCHEMA.TABLES
+        return List.of();
+    }
+    protected void disconnect() { /* close connection */ }
+    public String getConnectorType() { return "SNOWFLAKE"; }
+}
+
+class BigQueryConnector extends MetadataConnector {
+    protected void connect()    { /* Google Cloud client */ }
+    protected void authenticate() { /* Service account */ }
+    protected List&lt;TableMetadata&gt; fetchMetadata() {
+        // Use BigQuery API to list datasets/tables
+        return List.of();
+    }
+    protected void disconnect() { /* cleanup */ }
+    public String getConnectorType() { return "BIGQUERY"; }
+}
+
+// Factory to create connectors
+class ConnectorFactory {
+    public static MetadataConnector create(ConnectionConfig config) {
+        switch (config.getType()) {
+            case "SNOWFLAKE": return new SnowflakeConnector(config);
+            case "BIGQUERY":  return new BigQueryConnector(config);
+            case "MYSQL":     return new MySQLConnector(config);
+            default: throw new IllegalArgumentException("Unknown connector: " + config.getType());
+        }
+    }
+}</code></pre>
+  </div>
+</div>
+
+</div><!-- end Q&A -->
+
+<!-- ═══ INTERVIEW CHECKLIST ═══ -->
+<div class="subsection">
+<div class="subsection-title">Pre-Interview Checklist</div>
+<div class="grid-2">
+<div class="card">
+  <div class="card-header"><h3> Topics to Review</h3></div>
+  <div class="card-body">
+    <ul class="checklist">
+      <li><input type="checkbox"> Graph BFS/DFS (Clone Graph, Course Schedule)</li>
+      <li><input type="checkbox"> LRU Cache (OrderedDict &amp; DLL+HashMap)</li>
+      <li><input type="checkbox"> Trie implementation &amp; autocomplete</li>
+      <li><input type="checkbox"> Sliding Window (LSWRC, Min Window Substring)</li>
+      <li><input type="checkbox"> Dynamic Programming (Coin Change, LCS)</li>
+      <li><input type="checkbox"> Merge Intervals + sorting</li>
+      <li><input type="checkbox"> Top-K with Heap (nlargest, heapq)</li>
+      <li><input type="checkbox"> SOLID Principles (be able to explain with examples)</li>
+      <li><input type="checkbox"> Singleton, Factory, Observer, Strategy patterns</li>
+      <li><input type="checkbox"> Parking Lot LLD (full implementation)</li>
+      <li><input type="checkbox"> CAP Theorem + trade-offs</li>
+      <li><input type="checkbox"> Consistent Hashing</li>
+      <li><input type="checkbox"> Kafka architecture + consumer groups</li>
+      <li><input type="checkbox"> Data Catalog system design</li>
+      <li><input type="checkbox"> Alation product knowledge</li>
+    </ul>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header"><h3> Communication Tips</h3></div>
+  <div class="card-body">
+    <div class="timeline">
+      <div class="timeline-item"><h4>State assumptions out loud</h4><p>"I'm assuming the input array is not sorted and can contain duplicates. Is that correct?"</p></div>
+      <div class="timeline-item"><h4>Talk about trade-offs</h4><p>"We could use DFS (O(V+E) space) or BFS (better for shortest path). Given we need shortest path, BFS is better."</p></div>
+      <div class="timeline-item"><h4>Think about scale</h4><p>Even in LLD: "For a high-traffic system, I'd add a cache here and use async processing via Kafka."</p></div>
+      <div class="timeline-item"><h4>Name design patterns</h4><p>"This is a classic Factory pattern — lets us add new connectors without modifying existing code."</p></div>
+      <div class="timeline-item"><h4>Acknowledge imperfections</h4><p>"This O(n²) approach works for small input, but for n=10⁶ we'd need O(n log n) sorting approach."</p></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Must Remember Syntax -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Python Syntax I Always Forget</h3>
+    <div class="tag-row"><span class="badge badge-purple">Quick Reference</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-python"># ─── Collections ────────────────────────────────
+from collections import defaultdict, Counter, deque, OrderedDict
+import heapq, bisect
+
+# defaultdict: no KeyError on missing key
+dd = defaultdict(list)   # default = empty list
+dd = defaultdict(int)    # default = 0
+dd = defaultdict(set)    # default = empty set
+
+# Counter: frequency map
+c = Counter("hello")          # {'l':2,'h':1,'e':1,'o':1}
+c.most_common(2)              # [('l',2),('h',1)]
+c.update("world")             # add more counts
+c1 + c2                       # merge counters
+
+# deque: O(1) append/pop from both ends
+dq = deque([1,2,3])
+dq.appendleft(0)              # [0,1,2,3]
+dq.popleft()                  # O(1) pop from front
+
+# ─── Heap ────────────────────────────────────────
+heap = []
+heapq.heappush(heap, 5)
+heapq.heappop(heap)           # min element
+heapq.heappushpop(heap, x)    # push then pop (efficient)
+heapq.nlargest(3, arr)        # 3 largest elements
+heapq.nsmallest(3, arr)       # 3 smallest elements
+# MAX HEAP: negate values
+heapq.heappush(heap, -val); -heapq.heappop(heap)
+
+# Heap with tuples: sorted by first element
+heapq.heappush(heap, (distance, node_id, node))
+dist, nid, node = heapq.heappop(heap)
+
+# ─── Sorting ────────────────────────────────────
+arr.sort(key=lambda x: (x[1], x[0]))     # sort by [1], then [0]
+arr.sort(key=lambda x: -x[0])            # descending
+arr.sort(key=lambda x: x[0], reverse=True)
+
+# ─── Binary Search ──────────────────────────────
+import bisect
+bisect.bisect_left(arr, x)   # leftmost index where x can be inserted
+bisect.bisect_right(arr, x)  # rightmost index
+bisect.insort(arr, x)        # insert x keeping arr sorted
+
+# ─── String ────────────────────────────────────
+s.split()                    # split on whitespace
+s.split(',')                 # split on comma
+','.join(['a','b','c'])      # "a,b,c"
+s.strip(); s.lstrip(); s.rstrip()
+s.startswith('abc'); s.endswith('xyz')
+s.replace('old','new')
+s[::-1]                      # reverse string
+ord('a') = 97; chr(97) = 'a'
+
+# ─── Dict / Set ─────────────────────────────────
+d = {}
+d.get(key, default)          # safe get
+d.setdefault(key, []).append(v)
+{k:v for k,v in d.items() if v &gt; 0}   # dict comprehension
+s = set(); s.add(x); s.discard(x)
+s1 &amp; s2  # intersection
+s1 | s2  # union
+s1 - s2  # difference
+
+# ─── List / Matrix ──────────────────────────────
+matrix = [[0]*cols for _ in range(rows)]  # 2D array
+flat = [x for row in matrix for x in row]  # flatten
+zip(*matrix)                               # transpose
+
+# ─── Enumerate / Zip ────────────────────────────
+for i, val in enumerate(arr):            # (index, value)
+for a, b in zip(arr1, arr2):            # parallel iteration
+
+# ─── Graph Template ─────────────────────────────
+from collections import defaultdict, deque
+
+def bfs(graph, start):
+    visited = {start}
+    queue = deque([start])
+    while queue:
+        node = queue.popleft()
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+
+def dfs(graph, node, visited=None):
+    if visited is None: visited = set()
+    visited.add(node)
+    for neighbor in graph[node]:
+        if neighbor not in visited:
+            dfs(graph, neighbor, visited)</code></pre>
+  </div>
+</div>
+
+<!-- Java quick ref -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Java Syntax I Always Forget</h3>
+    <div class="tag-row"><span class="badge badge-purple">Quick Reference</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-java">// ─── Collections ──────────────────────────────────
+import java.util.*;
+import java.util.stream.*;
+
+List&lt;Integer&gt; list = new ArrayList&lt;&gt;();
+list.add(5); list.get(0); list.size();
+Collections.sort(list);
+Collections.sort(list, (a, b) -&gt; b - a);  // descending
+list.sort(Comparator.comparingInt(x -&gt; x[0]));
+
+Map&lt;String, Integer&gt; map = new HashMap&lt;&gt;();
+map.put("key", 1);
+map.get("key");              // null if not found
+map.getOrDefault("key", 0); // safe get
+map.putIfAbsent("key", 0);
+map.containsKey("key");
+for (Map.Entry&lt;String, Integer&gt; e : map.entrySet())
+    System.out.println(e.getKey() + " = " + e.getValue());
+
+Set&lt;String&gt; set = new HashSet&lt;&gt;();
+set.add("x"); set.contains("x"); set.remove("x");
+
+// ─── PriorityQueue (Min Heap) ──────────────────
+PriorityQueue&lt;Integer&gt; minHeap = new PriorityQueue&lt;&gt;();
+PriorityQueue&lt;Integer&gt; maxHeap = new PriorityQueue&lt;&gt;(Collections.reverseOrder());
+PriorityQueue&lt;int[]&gt; pq = new PriorityQueue&lt;&gt;((a, b) -&gt; a[0] - b[0]);  // sort by [0]
+pq.offer(arr); pq.poll(); pq.peek();
+
+// ─── Queue / Stack ────────────────────────────
+Queue&lt;Integer&gt; queue = new LinkedList&lt;&gt;();
+queue.offer(1); queue.poll(); queue.peek();
+
+Deque&lt;Integer&gt; deque = new ArrayDeque&lt;&gt;();
+deque.addFirst(x); deque.addLast(x);
+deque.removeFirst(); deque.removeLast();
+deque.peekFirst(); deque.peekLast();
+
+Stack&lt;Integer&gt; stack = new Stack&lt;&gt;();  // or use Deque
+stack.push(1); stack.pop(); stack.peek();
+
+// ─── Arrays ───────────────────────────────────
+int[] arr = new int[n];
+Arrays.fill(arr, 0);
+Arrays.sort(arr);
+Arrays.sort(arr, (a,b) -&gt; a[1] - b[1]);    // for Object arrays
+int[] copy = Arrays.copyOf(arr, arr.length);
+int[][] matrix = new int[rows][cols];
+
+// ─── String ────────────────────────────────────
+String s = "hello";
+s.charAt(0); s.length(); s.substring(1,3);
+s.contains("el"); s.startsWith("he"); s.endsWith("lo");
+s.toLowerCase(); s.toUpperCase();
+String.valueOf(123);        // int to String
+Integer.parseInt("123");    // String to int
+char[] chars = s.toCharArray();
+String joined = String.join(",", "a","b","c");
+
+StringBuilder sb = new StringBuilder();
+sb.append("hello"); sb.toString();
+
+// ─── Streams ────────────────────────────────────
+List&lt;Integer&gt; result = list.stream()
+    .filter(x -&gt; x &gt; 0)
+    .map(x -&gt; x * 2)
+    .sorted()
+    .collect(Collectors.toList());
+
+long count = list.stream().filter(x -&gt; x &gt; 0).count();
+Optional&lt;Integer&gt; max = list.stream().max(Integer::compareTo);
+int sum = list.stream().mapToInt(Integer::intValue).sum();
+
+// ─── Graph BFS Template ────────────────────────
+public List&lt;Integer&gt; bfs(Map&lt;Integer, List&lt;Integer&gt;&gt; graph, int start) {
+    List&lt;Integer&gt; result = new ArrayList&lt;&gt;();
+    Set&lt;Integer&gt; visited = new HashSet&lt;&gt;();
+    Queue&lt;Integer&gt; queue = new LinkedList&lt;&gt;();
+    queue.offer(start); visited.add(start);
+    while (!queue.isEmpty()) {
+        int node = queue.poll();
+        result.add(node);
+        for (int neighbor : graph.getOrDefault(node, new ArrayList&lt;&gt;())) {
+            if (!visited.contains(neighbor)) {
+                visited.add(neighbor);
+                queue.offer(neighbor);
+            }
+        }
+    }
+    return result;
+}</code></pre>
+  </div>
+</div>
+
+</div><!-- end checklist -->
+
+</div><!-- content-area -->
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+<script src="main.js"></script>
+<script src="search-data.js"></script>
+<script src="search.js"></script>
+</body>
+</html>

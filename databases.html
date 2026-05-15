@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Databases — SQL &amp; NoSQL | Interview Prep</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">IP</div>
+    <div><h2>Interview Prep</h2><p>Full Stack Reference</p></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Pages</div>
+    <a href="index.html" class="nav-link">Dashboard</a>
+    <a href="dsa.html" class="nav-link">DSA — Python</a>
+    <a href="oop-lld.html" class="nav-link">OOP &amp; LLD — Java</a>
+    <a href="system-design.html" class="nav-link">System Design</a>
+    <a href="kafka.html" class="nav-link">Kafka &amp; Messaging</a>
+    <a href="os-concurrency.html" class="nav-link">OS &amp; Concurrency</a>
+    <a href="docker-aws.html" class="nav-link">Docker &amp; AWS</a>
+    <a href="networking-security.html" class="nav-link">Networking &amp; Security</a>
+    <a href="databases.html" class="nav-link active">Databases — SQL &amp; NoSQL</a>
+    <a href="alation.html" class="nav-link">Alation Focus <span class="nav-badge">HOT</span></a>
+    <div class="nav-section-label">Sections</div>
+    <a href="#indexes" class="nav-link" style="font-size:12px;padding:5px 16px">Indexes</a>
+    <a href="#window" class="nav-link" style="font-size:12px;padding:5px 16px">Window Functions</a>
+    <a href="#joins" class="nav-link" style="font-size:12px;padding:5px 16px">JOINs</a>
+    <a href="#acid" class="nav-link" style="font-size:12px;padding:5px 16px">ACID &amp; Isolation</a>
+    <a href="#normalization" class="nav-link" style="font-size:12px;padding:5px 16px">Normalization</a>
+    <a href="#cte" class="nav-link" style="font-size:12px;padding:5px 16px">CTEs &amp; Recursive</a>
+    <a href="#nosql" class="nav-link" style="font-size:12px;padding:5px 16px">NoSQL &amp; CAP</a>
+    <a href="#mongodb" class="nav-link" style="font-size:12px;padding:5px 16px">MongoDB</a>
+    <a href="#cassandra" class="nav-link" style="font-size:12px;padding:5px 16px">Cassandra</a>
+    <a href="#redis" class="nav-link" style="font-size:12px;padding:5px 16px">Redis</a>
+  </div>
+  <div class="sidebar-footer"><kbd>Cmd K</kbd> to search</div>
+</nav>
+
+<main class="main">
+<div class="topbar">
+  <h1>Databases — SQL &amp; NoSQL</h1>
+  <button class="topbar-search-btn" onclick="window._spotlightOpen && window._spotlightOpen()">
+    Search topics... <kbd>Cmd K</kbd>
+  </button>
+</div>
+<div class="content-area">
+
+<div class="section-header">
+  <h1>SQL, NoSQL, and Distributed Databases</h1>
+  <p>Indexes, query optimization, ACID guarantees, isolation levels, normalization, window functions, CAP theorem, and deep dives into MongoDB, Cassandra, and Redis.</p>
+</div>
+
+<div class="section-jump">
+  <a href="#indexes" class="jump-btn">Indexes &amp; EXPLAIN</a>
+  <a href="#window" class="jump-btn">Window Functions</a>
+  <a href="#joins" class="jump-btn">JOINs</a>
+  <a href="#acid" class="jump-btn">ACID &amp; Isolation</a>
+  <a href="#normalization" class="jump-btn">Normalization</a>
+  <a href="#cte" class="jump-btn">CTEs</a>
+  <a href="#nosql" class="jump-btn">CAP Theorem</a>
+  <a href="#mongodb" class="jump-btn">MongoDB</a>
+  <a href="#cassandra" class="jump-btn">Cassandra</a>
+  <a href="#redis" class="jump-btn">Redis</a>
+</div>
+
+<!-- ═══════ INDEXES ═══════ -->
+<div id="indexes" class="subsection">
+<div class="subsection-title">SQL Indexes &amp; Query Optimization</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Index Types — B-tree, Hash, Composite, Covering, Partial</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span><span class="badge badge-tag">SQL</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Type</th><th>Structure</th><th>Best For</th><th>Not For</th></tr>
+      <tr><td>B-tree (default)</td><td>Balanced tree; sorted</td><td>Range queries, ORDER BY, equality</td><td>Low-cardinality columns (sex, bool)</td></tr>
+      <tr><td>Hash</td><td>Hash table</td><td>Equality only (=)</td><td>Range queries, ORDER BY</td></tr>
+      <tr><td>Composite</td><td>B-tree on multiple columns</td><td>Multi-column WHERE clauses</td><td>Queries that skip the leading column</td></tr>
+      <tr><td>Covering</td><td>Index includes all needed columns</td><td>Avoid table lookups (index-only scan)</td><td>Write-heavy tables</td></tr>
+      <tr><td>Partial</td><td>Index on subset of rows (WHERE clause)</td><td>Index active records only</td><td>Full-table queries</td></tr>
+      <tr><td>Full-text</td><td>Inverted index on text tokens</td><td>LIKE '%word%', text search</td><td>Exact matches (use B-tree)</td></tr>
+    </table>
+<pre><code class="language-sql">-- B-tree index (default in PostgreSQL/MySQL)
+CREATE INDEX idx_orders_user_date ON orders (user_id, created_at DESC);
+
+-- Covering index: includes all columns query needs
+CREATE INDEX idx_users_email_cover ON users (email)
+  INCLUDE (name, status);    -- PostgreSQL syntax; avoids heap fetch
+
+-- Partial index: only active users (sparse, smaller)
+CREATE INDEX idx_active_users ON users (email) WHERE status = 'active';
+
+-- Expression index
+CREATE INDEX idx_lower_email ON users (LOWER(email));
+-- Enables: WHERE LOWER(email) = 'alice@example.com'
+
+-- EXPLAIN ANALYZE to see index usage
+EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT)
+SELECT * FROM orders WHERE user_id = 42 AND created_at > NOW() - INTERVAL '30 days';
+
+-- Look for: Index Scan vs Seq Scan, cost estimates, actual rows</code></pre>
+    <div class="arch-box">B-tree Index Structure:
+Root node: [100 | 250 | 500]
+Left: [20, 45, 80]    Mid: [110, 180, 220]    Right: [300, 400, 460]
+
+Range scan WHERE id BETWEEN 45 AND 180:
+→ Navigate to leaf 45, scan right until > 180
+→ O(log n) to find start + O(k) to scan range
+
+Composite Index (user_id, created_at):
+WHERE user_id = 42                    -- uses index
+WHERE user_id = 42 AND created_at > X -- uses index
+WHERE created_at > X                  -- CANNOT use index (skips leading col)
+  → always put highest-cardinality, most-filtered col first</div>
+    <div class="callout callout-orange"><div class="callout-title">N+1 Query Problem</div>
+      Fetching 100 users then SELECT posts WHERE user_id = ? for each = 101 queries.<br>
+      Fix: JOIN (single query) or batch load: SELECT * FROM posts WHERE user_id IN (1,2,...100)<br>
+      ORMs: SQLAlchemy selectinload(), Django select_related(), Hibernate @BatchSize
+    </div>
+  </div>
+</div>
+
+</div><!-- indexes -->
+
+<!-- ═══════ WINDOW FUNCTIONS ═══════ -->
+<div id="window" class="subsection">
+<div class="subsection-title">Window Functions</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>ROW_NUMBER, RANK, LEAD, LAG, SUM OVER PARTITION</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span><span class="badge badge-tag">SQL</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="callout callout-blue"><div class="callout-title">Window Functions vs GROUP BY</div>GROUP BY collapses rows into groups (aggregates). Window functions compute values across related rows while KEEPING each row in the result set.</div>
+<pre><code class="language-sql">-- Sample: employees(id, name, dept, salary, hire_date)
+
+-- ── Ranking functions ─────────────────────────────────────
+SELECT
+  name, dept, salary,
+  ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC) AS row_num,
+  -- No gaps, no ties: 1,2,3,4
+  RANK()       OVER (PARTITION BY dept ORDER BY salary DESC) AS rank,
+  -- Gaps for ties: 1,2,2,4
+  DENSE_RANK() OVER (PARTITION BY dept ORDER BY salary DESC) AS dense_rank,
+  -- No gaps: 1,2,2,3
+  NTILE(4)     OVER (ORDER BY salary) AS quartile
+  -- Divides into n equal buckets
+FROM employees;
+
+-- ── Lead / Lag — access adjacent rows ────────────────────
+SELECT
+  name, hire_date, salary,
+  LAG(salary,  1, 0) OVER (PARTITION BY dept ORDER BY hire_date) AS prev_salary,
+  LEAD(salary, 1, 0) OVER (PARTITION BY dept ORDER BY hire_date) AS next_salary,
+  salary - LAG(salary, 1) OVER (ORDER BY hire_date) AS salary_change
+FROM employees;
+
+-- ── Running totals and moving averages ────────────────────
+SELECT
+  name, dept, salary, hire_date,
+  SUM(salary)  OVER (PARTITION BY dept ORDER BY hire_date
+                     ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total,
+  AVG(salary)  OVER (PARTITION BY dept ORDER BY hire_date
+                     ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg_3,
+  COUNT(*)     OVER (PARTITION BY dept) AS dept_headcount,
+  MAX(salary)  OVER (PARTITION BY dept) AS dept_max_salary,
+  salary / SUM(salary) OVER (PARTITION BY dept) * 100 AS pct_of_dept_payroll
+FROM employees;
+
+-- ── Top-N per group (classic interview problem) ───────────
+SELECT * FROM (
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC) AS rn
+  FROM employees
+) ranked
+WHERE rn <= 3;   -- top 3 earners per department
+
+-- ── First/Last value ──────────────────────────────────────
+SELECT
+  name, dept, salary,
+  FIRST_VALUE(name) OVER (PARTITION BY dept ORDER BY salary DESC) AS top_earner,
+  LAST_VALUE(salary) OVER (
+    PARTITION BY dept ORDER BY salary DESC
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+  ) AS lowest_in_dept
+FROM employees;</code></pre>
+  </div>
+</div>
+
+</div><!-- window -->
+
+<!-- ═══════ JOINS ═══════ -->
+<div id="joins" class="subsection">
+<div class="subsection-title">SQL JOINs</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>JOIN Types — INNER, LEFT, RIGHT, FULL OUTER, CROSS, SELF</h3>
+    <div class="tag-row"><span class="badge badge-tag">SQL</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">Tables: Users(id, name)  Orders(id, user_id, amount)
+
+INNER JOIN  — only rows with matches in BOTH tables
+  Users: [1:Alice, 2:Bob, 3:Carol]
+  Orders: [u1:$50, u1:$30, u2:$20]
+  Result: Alice→$50, Alice→$30, Bob→$20  (Carol excluded — no orders)
+
+LEFT JOIN   — all left rows + matched right rows (NULL if no match)
+  Result: Alice→$50, Alice→$30, Bob→$20, Carol→NULL
+
+RIGHT JOIN  — all right rows + matched left rows
+  (Rarely used; swap table order and use LEFT JOIN instead)
+
+FULL OUTER JOIN — all rows from both, NULL on unmatched side
+  (Not supported in MySQL — use UNION of LEFT + RIGHT)
+
+CROSS JOIN  — cartesian product (m×n rows)
+  Use for generating combinations; no ON clause needed
+
+SELF JOIN   — join table with itself
+  SELECT e.name, m.name AS manager
+  FROM employees e JOIN employees m ON e.manager_id = m.id</div>
+<pre><code class="language-sql">-- Find users with no orders (LEFT JOIN + IS NULL pattern)
+SELECT u.id, u.name
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+WHERE o.id IS NULL;
+-- Alternative: NOT EXISTS (often faster with proper index)
+SELECT id, name FROM users u
+WHERE NOT EXISTS (SELECT 1 FROM orders WHERE user_id = u.id);
+
+-- Self join: employee + manager
+SELECT e.name AS employee, m.name AS manager
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.id;  -- LEFT to include top-level (CEO)
+
+-- Multiple joins
+SELECT o.id, u.name, p.name AS product, o.quantity
+FROM orders o
+JOIN users    u ON o.user_id    = u.id
+JOIN products p ON o.product_id = p.id
+WHERE o.created_at >= CURRENT_DATE - INTERVAL '7 days';</code></pre>
+  </div>
+</div>
+
+</div><!-- joins -->
+
+<!-- ═══════ ACID ═══════ -->
+<div id="acid" class="subsection">
+<div class="subsection-title">ACID &amp; Transaction Isolation Levels</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>ACID Properties &amp; Transaction Isolation</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span><span class="badge badge-tag">Transactions</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>ACID</h4><ul>
+      <li><strong>Atomicity:</strong> Transaction is all-or-nothing. If any statement fails, the entire transaction rolls back. (WAL / undo logs)</li>
+      <li><strong>Consistency:</strong> Database moves from one valid state to another. Constraints, triggers, cascades are enforced.</li>
+      <li><strong>Isolation:</strong> Concurrent transactions don't see each other's uncommitted changes (configurable level).</li>
+      <li><strong>Durability:</strong> Committed transactions survive crashes. (Write-Ahead Log / fsync to disk)</li>
+    </ul></div>
+    <table>
+      <tr><th>Isolation Level</th><th>Dirty Read</th><th>Non-Repeatable Read</th><th>Phantom Read</th><th>Performance</th></tr>
+      <tr><td>READ UNCOMMITTED</td><td>Possible</td><td>Possible</td><td>Possible</td><td>Fastest</td></tr>
+      <tr><td>READ COMMITTED (default PG)</td><td>Prevented</td><td>Possible</td><td>Possible</td><td>Good</td></tr>
+      <tr><td>REPEATABLE READ (default MySQL)</td><td>Prevented</td><td>Prevented</td><td>Possible</td><td>Moderate</td></tr>
+      <tr><td>SERIALIZABLE</td><td>Prevented</td><td>Prevented</td><td>Prevented</td><td>Slowest</td></tr>
+    </table>
+    <div class="arch-box">Anomalies explained:
+
+Dirty Read: T2 reads T1's uncommitted change, T1 rolls back → T2 used invalid data
+
+Non-Repeatable Read:
+  T1: SELECT salary FROM emp WHERE id=1  → $5000
+  T2: UPDATE emp SET salary=6000 WHERE id=1; COMMIT
+  T1: SELECT salary FROM emp WHERE id=1  → $6000 (changed!)
+
+Phantom Read:
+  T1: SELECT COUNT(*) FROM orders WHERE total > 100  → 5
+  T2: INSERT INTO orders VALUES (200); COMMIT
+  T1: SELECT COUNT(*) FROM orders WHERE total > 100  → 6 (new row appeared!)</div>
+<pre><code class="language-sql">-- Set isolation level
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+  -- critical financial operation
+  UPDATE accounts SET balance = balance - 500 WHERE id = 1;
+  UPDATE accounts SET balance = balance + 500 WHERE id = 2;
+COMMIT;
+
+-- Optimistic locking (avoid long-held locks)
+BEGIN;
+  SELECT version FROM inventory WHERE product_id = 42;  -- version=5
+  -- ... do business logic ...
+  UPDATE inventory SET qty = qty - 1, version = version + 1
+  WHERE product_id = 42 AND version = 5;  -- fails if version changed
+  -- check affected rows; if 0, retry
+COMMIT;</code></pre>
+  </div>
+</div>
+
+</div><!-- acid -->
+
+<!-- ═══════ NORMALIZATION ═══════ -->
+<div id="normalization" class="subsection">
+<div class="subsection-title">Normalization — 1NF through BCNF</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Normal Forms — 1NF, 2NF, 3NF, BCNF</h3>
+    <div class="tag-row"><span class="badge badge-tag">SQL</span><span class="badge badge-tag">Schema Design</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Form</th><th>Rule</th><th>Violation Example</th></tr>
+      <tr><td>1NF</td><td>Atomic values; no repeating groups; primary key exists</td><td>phone = "555-1234, 555-5678" (multi-value)</td></tr>
+      <tr><td>2NF</td><td>1NF + no partial dependencies on composite PK</td><td>Order(order_id, product_id, product_name) — product_name depends only on product_id</td></tr>
+      <tr><td>3NF</td><td>2NF + no transitive dependencies (non-key → non-key)</td><td>Employee(emp_id, dept_id, dept_name) — dept_name depends on dept_id, not emp_id</td></tr>
+      <tr><td>BCNF</td><td>Every determinant is a candidate key</td><td>Rare — stricter than 3NF; split when 3NF allows anomalies</td></tr>
+    </table>
+    <div class="arch-box">De-normalization trade-offs:
+  Normalized (3NF):  JOIN orders o → products p → categories c
+    Pros: no data redundancy, easier updates
+    Cons: complex queries, JOIN overhead
+
+  De-normalized (for read performance):
+    Add category_name, product_name to orders table directly
+    Pros: single-table reads, no JOINs
+    Cons: update anomalies (must update all order rows if category renames)
+
+  Decision: Normalize first; denormalize only when profiling shows JOIN bottleneck.
+  OLTP: normalize (frequent writes). OLAP/DWH: denormalize (star/snowflake schema).</div>
+  </div>
+</div>
+
+</div><!-- normalization -->
+
+<!-- ═══════ CTEs ═══════ -->
+<div id="cte" class="subsection">
+<div class="subsection-title">CTEs &amp; Recursive CTEs</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>CTEs — Common Table Expressions &amp; Recursive Queries</h3>
+    <div class="tag-row"><span class="badge badge-tag">SQL</span><span class="badge badge-tag">Advanced</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-sql">-- ── Basic CTE ─────────────────────────────────────────────
+WITH dept_avg AS (
+  SELECT dept_id, AVG(salary) AS avg_salary
+  FROM employees
+  GROUP BY dept_id
+),
+high_earners AS (
+  SELECT e.*, d.avg_salary,
+         e.salary - d.avg_salary AS above_avg
+  FROM employees e
+  JOIN dept_avg d ON e.dept_id = d.dept_id
+  WHERE e.salary > d.avg_salary
+)
+SELECT name, dept_id, salary, above_avg
+FROM high_earners
+ORDER BY above_avg DESC;
+
+-- ── Recursive CTE — org chart (manager hierarchy) ─────────
+WITH RECURSIVE org_tree AS (
+  -- Base case: top-level managers (no manager)
+  SELECT id, name, manager_id, 1 AS level, CAST(name AS VARCHAR(1000)) AS path
+  FROM employees
+  WHERE manager_id IS NULL
+
+  UNION ALL
+
+  -- Recursive case: employees with a manager
+  SELECT e.id, e.name, e.manager_id, ot.level + 1,
+         CAST(ot.path || ' > ' || e.name AS VARCHAR(1000))
+  FROM employees e
+  JOIN org_tree ot ON e.manager_id = ot.id
+)
+SELECT id, name, level, path
+FROM org_tree
+ORDER BY path;
+
+-- ── Recursive CTE — find all paths in a graph ──────────────
+WITH RECURSIVE paths AS (
+  SELECT from_node, to_node, ARRAY[from_node, to_node] AS path
+  FROM edges
+  WHERE from_node = 1    -- start node
+
+  UNION ALL
+
+  SELECT p.from_node, e.to_node, p.path || e.to_node
+  FROM paths p
+  JOIN edges e ON p.to_node = e.from_node
+  WHERE NOT (e.to_node = ANY(p.path))   -- avoid cycles
+)
+SELECT * FROM paths WHERE to_node = 10;  -- find all paths to node 10</code></pre>
+    <div class="callout callout-blue"><div class="callout-title">CTE vs Subquery vs View</div>CTE: Named, reusable within one query. Improves readability. PostgreSQL materializes CTEs (fence optimization). MySQL 8+ supports recursive CTEs.<br>Subquery: Inline, not reusable. Can be correlated (references outer query).<br>View: Persistent named query. Can be indexed (materialized view).</div>
+  </div>
+</div>
+
+</div><!-- cte -->
+
+<!-- ═══════ NOSQL / CAP ═══════ -->
+<div id="nosql" class="subsection">
+<div class="subsection-title">NoSQL &amp; CAP Theorem</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>CAP Theorem &amp; NoSQL Database Categories</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span><span class="badge badge-tag">Distributed</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>CAP Theorem</h4>
+      <p>A distributed system can only guarantee <strong>two</strong> of three properties simultaneously:</p>
+      <ul>
+        <li><strong>Consistency (C):</strong> Every read receives the most recent write (or an error).</li>
+        <li><strong>Availability (A):</strong> Every request receives a response (not necessarily latest data).</li>
+        <li><strong>Partition Tolerance (P):</strong> System continues operating despite network partition.</li>
+      </ul>
+      <p>In reality, network partitions happen, so you choose <strong>CP</strong> or <strong>AP</strong>.</p>
+      <p><strong>BASE</strong> (NoSQL alternative to ACID): Basically Available, Soft state, Eventually consistent.</p>
+    </div>
+    <table>
+      <tr><th>Database</th><th>Type</th><th>CAP</th><th>Best For</th></tr>
+      <tr><td>PostgreSQL, MySQL</td><td>Relational (RDBMS)</td><td>CP</td><td>Transactions, reporting, joins</td></tr>
+      <tr><td>MongoDB</td><td>Document</td><td>CP (configurable)</td><td>Flexible schemas, hierarchical data</td></tr>
+      <tr><td>Cassandra</td><td>Wide-column</td><td>AP</td><td>High-write, time-series, sensor data</td></tr>
+      <tr><td>Redis</td><td>In-memory KV</td><td>CP (cluster mode)</td><td>Caching, sessions, rate limiting</td></tr>
+      <tr><td>DynamoDB</td><td>KV/Document</td><td>AP (eventual) / CP (strong)</td><td>AWS-native, serverless scale</td></tr>
+      <tr><td>Neo4j</td><td>Graph</td><td>CA (single-node)</td><td>Relationship queries (fraud, social)</td></tr>
+      <tr><td>Elasticsearch</td><td>Search/Document</td><td>AP</td><td>Full-text search, log analytics</td></tr>
+      <tr><td>InfluxDB</td><td>Time-series</td><td>CP</td><td>Metrics, monitoring, IoT</td></tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- nosql -->
+
+<!-- ═══════ MONGODB ═══════ -->
+<div id="mongodb" class="subsection">
+<div class="subsection-title">MongoDB</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>MongoDB — Document Model &amp; Aggregation Pipeline</h3>
+    <div class="tag-row"><span class="badge badge-tag">MongoDB</span><span class="badge badge-tag">NoSQL</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-python">from pymongo import MongoClient, ASCENDING, DESCENDING
+from datetime import datetime, timedelta
+
+client = MongoClient("mongodb://localhost:27017")
+db     = client["ecommerce"]
+orders = db["orders"]
+
+# ── CRUD ─────────────────────────────────────────────────
+# Insert
+doc_id = orders.insert_one({
+    "user_id": "u123",
+    "items": [
+        {"product": "Laptop", "qty": 1, "price": 999.99},
+        {"product": "Mouse",  "qty": 2, "price": 29.99},
+    ],
+    "status": "pending",
+    "created_at": datetime.utcnow(),
+    "total": 1059.97
+}).inserted_id
+
+# Query
+recent = list(orders.find(
+    {"status": "shipped", "created_at": {"$gte": datetime.utcnow() - timedelta(days=7)}},
+    {"user_id": 1, "total": 1, "_id": 0}  # projection
+).sort("created_at", DESCENDING).limit(20))
+
+# Update — atomic operators
+orders.update_one(
+    {"_id": doc_id},
+    {
+        "$set":  {"status": "shipped"},
+        "$push": {"tracking": {"event": "dispatched", "ts": datetime.utcnow()}},
+        "$inc":  {"update_count": 1}
+    }
+)
+
+# ── Aggregation Pipeline ──────────────────────────────────
+pipeline = [
+    # Stage 1: Filter
+    {"$match": {
+        "created_at": {"$gte": datetime(2024, 1, 1)},
+        "status": {"$in": ["shipped", "delivered"]}
+    }},
+    # Stage 2: Unwind array
+    {"$unwind": "$items"},
+    # Stage 3: Group
+    {"$group": {
+        "_id": "$items.product",
+        "total_revenue": {"$sum": {"$multiply": ["$items.qty", "$items.price"]}},
+        "units_sold":    {"$sum": "$items.qty"},
+        "order_count":   {"$addToSet": "$_id"}
+    }},
+    # Stage 4: Add computed field
+    {"$addFields": {
+        "unique_orders": {"$size": "$order_count"},
+        "avg_price": {"$divide": ["$total_revenue", "$units_sold"]}
+    }},
+    # Stage 5: Sort
+    {"$sort": {"total_revenue": -1}},
+    # Stage 6: Limit
+    {"$limit": 10},
+    # Stage 7: Project output
+    {"$project": {
+        "product": "$_id", "_id": 0,
+        "total_revenue": {"$round": ["$total_revenue", 2]},
+        "units_sold": 1, "unique_orders": 1
+    }}
+]
+results = list(orders.aggregate(pipeline))
+
+# ── Indexes ────────────────────────────────────────────────
+orders.create_index([("user_id", ASCENDING), ("created_at", DESCENDING)])
+orders.create_index([("status", ASCENDING)], partial_filter_expression={"status": {"$ne": "deleted"}})
+orders.create_index([("items.product", "text")])  # full-text index</code></pre>
+    <div class="concept-box"><h4>MongoDB Schema Design Patterns</h4><ul>
+      <li><strong>Embed vs Reference:</strong> Embed when data is accessed together and bounded in size (1:1, 1:few). Reference for unbounded 1:many (user → orders) and many-to-many.</li>
+      <li><strong>Bucket pattern:</strong> Group time-series data into buckets (e.g., 1 doc = 1 hour of sensor readings) to reduce document count.</li>
+      <li><strong>Computed pattern:</strong> Pre-compute aggregates (total_orders) on write to speed up reads.</li>
+      <li><strong>Outlier pattern:</strong> For documents that rarely exceed a threshold but occasionally balloon, use an overflow flag with linked documents.</li>
+    </ul></div>
+  </div>
+</div>
+
+</div><!-- mongodb -->
+
+<!-- ═══════ CASSANDRA ═══════ -->
+<div id="cassandra" class="subsection">
+<div class="subsection-title">Apache Cassandra</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Cassandra — Wide-Column Model, Partition Design &amp; Consistency</h3>
+    <div class="tag-row"><span class="badge badge-tag">Cassandra</span><span class="badge badge-tag">NoSQL</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Core Concepts</h4><ul>
+      <li><strong>Partition key:</strong> Determines which node holds the data (hashed). All rows with same partition key are co-located.</li>
+      <li><strong>Clustering columns:</strong> Define sort order within a partition. Enables efficient range queries within a partition.</li>
+      <li><strong>No JOINs, no transactions across partitions</strong> — denormalize; design tables around queries.</li>
+      <li><strong>Write path:</strong> Write to commit log (WAL) + memtable (in-memory). Memtable flushes to SSTable on disk periodically.</li>
+      <li><strong>Read path:</strong> Check memtable → row cache → bloom filter → SSTable (merge results). Compaction merges SSTables periodically.</li>
+    </ul></div>
+<pre><code class="language-sql">-- CQL (Cassandra Query Language)
+
+-- Schema design: query-first approach
+-- Q: "Get all events for a user, newest first"
+CREATE TABLE user_events (
+  user_id   UUID,
+  event_ts  TIMESTAMP,
+  event_id  UUID,
+  type      TEXT,
+  payload   MAP<TEXT, TEXT>,
+  PRIMARY KEY (user_id, event_ts, event_id)
+) WITH CLUSTERING ORDER BY (event_ts DESC, event_id ASC)
+  AND default_time_to_live = 7776000;  -- auto-expire after 90 days
+
+-- Partition key = user_id (all events for a user on one node)
+-- Clustering = event_ts DESC (newest first without sorting)
+
+-- Q: "Get events for user in last 24 hours"
+SELECT * FROM user_events
+WHERE user_id = f47ac10b-...
+  AND event_ts >= toTimestamp(now()) - 86400s
+LIMIT 100;
+
+-- Tunable consistency (per-query)
+-- Write with QUORUM (majority of replicas)
+INSERT INTO user_events ... USING CONSISTENCY QUORUM;
+
+-- Read with ONE (fastest, eventual consistency)
+SELECT ... FROM user_events WHERE ... CONSISTENCY ONE;
+
+-- QUORUM for both = strong consistency (safe but slower)
+-- Replication factor 3: QUORUM = 2 replicas must ack</code></pre>
+    <div class="arch-box">Cassandra Consistency Levels (replication_factor = 3):
+  ANY     — at least 1 node (weakest; even hinted handoff counts)
+  ONE     — 1 replica responds
+  TWO     — 2 replicas respond
+  QUORUM  — ceil(RF/2)+1 = 2 of 3 (most common for strong consistency)
+  ALL     — all 3 replicas (strongest, least available)
+
+Strong consistency: Write QUORUM + Read QUORUM
+  (At least one replica overlaps between write and read set)
+
+Use case fit:
+  ✅ Time-series / IoT sensor data
+  ✅ Activity feeds, audit logs (append-heavy)
+  ✅ User session data with TTL
+  ❌ Complex relationships needing JOINs
+  ❌ Transactions across multiple partition keys</div>
+  </div>
+</div>
+
+</div><!-- cassandra -->
+
+<!-- ═══════ REDIS ═══════ -->
+<div id="redis" class="subsection">
+<div class="subsection-title">Redis</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Redis Data Types, Patterns &amp; Persistence</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span><span class="badge badge-tag">Redis</span><span class="badge badge-tag">Caching</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Data Type</th><th>Commands</th><th>Use Cases</th></tr>
+      <tr><td>String</td><td>GET/SET/INCR/EXPIRE</td><td>Cache, counters, rate limiting, session tokens</td></tr>
+      <tr><td>Hash</td><td>HGET/HSET/HMGET</td><td>User profiles, object fields</td></tr>
+      <tr><td>List</td><td>LPUSH/RPUSH/LRANGE/BLPOP</td><td>Message queues, activity feeds, recent N items</td></tr>
+      <tr><td>Set</td><td>SADD/SMEMBERS/SINTER/SUNION</td><td>Unique visitors, tags, social graph</td></tr>
+      <tr><td>Sorted Set</td><td>ZADD/ZRANGE/ZRANGEBYSCORE</td><td>Leaderboards, rate limiting (sliding window), priority queues</td></tr>
+      <tr><td>Stream</td><td>XADD/XREAD/XGROUP</td><td>Event sourcing, log aggregation (Kafka-lite)</td></tr>
+      <tr><td>Bitmap</td><td>SETBIT/GETBIT/BITCOUNT</td><td>Daily active users (1 bit per user), feature flags</td></tr>
+      <tr><td>HyperLogLog</td><td>PFADD/PFCOUNT</td><td>Approximate unique count (12KB for any cardinality)</td></tr>
+    </table>
+<pre><code class="language-python">import redis, time, json
+
+r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+
+# ── Caching with TTL ───────────────────────────────────────
+def get_user(user_id: str) -> dict:
+    key = f"user:{user_id}"
+    cached = r.get(key)
+    if cached:
+        return json.loads(cached)
+    user = db.query_user(user_id)           # slow DB query
+    r.setex(key, 3600, json.dumps(user))    # cache 1 hour
+    return user
+
+# ── Distributed Rate Limiting (token bucket) ──────────────
+def rate_limit(user_id: str, limit: int = 100, window: int = 60) -> bool:
+    key = f"rate:{user_id}"
+    pipe = r.pipeline()
+    now  = time.time()
+    pipe.zremrangebyscore(key, 0, now - window)    # remove old requests
+    pipe.zadd(key, {str(now): now})                # add current request
+    pipe.zcard(key)                                # count in window
+    pipe.expire(key, window)
+    _, _, count, _ = pipe.execute()
+    return count <= limit
+
+# ── Distributed Lock (SETNX pattern) ──────────────────────
+import uuid
+def acquire_lock(resource: str, ttl: int = 10) -> str | None:
+    lock_id = str(uuid.uuid4())
+    acquired = r.set(f"lock:{resource}", lock_id, nx=True, ex=ttl)
+    return lock_id if acquired else None
+
+def release_lock(resource: str, lock_id: str) -> bool:
+    # Lua script for atomic check-and-delete
+    lua = """
+    if redis.call("get", KEYS[1]) == ARGV[1] then
+        return redis.call("del", KEYS[1])
+    else return 0 end"""
+    return bool(r.eval(lua, 1, f"lock:{resource}", lock_id))
+
+# ── Leaderboard (Sorted Set) ───────────────────────────────
+r.zadd("leaderboard:2024", {"alice": 9500, "bob": 8700, "carol": 9200})
+# Top 10
+r.zrevrange("leaderboard:2024", 0, 9, withscores=True)
+# User rank
+r.zrevrank("leaderboard:2024", "alice")  # 0-indexed rank
+
+# ── Pub/Sub ────────────────────────────────────────────────
+# Publisher
+r.publish("notifications:user:u123", json.dumps({"type": "order_shipped", "order_id": "o456"}))
+# Subscriber (blocking)
+pubsub = r.pubsub()
+pubsub.subscribe("notifications:user:u123")
+for message in pubsub.listen():
+    if message["type"] == "message":
+        print(json.loads(message["data"]))</code></pre>
+    <div class="concept-box"><h4>Redis Persistence Modes</h4><ul>
+      <li><strong>RDB (snapshots):</strong> Periodic binary dump. Fast restart, compact file. Risk: lose data since last snapshot (typically minutes).</li>
+      <li><strong>AOF (Append Only File):</strong> Log every write command. Configurable fsync: always (safe but slow), everysec (1s data loss risk), no (OS decides). Larger file, slower restart but better durability.</li>
+      <li><strong>RDB + AOF:</strong> Best of both — use AOF for durability, RDB for fast restart. Redis 7+ uses newer AOF + RDB hybrid format.</li>
+      <li><strong>No persistence:</strong> Pure cache — fastest, full data loss on restart. Acceptable when data can be rebuilt from primary store.</li>
+    </ul></div>
+    <div class="callout callout-orange"><div class="callout-title">Redis Cluster vs Sentinel vs Standalone</div>
+      <strong>Standalone:</strong> Single node. Simplest; no HA.<br>
+      <strong>Sentinel:</strong> HA setup — 3+ sentinel processes monitor master + replicas. Auto-failover. One shard (no horizontal scale).<br>
+      <strong>Cluster:</strong> Horizontal sharding across 3-N master nodes (16384 hash slots). Each master has replicas. Scales writes; some multi-key commands require same slot (use hash tags {user}:*).
+    </div>
+  </div>
+</div>
+
+</div><!-- redis -->
+
+</div><!-- content-area -->
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="main.js"></script>
+<script src="search-data.js"></script>
+<script src="search.js"></script>
+</body>
+</html>
