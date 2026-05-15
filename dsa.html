@@ -1534,41 +1534,118 @@ def numIslandsUF(grid):
   <div class="problem-card-body">
     <div class="solution-rank">
       <div class="rank-item optimal"><span class="rank-label">Optimal</span><div class="rank-content"><strong>Min-heap (heapq) — lazy deletion</strong><div class="rank-complexity">Time O((V+E) log V) · Space O(V) — standard for sparse graphs</div></div></div>
-      <div class="rank-item good"><span class="rank-label">Good</span><div class="rank-content"><strong>Bellman-Ford</strong><div class="rank-complexity">Time O(V·E) · Space O(V) — use when negative weights exist (Dijkstra fails)</div></div></div>
-      <div class="rank-item poor"><span class="rank-label">Avoid</span><div class="rank-content"><strong>Floyd-Warshall for single-source</strong><div class="rank-complexity">Time O(V³) — only needed for all-pairs shortest path</div></div></div>
+      <div class="rank-item good"><span class="rank-label">Good</span><div class="rank-content"><strong>Bellman-Ford</strong><div class="rank-complexity">Time O(V·E) · Space O(V) — handles negative weights, detects negative cycles</div></div></div>
+      <div class="rank-item poor"><span class="rank-label">Avoid</span><div class="rank-content"><strong>Floyd-Warshall for single-source</strong><div class="rank-complexity">Time O(V³) · Space O(V²) — only justified for all-pairs shortest path</div></div></div>
     </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this)">Dijkstra (heapq)</button>
+      <button class="tab-btn" onclick="switchTab(this)">Bellman-Ford</button>
+      <button class="tab-btn" onclick="switchTab(this)">Floyd-Warshall</button>
+    </div>
+    <div class="tab-pane active">
 <pre><code class="language-python">import heapq
 from collections import defaultdict
 
 def dijkstra(graph, src, n):
     """
     graph: {node: [(neighbor, weight), ...]}
-    Returns dist[] array from src to all nodes.
+    Returns dist[] from src to all nodes (0-indexed).
     """
     dist = [float('inf')] * n
     dist[src] = 0
-    heap = [(0, src)]     # (cost, node)
+    heap = [(0, src)]          # (cost, node)
 
     while heap:
         cost, u = heapq.heappop(heap)
-        if cost > dist[u]: continue    # stale entry — skip
+        if cost > dist[u]: continue   # stale entry — skip
 
         for v, w in graph[u]:
-            if dist[u] + w < dist[v]:
-                dist[v] = dist[u] + w
+            new_dist = dist[u] + w
+            if new_dist &lt; dist[v]:
+                dist[v] = new_dist
                 heapq.heappush(heap, (dist[v], v))
 
     return dist
 
-# Example: LeetCode 743 — Network Delay Time
+# LeetCode 743 — Network Delay Time
 def networkDelayTime(times, n, k):
     g = defaultdict(list)
     for u, v, w in times:
         g[u].append((v, w))
-    dist = dijkstra(g, k, n + 1)
+    dist = dijkstra(g, k, n + 1)    # k is 1-indexed; use dist[1..n]
     ans = max(dist[1:])
     return -1 if ans == float('inf') else ans</code></pre>
-    <div class="callout callout-orange"><div class="callout-title">Why Dijkstra Fails with Negative Weights</div>Once a node is popped from the heap as "settled", its distance is assumed final. A negative edge could later provide a shorter path, but we never re-examine settled nodes.</div>
+    </div>
+    <div class="tab-pane">
+<pre><code class="language-python">def bellman_ford(n, edges, src):
+    """
+    edges: [(u, v, weight), ...]
+    Works with negative weights; detects negative cycles.
+    Time O(V·E)  Space O(V)
+    """
+    dist = [float('inf')] * n
+    dist[src] = 0
+
+    for _ in range(n - 1):           # relax all edges V-1 times
+        updated = False
+        for u, v, w in edges:
+            if dist[u] != float('inf') and dist[u] + w &lt; dist[v]:
+                dist[v] = dist[u] + w
+                updated = True
+        if not updated:
+            break                    # early exit if no relaxation happened
+
+    # Check for negative-weight cycles
+    for u, v, w in edges:
+        if dist[u] != float('inf') and dist[u] + w &lt; dist[v]:
+            return None              # negative cycle detected
+
+    return dist
+
+# LeetCode 787 — Cheapest Flights Within K Stops
+def findCheapestPrice(n, flights, src, dst, k):
+    dist = [float('inf')] * n
+    dist[src] = 0
+    for _ in range(k + 1):          # at most k+1 edges = k stops
+        temp = dist[:]
+        for u, v, w in flights:
+            if dist[u] != float('inf') and dist[u] + w &lt; temp[v]:
+                temp[v] = dist[u] + w
+        dist = temp
+    return dist[dst] if dist[dst] != float('inf') else -1</code></pre>
+    </div>
+    <div class="tab-pane">
+<pre><code class="language-python">def floyd_warshall(n, edges):
+    """
+    All-pairs shortest path.
+    Time O(V³)  Space O(V²)
+    Use only when you need distances between ALL pairs of nodes.
+    """
+    INF = float('inf')
+    dist = [[INF] * n for _ in range(n)]
+    for i in range(n):
+        dist[i][i] = 0
+    for u, v, w in edges:
+        dist[u][v] = w              # directed; add dist[v][u]=w for undirected
+
+    for k in range(n):              # intermediate node
+        for i in range(n):
+            for j in range(n):
+                if dist[i][k] + dist[k][j] &lt; dist[i][j]:
+                    dist[i][j] = dist[i][k] + dist[k][j]
+
+    # Detect negative cycle: dist[i][i] &lt; 0 for any i
+    for i in range(n):
+        if dist[i][i] &lt; 0:
+            return None             # negative cycle exists
+
+    return dist</code></pre>
+    </div>
+    <div class="callout callout-orange"><div class="callout-title">Algorithm Selection Guide</div>
+      <strong>Dijkstra</strong> — non-negative weights, fastest in practice (log factor).<br>
+      <strong>Bellman-Ford</strong> — negative weights ok; use K-stops variant for LeetCode 787.<br>
+      <strong>Floyd-Warshall</strong> — all-pairs; overkill for single-source queries.
+    </div>
   </div>
 </div>
 
