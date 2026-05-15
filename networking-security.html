@@ -356,12 +356,12 @@ class OAuthClient:
         self._token        = None
         self._expires_at   = 0
 
-    def get_access_token(self) -> str:
-        if self._token and time.time() < self._expires_at - 60:  # 60s buffer
+    def get_access_token(self) -&gt; str:
+        if self._token and time.time() &lt; self._expires_at - 60:  # 60s buffer
             return self._token
         return self._refresh_token()
 
-    def _refresh_token(self) -> str:
+    def _refresh_token(self) -&gt; str:
         resp = httpx.post(self.token_url, data={
             "grant_type":    "client_credentials",
             "client_id":     self.client_id,
@@ -456,7 +456,7 @@ Signature: RS256(base64(header) + "." + base64(payload), privateKey)</div>
 from cryptography.hazmat.primitives import serialization
 
 # ── Verify a JWT (RS256) ───────────────────────────────────
-def verify_jwt(token: str, jwks_uri: str) -> dict:
+def verify_jwt(token: str, jwks_uri: str) -&gt; dict:
     """Fetch public key from JWKS endpoint and validate token."""
     import httpx
     header = jwt.get_unverified_header(token)
@@ -544,7 +544,7 @@ decrypted = private_key.decrypt(encrypted,
     padding.OAEP(mgf=padding.MGF1(hashes.SHA256()), algorithm=hashes.SHA256(), label=None)
 )
 
-# RSA practical limit: encrypt only small data (< key_size - overhead)
+# RSA practical limit: encrypt only small data (&lt; key_size - overhead)
 # In TLS: RSA/ECDH exchange symmetric session key, then use AES for bulk</code></pre>
   </div>
 </div>

@@ -152,9 +152,9 @@ class LFUCache:
     def __init__(self, capacity):
         self.cap = capacity
         self.min_freq = 0
-        self.key_val = {}           # key -> value
-        self.key_freq = {}          # key -> freq
-        self.freq_keys = defaultdict(OrderedDict)  # freq -> OrderedDict of keys
+        self.key_val = {}           # key -&gt; value
+        self.key_freq = {}          # key -&gt; freq
+        self.freq_keys = defaultdict(OrderedDict)  # freq -&gt; OrderedDict of keys
 
     def _update_freq(self, key):
         freq = self.key_freq[key]
@@ -198,7 +198,7 @@ class LFUCache:
   <div class="problem-card-body">
 <pre><code class="language-python">class TrieNode:
     def __init__(self):
-        self.children = {}  # char -> TrieNode
+        self.children = {}  # char -&gt; TrieNode
         self.is_end = False
         self.count = 0  # number of strings ending here
 

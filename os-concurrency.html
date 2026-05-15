@@ -945,7 +945,7 @@ import redis, time
 
 r = redis.Redis()
 
-def is_allowed_fixed_window(user_id: str, limit: int = 100, window_sec: int = 60) -> bool:
+def is_allowed_fixed_window(user_id: str, limit: int = 100, window_sec: int = 60) -&gt; bool:
     # Key includes current window timestamp to auto-expire
     window_key = f"rl:fw:{user_id}:{int(time.time() // window_sec)}"
     
@@ -970,7 +970,7 @@ import redis, time
 
 r = redis.Redis()
 
-def is_allowed_sliding_log(user_id: str, limit: int = 100, window_sec: int = 60) -> bool:
+def is_allowed_sliding_log(user_id: str, limit: int = 100, window_sec: int = 60) -&gt; bool:
     key = f"rl:swl:{user_id}"
     now = time.time()
     window_start = now - window_sec
@@ -1013,7 +1013,7 @@ local elapsed = math.max(0, now - last_refill)
 local new_tokens = math.min(capacity, tokens + elapsed * refill_rate)
 
 -- Check if we have enough tokens
-if new_tokens >= tokens_requested then
+if new_tokens &gt;= tokens_requested then
     new_tokens = new_tokens - tokens_requested
     redis.call('HMSET', key, 'tokens', new_tokens, 'last_refill', now)
     redis.call('EXPIRE', key, 3600)
@@ -1027,7 +1027,7 @@ end
 
 token_bucket_script = r.register_script(TOKEN_BUCKET_LUA)
 
-def is_allowed_token_bucket(user_id: str, capacity=10, refill_rate=1) -> bool:
+def is_allowed_token_bucket(user_id: str, capacity=10, refill_rate=1) -&gt; bool:
     key = f"rl:tb:{user_id}"
     result = token_bucket_script(
         keys=[key],
@@ -1059,7 +1059,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
         res.setHeader("X-RateLimit-Limit", String.valueOf(LIMIT));
         res.setHeader("X-RateLimit-Remaining", String.valueOf(Math.max(0, LIMIT - count)));
         
-        if (count > LIMIT) {
+        if (count &gt; LIMIT) {
             res.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             res.setHeader("Retry-After", String.valueOf(WINDOW_SECONDS));
             res.getWriter().write("{\"error\": \"Rate limit exceeded\"}");

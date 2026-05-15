@@ -217,10 +217,10 @@ class PushNotification implements Notification {
 class NotificationFactory {
     public static Notification create(String type) {
         return switch (type) {
-            case "EMAIL" -> new EmailNotification();
-            case "SMS"   -> new SMSNotification();
-            case "PUSH"  -> new PushNotification();
-            default -> throw new IllegalArgumentException("Unknown type: " + type);
+            case "EMAIL" -&gt; new EmailNotification();
+            case "SMS"   -&gt; new SMSNotification();
+            case "PUSH"  -&gt; new PushNotification();
+            default -&gt; throw new IllegalArgumentException("Unknown type: " + type);
         };
     }
 }
@@ -541,7 +541,7 @@ class Directory implements FileSystemItem {
     }
     public void display(String indent) {
         System.out.println(indent + "+ " + name + "/");
-        children.forEach(c -> c.display(indent + "  "));
+        children.forEach(c -&gt; c.display(indent + "  "));
     }
 }
 
@@ -694,7 +694,7 @@ class TreeTypeFactory {
     
     public static TreeType getTreeType(String name, String color, String texture) {
         String key = name + "_" + color;
-        return cache.computeIfAbsent(key, k -> new TreeType(name, color, texture));
+        return cache.computeIfAbsent(key, k -&gt; new TreeType(name, color, texture));
     }
 }
 
@@ -990,8 +990,8 @@ class ChatRoom implements ChatMediator {
     
     public void sendMessage(String message, User sender) {
         users.stream()
-             .filter(u -> u != sender)  // don't send to self
-             .forEach(u -> u.receive(message, sender.getName()));
+             .filter(u -&gt; u != sender)  // don't send to self
+             .forEach(u -&gt; u.receive(message, sender.getName()));
     }
 }
 
@@ -1116,7 +1116,7 @@ class DataCatalogAsset {
     public void unsubscribe(MetadataChangeListener listener) { listeners.remove(listener); }
     
     private void notifyListeners(MetadataEvent event) {
-        listeners.forEach(l -> l.onMetadataChanged(event));
+        listeners.forEach(l -&gt; l.onMetadataChanged(event));
     }
     
     public void updateDescription(String desc) {
@@ -1314,7 +1314,7 @@ class CSVImporter extends DataImporter {
     protected void connect(String src) { System.out.println("Opening CSV: " + src); }
     protected List&lt;String&gt; extract()   { return List.of("row1", "row2"); }
     protected List&lt;Object&gt; transform(List&lt;String&gt; raw) {
-        return raw.stream().map(r -> (Object)r.split(",")).toList();
+        return raw.stream().map(r -&gt; (Object)r.split(",")).toList();
     }
 }
 
@@ -1322,7 +1322,7 @@ class JSONImporter extends DataImporter {
     protected void connect(String src) { System.out.println("Connecting to JSON API: " + src); }
     protected List&lt;String&gt; extract()   { return List.of("{}", "{}"); }
     protected List&lt;Object&gt; transform(List&lt;String&gt; raw) {
-        return raw.stream().map(r -> (Object)parseJson(r)).toList();
+        return raw.stream().map(r -&gt; (Object)parseJson(r)).toList();
     }
     private Object parseJson(String s) { return Map.of(); }
 }
@@ -1402,10 +1402,10 @@ List&lt;MetadataElement&gt; elements = List.of(
 );
 
 MetadataVisitor qualityChecker = new DataQualityScorer();
-elements.forEach(e -> e.accept(qualityChecker));
+elements.forEach(e -&gt; e.accept(qualityChecker));
 
 MetadataVisitor docChecker = new DocumentationChecker();
-elements.forEach(e -> e.accept(docChecker));</code></pre>
+elements.forEach(e -&gt; e.accept(docChecker));</code></pre>
   </div>
 </div>
 </div>
@@ -1443,9 +1443,9 @@ class ParkingSlot {
     public boolean isAvailable() { return parkedVehicle == null; }
     public boolean canFit(Vehicle v) {
         return isAvailable() &amp;&amp; switch(v.type) {
-            case MOTORCYCLE -> type == SlotType.MOTORCYCLE || type == SlotType.COMPACT;
-            case CAR        -> type == SlotType.COMPACT || type == SlotType.LARGE;
-            case TRUCK, VAN -> type == SlotType.LARGE;
+            case MOTORCYCLE -&gt; type == SlotType.MOTORCYCLE || type == SlotType.COMPACT;
+            case CAR        -&gt; type == SlotType.COMPACT || type == SlotType.LARGE;
+            case TRUCK, VAN -&gt; type == SlotType.LARGE;
         };
     }
     public void park(Vehicle v)  { this.parkedVehicle = v; }
@@ -1457,7 +1457,7 @@ class ParkingFloor {
     private final List&lt;ParkingSlot&gt; slots;
     
     public Optional&lt;ParkingSlot&gt; findAvailableSlot(Vehicle vehicle) {
-        return slots.stream().filter(s -> s.canFit(vehicle)).findFirst();
+        return slots.stream().filter(s -&gt; s.canFit(vehicle)).findFirst();
     }
 }
 
@@ -1551,7 +1551,7 @@ class ElevatorController {
     public void requestElevator(int floor, Direction direction) {
         // Find nearest idle elevator, or least-loaded
         Elevator best = elevators.stream()
-            .min(Comparator.comparingInt(e -> Math.abs(e.getCurrentFloor() - floor)))
+            .min(Comparator.comparingInt(e -&gt; Math.abs(e.getCurrentFloor() - floor)))
             .orElseThrow();
         best.addRequest(floor);
     }
@@ -1612,13 +1612,13 @@ class Library {
     
     class TitleSearch implements SearchStrategy {
         public List&lt;Book&gt; search(String q, List&lt;Book&gt; catalog) {
-            return catalog.stream().filter(b -> b.getTitle().toLowerCase().contains(q.toLowerCase())).toList();
+            return catalog.stream().filter(b -&gt; b.getTitle().toLowerCase().contains(q.toLowerCase())).toList();
         }
     }
     
     public Loan issueBook(String isbn, Member member) {
         Book book = findByISBN(isbn).orElseThrow();
-        BookItem copy = book.getAvailableCopy().orElseThrow(() -> new RuntimeException("No copies available"));
+        BookItem copy = book.getAvailableCopy().orElseThrow(() -&gt; new RuntimeException("No copies available"));
         copy.setStatus(BookStatus.LOANED);
         return new Loan(copy, member, LocalDate.now(), LocalDate.now().plusDays(14));
     }
@@ -1655,7 +1655,7 @@ class Library {
     </table>
 <pre><code class="language-java">import java.util.function.*;
 
-// ── Function<T, R> ──────────────────────────────────────────
+// ── Function&lt;T, R&gt; ──────────────────────────────────────────
 Function&lt;String, Integer&gt; strLen = String::length;
 Function&lt;String, String&gt;  upper  = String::toUpperCase;
 
@@ -1663,41 +1663,41 @@ Function&lt;String, String&gt;  upper  = String::toUpperCase;
 Function&lt;String, String&gt; trimThenUpper = ((Function&lt;String,String&gt; String::trim).andThen(String::toUpperCase);
 System.out.println(trimThenUpper.apply("  hello  ")); // "HELLO"
 
-// ── BiFunction<T, U, R> ────────────────────────────────────
-BiFunction&lt;String, Integer, String&gt; repeat = (s, n) -> s.repeat(n);
+// ── BiFunction&lt;T, U, R&gt; ────────────────────────────────────
+BiFunction&lt;String, Integer, String&gt; repeat = (s, n) -&gt; s.repeat(n);
 System.out.println(repeat.apply("ab", 3)); // "ababab"
 
 // andThen on BiFunction (applies another Function to the result)
 BiFunction&lt;Integer, Integer, Integer&gt; add    = Integer::sum;
-Function&lt;Integer, String&gt;             format = n -> "Result: " + n;
+Function&lt;Integer, String&gt;             format = n -&gt; "Result: " + n;
 BiFunction&lt;Integer, Integer, String&gt;  addFmt = add.andThen(format);
 System.out.println(addFmt.apply(3, 4)); // "Result: 7"
 
-// ── Predicate<T> ───────────────────────────────────────────
-Predicate&lt;String&gt; nonEmpty = s -> !s.isEmpty();
-Predicate&lt;String&gt; hasDigit  = s -> s.chars().anyMatch(Character::isDigit);
+// ── Predicate&lt;T&gt; ───────────────────────────────────────────
+Predicate&lt;String&gt; nonEmpty = s -&gt; !s.isEmpty();
+Predicate&lt;String&gt; hasDigit  = s -&gt; s.chars().anyMatch(Character::isDigit);
 
 // Compose predicates
 Predicate&lt;String&gt; validPassword = nonEmpty.and(hasDigit);
 Predicate&lt;String&gt; reject        = nonEmpty.negate();
 Predicate&lt;String&gt; either        = nonEmpty.or(hasDigit);
 
-// ── Consumer<T> ─────────────────────────────────────────────
+// ── Consumer&lt;T&gt; ─────────────────────────────────────────────
 Consumer&lt;String&gt; print  = System.out::println;
-Consumer&lt;String&gt; log    = s -> System.err.println("[LOG] " + s);
+Consumer&lt;String&gt; log    = s -&gt; System.err.println("[LOG] " + s);
 Consumer&lt;String&gt; both   = print.andThen(log);  // chain side effects
 
 // BiConsumer — used in Map.forEach
 Map&lt;String, Integer&gt; scores = Map.of("Alice", 95, "Bob", 87);
-BiConsumer&lt;String, Integer&gt; printScore = (k, v) -> System.out.println(k + ": " + v);
+BiConsumer&lt;String, Integer&gt; printScore = (k, v) -&gt; System.out.println(k + ": " + v);
 scores.forEach(printScore);
 
-// ── Supplier<T> ─────────────────────────────────────────────
+// ── Supplier&lt;T&gt; ─────────────────────────────────────────────
 Supplier&lt;List&lt;String&gt;&gt; listFactory = ArrayList::new;
 List&lt;String&gt; list = listFactory.get();
 
 // Lazy initialization pattern
-Supplier&lt;ExpensiveObject&gt; lazy = () -> new ExpensiveObject();
+Supplier&lt;ExpensiveObject&gt; lazy = () -&gt; new ExpensiveObject();
 // Object not created until lazy.get() is called</code></pre>
   </div>
 </div>
@@ -1711,10 +1711,10 @@ Supplier&lt;ExpensiveObject&gt; lazy = () -> new ExpensiveObject();
   <div class="problem-card-body">
     <table>
       <tr><th>Type</th><th>Syntax</th><th>Equivalent Lambda</th></tr>
-      <tr><td>Static method</td><td><code>ClassName::staticMethod</code></td><td><code>x -> ClassName.staticMethod(x)</code></td></tr>
-      <tr><td>Instance method (specific object)</td><td><code>instance::method</code></td><td><code>x -> instance.method(x)</code></td></tr>
-      <tr><td>Instance method (arbitrary object)</td><td><code>ClassName::instanceMethod</code></td><td><code>x -> x.instanceMethod()</code></td></tr>
-      <tr><td>Constructor</td><td><code>ClassName::new</code></td><td><code>(args) -> new ClassName(args)</code></td></tr>
+      <tr><td>Static method</td><td><code>ClassName::staticMethod</code></td><td><code>x -&gt; ClassName.staticMethod(x)</code></td></tr>
+      <tr><td>Instance method (specific object)</td><td><code>instance::method</code></td><td><code>x -&gt; instance.method(x)</code></td></tr>
+      <tr><td>Instance method (arbitrary object)</td><td><code>ClassName::instanceMethod</code></td><td><code>x -&gt; x.instanceMethod()</code></td></tr>
+      <tr><td>Constructor</td><td><code>ClassName::new</code></td><td><code>(args) -&gt; new ClassName(args)</code></td></tr>
     </table>
 <pre><code class="language-java">// 1. Static method reference
 Function&lt;String, Integer&gt;  parseInt  = Integer::parseInt;   // Integer.parseInt(s)
@@ -1723,11 +1723,11 @@ BiFunction&lt;Integer,Integer,Integer&gt; max = Integer::max;
 
 // 2. Instance method of specific object
 String prefix = "Hello";
-Predicate&lt;String&gt; startsWith = prefix::startsWith;   // s -> prefix.startsWith(s) — wait, wrong
-Supplier&lt;Integer&gt; len        = prefix::length;        // () -> prefix.length()
+Predicate&lt;String&gt; startsWith = prefix::startsWith;   // s -&gt; prefix.startsWith(s) — wait, wrong
+Supplier&lt;Integer&gt; len        = prefix::length;        // () -&gt; prefix.length()
 
 // 3. Instance method of arbitrary object (most common in streams)
-Function&lt;String, String&gt;    toUpper   = String::toUpperCase;  // s -> s.toUpperCase()
+Function&lt;String, String&gt;    toUpper   = String::toUpperCase;  // s -&gt; s.toUpperCase()
 Function&lt;String, Integer&gt;   strLength = String::length;
 Predicate&lt;String&gt;           isEmpty   = String::isEmpty;
 Comparator&lt;String&gt;          cmp       = String::compareTo;
@@ -1768,7 +1768,7 @@ List&lt;String&gt; names = List.of("Alice", "Bob", "Charlie", "Adam", "Betty");
 
 // ── Intermediate operations (lazy, return Stream) ──────────
 // filter — keep elements matching predicate
-Stream&lt;String&gt; aNames = names.stream().filter(n -> n.startsWith("A"));
+Stream&lt;String&gt; aNames = names.stream().filter(n -&gt; n.startsWith("A"));
 
 // map — transform T → R
 Stream&lt;Integer&gt; lengths = names.stream().map(String::length);
@@ -1781,11 +1781,11 @@ List&lt;Integer&gt; flat = nested.stream()
 
 // distinct, sorted, limit, skip, peek
 names.stream()
-     .filter(n -> n.length() > 3)
+     .filter(n -&gt; n.length() &gt; 3)
      .distinct()
      .sorted(Comparator.reverseOrder())
      .limit(3)
-     .peek(n -> System.out.println("Processing: " + n))  // debug, not for side effects
+     .peek(n -&gt; System.out.println("Processing: " + n))  // debug, not for side effects
      .collect(Collectors.toList());
 
 // ── Terminal operations (eager, trigger pipeline) ──────────
@@ -1800,12 +1800,12 @@ int totalLen = names.stream()
     .sum();                             // shorthand; also: .reduce(0, Integer::sum)
 
 Optional&lt;String&gt; longest = names.stream()
-    .reduce((a, b) -> a.length() >= b.length() ? a : b);
+    .reduce((a, b) -&gt; a.length() &gt;= b.length() ? a : b);
 
 // count, min, max, findFirst, findAny, anyMatch, allMatch, noneMatch
-long count   = names.stream().filter(n -> n.contains("a")).count();
-boolean any  = names.stream().anyMatch(n -> n.startsWith("Z"));
-Optional&lt;String&gt; first = names.stream().filter(n -> n.length() == 3).findFirst();</code></pre>
+long count   = names.stream().filter(n -&gt; n.contains("a")).count();
+boolean any  = names.stream().anyMatch(n -&gt; n.startsWith("Z"));
+Optional&lt;String&gt; first = names.stream().filter(n -&gt; n.length() == 3).findFirst();</code></pre>
   </div>
 </div>
 
@@ -1843,12 +1843,12 @@ Map&lt;String, Double&gt; avgSalary =
 Map&lt;String, Map&lt;String, List&lt;String&gt;&gt;&gt; nested =
     employees.stream().collect(Collectors.groupingBy(Employee::dept,
         Collectors.groupingBy(
-            e -> e.salary() >= 80000 ? "senior" : "junior",
+            e -&gt; e.salary() &gt;= 80000 ? "senior" : "junior",
             Collectors.mapping(Employee::name, Collectors.toList()))));
 
 // ── partitioningBy ─────────────────────────────────────────
 Map&lt;Boolean, List&lt;Employee&gt;&gt; seniorJunior =
-    employees.stream().collect(Collectors.partitioningBy(e -> e.salary() >= 80000));
+    employees.stream().collect(Collectors.partitioningBy(e -&gt; e.salary() &gt;= 80000));
 
 // ── joining ────────────────────────────────────────────────
 String csv    = employees.stream().map(Employee::name).collect(Collectors.joining(", "));
@@ -1894,25 +1894,25 @@ Optional&lt;String&gt; nullable = Optional.ofNullable(maybeNull);
 // Extract value
 String val = opt.get();                          // throws if empty — avoid
 String val2 = opt.orElse("default");            // safe default
-String val3 = opt.orElseGet(() -> compute());   // lazy default
+String val3 = opt.orElseGet(() -&gt; compute());   // lazy default
 String val4 = opt.orElseThrow(IllegalArgumentException::new);
 
 // Transform
 Optional&lt;Integer&gt; len = opt.map(String::length);           // Optional&lt;Integer&gt;
 Optional&lt;String&gt; upper = opt.map(String::toUpperCase);
-Optional&lt;String&gt; nested = opt.flatMap(s -> Optional.of(s.trim())); // avoid Optional&lt;Optional&gt;
+Optional&lt;String&gt; nested = opt.flatMap(s -&gt; Optional.of(s.trim())); // avoid Optional&lt;Optional&gt;
 
 // Filter
-Optional&lt;String&gt; filtered = opt.filter(s -> s.length() > 3);
+Optional&lt;String&gt; filtered = opt.filter(s -&gt; s.length() &gt; 3);
 
 // Side effects
 opt.ifPresent(System.out::println);
-opt.ifPresentOrElse(System.out::println, () -> System.out.println("empty")); // Java 9
+opt.ifPresentOrElse(System.out::println, () -&gt; System.out.println("empty")); // Java 9
 
 // Chaining Optional in service layer
 Optional&lt;User&gt; user = userRepo.findById(id)
     .filter(User::isActive)
-    .map(u -> { u.setLastSeen(now()); return u; });</code></pre>
+    .map(u -&gt; { u.setLastSeen(now()); return u; });</code></pre>
     </div>
     <div class="tab-pane">
 <pre><code class="language-java">// Comparator.comparing — declarative chaining
@@ -1934,20 +1934,20 @@ nums.stream().sorted(Comparator.reverseOrder()).forEach(System.out::println);</c
 <pre><code class="language-java">// Parallel streams — uses ForkJoinPool.commonPool()
 long count = LongStream.range(0, 1_000_000)
     .parallel()
-    .filter(n -> n % 2 == 0)
+    .filter(n -&gt; n % 2 == 0)
     .count();
 
 // When to use parallel:
-//  CPU-bound, large datasets (>10k elements)
+//  CPU-bound, large datasets (&gt;10k elements)
 //  Stateless, independent operations (map, filter)
 //  I/O bound (blocks threads in shared pool)
 //  Operations with shared mutable state
-//  Small datasets — overhead > benefit
+//  Small datasets — overhead &gt; benefit
 //  Ordered operations (findFirst may be slow parallel)
 
 // Custom ForkJoinPool (don't pollute common pool)
 ForkJoinPool pool = new ForkJoinPool(4);
-List&lt;String&gt; result = pool.submit(() ->
+List&lt;String&gt; result = pool.submit(() -&gt;
     names.parallelStream()
          .map(String::toUpperCase)
          .collect(Collectors.toList())
@@ -1971,7 +1971,7 @@ Map&lt;String, Long&gt; freq = Arrays.stream(text.split("\\s+"))
 freq.entrySet().stream()
     .sorted(Map.Entry.&lt;String,Long&gt;comparingByValue().reversed())
     .limit(5)
-    .forEach(e -> System.out.println(e.getKey() + ": " + e.getValue()));
+    .forEach(e -&gt; System.out.println(e.getKey() + ": " + e.getValue()));
 
 // ── Pattern 2: Flatten nested lists and deduplicate ────────
 List&lt;List&lt;String&gt;&gt; matrix = List.of(List.of("a","b","c"), List.of("b","c","d"));
@@ -1999,8 +1999,8 @@ OptionalDouble avgSalaryOpt = employees.stream()
     .average();
 
 // ── Pattern 6: Chained BiFunction for transformation pipeline
-BiFunction&lt;String, String, String&gt; concat   = (a, b) -> a + b;
-BiFunction&lt;String, String, Integer&gt; compareLen = (a, b) -> Integer.compare(a.length(), b.length());
+BiFunction&lt;String, String, String&gt; concat   = (a, b) -&gt; a + b;
+BiFunction&lt;String, String, Integer&gt; compareLen = (a, b) -&gt; Integer.compare(a.length(), b.length());
 
 // andThen: apply Function to the result of BiFunction
 BiFunction&lt;String, String, String&gt; concatUpper = concat.andThen(String::toUpperCase);

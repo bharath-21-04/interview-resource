@@ -103,7 +103,7 @@ CREATE INDEX idx_lower_email ON users (LOWER(email));
 
 -- EXPLAIN ANALYZE to see index usage
 EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT)
-SELECT * FROM orders WHERE user_id = 42 AND created_at > NOW() - INTERVAL '30 days';
+SELECT * FROM orders WHERE user_id = 42 AND created_at &gt; NOW() - INTERVAL '30 days';
 
 -- Look for: Index Scan vs Seq Scan, cost estimates, actual rows</code></pre>
     <div class="arch-box">B-tree Index Structure:
@@ -181,7 +181,7 @@ SELECT * FROM (
   SELECT *, ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC) AS rn
   FROM employees
 ) ranked
-WHERE rn <= 3;   -- top 3 earners per department
+WHERE rn &lt;= 3;   -- top 3 earners per department
 
 -- ── First/Last value ──────────────────────────────────────
 SELECT
@@ -249,7 +249,7 @@ SELECT o.id, u.name, p.name AS product, o.quantity
 FROM orders o
 JOIN users    u ON o.user_id    = u.id
 JOIN products p ON o.product_id = p.id
-WHERE o.created_at >= CURRENT_DATE - INTERVAL '7 days';</code></pre>
+WHERE o.created_at &gt;= CURRENT_DATE - INTERVAL '7 days';</code></pre>
   </div>
 </div>
 
@@ -369,7 +369,7 @@ high_earners AS (
          e.salary - d.avg_salary AS above_avg
   FROM employees e
   JOIN dept_avg d ON e.dept_id = d.dept_id
-  WHERE e.salary > d.avg_salary
+  WHERE e.salary &gt; d.avg_salary
 )
 SELECT name, dept_id, salary, above_avg
 FROM high_earners
@@ -386,7 +386,7 @@ WITH RECURSIVE org_tree AS (
 
   -- Recursive case: employees with a manager
   SELECT e.id, e.name, e.manager_id, ot.level + 1,
-         CAST(ot.path || ' > ' || e.name AS VARCHAR(1000))
+         CAST(ot.path || ' &gt; ' || e.name AS VARCHAR(1000))
   FROM employees e
   JOIN org_tree ot ON e.manager_id = ot.id
 )
@@ -574,7 +574,7 @@ CREATE TABLE user_events (
   event_ts  TIMESTAMP,
   event_id  UUID,
   type      TEXT,
-  payload   MAP<TEXT, TEXT>,
+  payload   MAP&lt;TEXT, TEXT&gt;,
   PRIMARY KEY (user_id, event_ts, event_id)
 ) WITH CLUSTERING ORDER BY (event_ts DESC, event_id ASC)
   AND default_time_to_live = 7776000;  -- auto-expire after 90 days
@@ -585,7 +585,7 @@ CREATE TABLE user_events (
 -- Q: "Get events for user in last 24 hours"
 SELECT * FROM user_events
 WHERE user_id = f47ac10b-...
-  AND event_ts >= toTimestamp(now()) - 86400s
+  AND event_ts &gt;= toTimestamp(now()) - 86400s
 LIMIT 100;
 
 -- Tunable consistency (per-query)
@@ -645,7 +645,7 @@ Use case fit:
 r = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 # ── Caching with TTL ───────────────────────────────────────
-def get_user(user_id: str) -> dict:
+def get_user(user_id: str) -&gt; dict:
     key = f"user:{user_id}"
     cached = r.get(key)
     if cached:
@@ -655,7 +655,7 @@ def get_user(user_id: str) -> dict:
     return user
 
 # ── Distributed Rate Limiting (token bucket) ──────────────
-def rate_limit(user_id: str, limit: int = 100, window: int = 60) -> bool:
+def rate_limit(user_id: str, limit: int = 100, window: int = 60) -&gt; bool:
     key = f"rate:{user_id}"
     pipe = r.pipeline()
     now  = time.time()
@@ -664,16 +664,16 @@ def rate_limit(user_id: str, limit: int = 100, window: int = 60) -> bool:
     pipe.zcard(key)                                # count in window
     pipe.expire(key, window)
     _, _, count, _ = pipe.execute()
-    return count <= limit
+    return count &lt;= limit
 
 # ── Distributed Lock (SETNX pattern) ──────────────────────
 import uuid
-def acquire_lock(resource: str, ttl: int = 10) -> str | None:
+def acquire_lock(resource: str, ttl: int = 10) -&gt; str | None:
     lock_id = str(uuid.uuid4())
     acquired = r.set(f"lock:{resource}", lock_id, nx=True, ex=ttl)
     return lock_id if acquired else None
 
-def release_lock(resource: str, lock_id: str) -> bool:
+def release_lock(resource: str, lock_id: str) -&gt; bool:
     # Lua script for atomic check-and-delete
     lua = """
     if redis.call("get", KEYS[1]) == ARGV[1] then
