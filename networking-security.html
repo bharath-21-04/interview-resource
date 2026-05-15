@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Networking &amp; Security | Interview Prep</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">IP</div>
+    <div><h2>Interview Prep</h2><p>Full Stack Reference</p></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Pages</div>
+    <a href="index.html" class="nav-link">Dashboard</a>
+    <a href="dsa.html" class="nav-link">DSA — Python</a>
+    <a href="oop-lld.html" class="nav-link">OOP &amp; LLD — Java</a>
+    <a href="system-design.html" class="nav-link">System Design</a>
+    <a href="kafka.html" class="nav-link">Kafka &amp; Messaging</a>
+    <a href="os-concurrency.html" class="nav-link">OS &amp; Concurrency</a>
+    <a href="docker-aws.html" class="nav-link">Docker &amp; AWS</a>
+    <a href="networking-security.html" class="nav-link active">Networking &amp; Security</a>
+    <a href="databases.html" class="nav-link">Databases — SQL &amp; NoSQL</a>
+    <a href="alation.html" class="nav-link">Alation Focus <span class="nav-badge">HOT</span></a>
+    <div class="nav-section-label">Sections</div>
+    <a href="#http" class="nav-link" style="font-size:12px;padding:5px 16px">HTTP &amp; Transport</a>
+    <a href="#dns" class="nav-link" style="font-size:12px;padding:5px 16px">DNS &amp; Routing</a>
+    <a href="#realtime" class="nav-link" style="font-size:12px;padding:5px 16px">Real-Time Protocols</a>
+    <a href="#oauth" class="nav-link" style="font-size:12px;padding:5px 16px">OAuth 2.0 &amp; SSO</a>
+    <a href="#jwt" class="nav-link" style="font-size:12px;padding:5px 16px">JWT</a>
+    <a href="#crypto" class="nav-link" style="font-size:12px;padding:5px 16px">Cryptography</a>
+    <a href="#tls" class="nav-link" style="font-size:12px;padding:5px 16px">TLS / HTTPS</a>
+    <a href="#cors" class="nav-link" style="font-size:12px;padding:5px 16px">CORS &amp; Security Headers</a>
+  </div>
+  <div class="sidebar-footer"><kbd>Cmd K</kbd> to search</div>
+</nav>
+
+<main class="main">
+<div class="topbar">
+  <h1>Networking &amp; Security</h1>
+  <button class="topbar-search-btn" onclick="window._spotlightOpen && window._spotlightOpen()">
+    Search topics... <kbd>Cmd K</kbd>
+  </button>
+</div>
+<div class="content-area">
+
+<div class="section-header">
+  <h1>Networking, OAuth 2.0, SSO &amp; Cryptography</h1>
+  <p>Transport protocols, HTTP evolution, authentication flows, JWT, TLS, and cryptographic primitives — with trade-offs and attack vectors.</p>
+</div>
+
+<div class="section-jump">
+  <a href="#http" class="jump-btn">HTTP/1.1 vs 2 vs 3</a>
+  <a href="#tcp-udp" class="jump-btn">TCP vs UDP</a>
+  <a href="#dns" class="jump-btn">DNS</a>
+  <a href="#realtime" class="jump-btn">WebSockets &amp; SSE</a>
+  <a href="#cors" class="jump-btn">CORS</a>
+  <a href="#oauth" class="jump-btn">OAuth 2.0</a>
+  <a href="#sso" class="jump-btn">SSO / SAML / OIDC</a>
+  <a href="#jwt" class="jump-btn">JWT</a>
+  <a href="#crypto" class="jump-btn">Cryptography</a>
+  <a href="#tls" class="jump-btn">TLS Handshake</a>
+  <a href="#hashing" class="jump-btn">Hashing &amp; Passwords</a>
+</div>
+
+<!-- ═══════ HTTP ═══════ -->
+<div id="http" class="subsection">
+<div class="subsection-title">HTTP Protocol Evolution</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>HTTP/1.1 vs HTTP/2 vs HTTP/3 — Differences &amp; Trade-offs</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span><span class="badge badge-tag">Networking</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th></th><th>HTTP/1.1</th><th>HTTP/2</th><th>HTTP/3</th></tr>
+      <tr><td><strong>Transport</strong></td><td>TCP</td><td>TCP</td><td>QUIC (UDP-based)</td></tr>
+      <tr><td><strong>Multiplexing</strong></td><td>No (pipelining broken)</td><td>Yes — multiple streams on one TCP conn</td><td>Yes — independent QUIC streams</td></tr>
+      <tr><td><strong>Head-of-line blocking</strong></td><td>Yes (per connection)</td><td>Yes (at TCP level)</td><td>No — per stream independent</td></tr>
+      <tr><td><strong>Header compression</strong></td><td>None</td><td>HPACK (static+dynamic tables)</td><td>QPACK</td></tr>
+      <tr><td><strong>Server Push</strong></td><td>No</td><td>Yes (largely unused, removed in H3)</td><td>No</td></tr>
+      <tr><td><strong>TLS</strong></td><td>Optional</td><td>Effectively required (browsers)</td><td>Always (built into QUIC)</td></tr>
+      <tr><td><strong>Connection setup</strong></td><td>1 RTT TCP + 2 RTT TLS 1.2</td><td>1 RTT TCP + 1 RTT TLS 1.3</td><td>0-1 RTT (QUIC + TLS combined)</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Simple, legacy</td><td>Web apps, APIs</td><td>Mobile, high-latency, lossy networks</td></tr>
+    </table>
+    <div class="arch-box">HTTP/1.1: Request → Response → Request → Response  (sequential, or 6 parallel connections)
+HTTP/2:  [Stream 1: GET /html]  [Stream 2: GET /css]  [Stream 3: GET /js]
+         All multiplexed over ONE TCP connection
+         ⚠ TCP packet loss blocks ALL streams (HOL blocking at TCP layer)
+
+HTTP/3 (QUIC):
+         [Stream 1: GET /html] ── independent QUIC stream
+         [Stream 2: GET /css]  ── independent QUIC stream
+         [Stream 3: GET /js]   ── independent QUIC stream
+         Lost UDP packet only affects its stream, not others</div>
+    <div class="callout callout-blue"><div class="callout-title">HTTP Methods — Idempotency &amp; Safety</div>
+      <strong>Safe</strong> (no side effects): GET, HEAD, OPTIONS<br>
+      <strong>Idempotent</strong> (same result if repeated): GET, PUT, DELETE, HEAD, OPTIONS<br>
+      <strong>Neither</strong>: POST (creates new resource), PATCH (may not be idempotent)</div>
+  </div>
+</div>
+
+<div id="tcp-udp" class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>TCP vs UDP — When to Use Each</h3>
+    <div class="tag-row"><span class="badge badge-tag">Transport</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th></th><th>TCP</th><th>UDP</th></tr>
+      <tr><td>Connection</td><td>3-way handshake (SYN, SYN-ACK, ACK)</td><td>Connectionless</td></tr>
+      <tr><td>Reliability</td><td>Guaranteed delivery, ordering, retransmit</td><td>Best-effort, may drop/reorder</td></tr>
+      <tr><td>Overhead</td><td>High (20-byte header, ACKs, flow control)</td><td>Low (8-byte header)</td></tr>
+      <tr><td>Latency</td><td>Higher (setup + ACKs)</td><td>Lower</td></tr>
+      <tr><td>Use cases</td><td>HTTP, HTTPS, FTP, SMTP, SSH, databases</td><td>DNS, DHCP, video streaming, gaming, VoIP, QUIC</td></tr>
+    </table>
+    <div class="arch-box">TCP 3-Way Handshake:
+Client ──── SYN (seq=x) ──────────────────► Server
+Client ◄─── SYN-ACK (seq=y, ack=x+1) ────── Server
+Client ──── ACK (ack=y+1) ───────────────── Server
+[Connection established — data transfer]
+
+TCP 4-Way Close:
+Client ──── FIN ──────────────────────────► Server
+Client ◄─── ACK ─────────────────────────── Server
+Client ◄─── FIN ─────────────────────────── Server
+Client ──── ACK ──────────────────────────► Server
+[TIME_WAIT on client for 2×MSL to handle delayed packets]</div>
+    <div class="concept-box"><h4>TCP Flow Control &amp; Congestion Control</h4>
+      <ul>
+        <li><strong>Flow control (receiver-driven):</strong> Receiver advertises window size; sender can't exceed it. Prevents overwhelming a slow receiver.</li>
+        <li><strong>Congestion control (network-driven):</strong> Slow start → congestion avoidance → fast retransmit/recovery. Responds to packet loss as congestion signal.</li>
+        <li><strong>Nagle's algorithm:</strong> Buffers small packets (disable with TCP_NODELAY for latency-sensitive apps like games)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div><!-- http -->
+
+<!-- ═══════ DNS ═══════ -->
+<div id="dns" class="subsection">
+<div class="subsection-title">DNS — Domain Name System</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>DNS Resolution Process &amp; Record Types</h3>
+    <div class="tag-row"><span class="badge badge-tag">Networking</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">DNS Resolution: browser.com → 93.184.216.34
+
+1. Browser cache (TTL-based)
+2. OS cache / /etc/hosts
+3. Recursive Resolver (ISP or 8.8.8.8)
+   ├── Root DNS server → "try .com TLD servers"
+   ├── .com TLD server  → "try browser.com nameservers"
+   └── Authoritative NS → returns A record: 93.184.216.34
+4. Resolver caches response (per TTL)
+5. Browser connects to 93.184.216.34</div>
+    <table>
+      <tr><th>Record</th><th>Purpose</th><th>Example</th></tr>
+      <tr><td>A</td><td>IPv4 address</td><td>example.com → 93.184.216.34</td></tr>
+      <tr><td>AAAA</td><td>IPv6 address</td><td>example.com → 2606:2800::1</td></tr>
+      <tr><td>CNAME</td><td>Alias to another hostname</td><td>www → example.com</td></tr>
+      <tr><td>MX</td><td>Mail server</td><td>example.com → mail.example.com (priority 10)</td></tr>
+      <tr><td>TXT</td><td>Text (SPF, DKIM, domain verify)</td><td>"v=spf1 include:..."</td></tr>
+      <tr><td>NS</td><td>Authoritative nameservers</td><td>example.com → ns1.cloudflare.com</td></tr>
+      <tr><td>SOA</td><td>Zone authority info</td><td>Serial number, TTL defaults</td></tr>
+      <tr><td>SRV</td><td>Service location</td><td>_sip._tcp.example.com → sip.example.com:5060</td></tr>
+    </table>
+    <div class="warn-box"><strong>Low TTL trade-off:</strong> Faster failover during outages but higher DNS query load. High TTL = less load but slow propagation of changes. Route 53 health-check failover works best with TTL ≤ 60s.</div>
+  </div>
+</div>
+
+</div><!-- dns -->
+
+<!-- ═══════ REAL-TIME ═══════ -->
+<div id="realtime" class="subsection">
+<div class="subsection-title">Real-Time Communication Patterns</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>WebSockets vs SSE vs Long Polling vs Short Polling</h3>
+    <div class="tag-row"><span class="badge badge-tag">Real-Time</span><span class="badge badge-tag">Networking</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Method</th><th>Direction</th><th>Protocol</th><th>Best For</th><th>Bottleneck</th></tr>
+      <tr><td>Short Polling</td><td>Client pulls</td><td>HTTP</td><td>Simple, infrequent updates</td><td>Wasteful — many empty responses</td></tr>
+      <tr><td>Long Polling</td><td>Client pulls (held)</td><td>HTTP</td><td>When WebSocket unavailable</td><td>Connection churn, server threads blocked</td></tr>
+      <tr><td>SSE (Server-Sent Events)</td><td>Server → Client only</td><td>HTTP/1.1 text/event-stream</td><td>Live feeds, logs, notifications</td><td>Unidirectional; 6-connection limit in HTTP/1.1</td></tr>
+      <tr><td>WebSocket</td><td>Bidirectional full-duplex</td><td>WS/WSS (upgrades HTTP)</td><td>Chat, gaming, collaboration</td><td>Stateful — harder to load-balance; sticky sessions needed</td></tr>
+    </table>
+<pre><code class="language-python"># WebSocket server — Python (websockets library)
+import asyncio, websockets, json
+
+connected = set()
+
+async def handler(websocket):
+    connected.add(websocket)
+    try:
+        async for message in websocket:
+            data = json.loads(message)
+            # Broadcast to all connected clients
+            await asyncio.gather(*[
+                ws.send(json.dumps({"user": data["user"], "msg": data["msg"]}))
+                for ws in connected if ws != websocket
+            ])
+    finally:
+        connected.remove(websocket)
+
+async def main():
+    async with websockets.serve(handler, "localhost", 8765):
+        await asyncio.Future()  # run forever</code></pre>
+    <div class="callout callout-orange"><div class="callout-title">WebSocket at Scale</div>Use Redis Pub/Sub as the broadcast layer across multiple WebSocket server instances. Each server subscribes to Redis; when a message arrives, broadcast to local connected clients. This enables horizontal scaling without sticky sessions for broadcasting.</div>
+  </div>
+</div>
+
+</div><!-- realtime -->
+
+<!-- ═══════ CORS ═══════ -->
+<div id="cors" class="subsection">
+<div class="subsection-title">CORS &amp; Security Headers</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>CORS — Cross-Origin Resource Sharing</h3>
+    <div class="tag-row"><span class="badge badge-tag">Security</span><span class="badge badge-tag">HTTP</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">Same-origin: protocol + host + port must all match
+  https://app.example.com:443/api  ✅ same origin
+  http://app.example.com/api       ✗ different protocol
+  https://api.example.com/api      ✗ different subdomain
+  https://app.example.com:8080/api ✗ different port
+
+Simple request (no preflight):
+  GET/POST with basic headers → browser adds Origin header
+  Server responds with Access-Control-Allow-Origin
+
+Preflight (OPTIONS) for non-simple requests:
+  Client  ── OPTIONS /api ──────────────────────────────► Server
+          ← Access-Control-Allow-Origin: https://app.com
+          ← Access-Control-Allow-Methods: GET, POST, PUT
+          ← Access-Control-Allow-Headers: Content-Type, Authorization
+          ← Access-Control-Max-Age: 86400  (cache preflight 24h)
+  Client  ── Actual Request ──────────────────────────── Server</div>
+<pre><code class="language-python"># FastAPI CORS configuration
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://app.example.com"],   # never use "*" with credentials
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
+    max_age=86400,
+)</code></pre>
+    <div class="concept-box"><h4>Security Headers</h4><ul>
+      <li><code>Content-Security-Policy</code>: Whitelist sources for scripts/styles/images. Prevents XSS.</li>
+      <li><code>X-Frame-Options: DENY</code>: Prevent clickjacking (or use CSP <code>frame-ancestors</code>)</li>
+      <li><code>X-Content-Type-Options: nosniff</code>: Prevent MIME sniffing attacks</li>
+      <li><code>Strict-Transport-Security: max-age=31536000; includeSubDomains</code>: Force HTTPS</li>
+      <li><code>Referrer-Policy: strict-origin-when-cross-origin</code>: Control referrer leakage</li>
+      <li><code>Permissions-Policy</code>: Restrict camera, microphone, geolocation access</li>
+    </ul></div>
+  </div>
+</div>
+
+</div><!-- cors -->
+
+<!-- ═══════ OAUTH 2.0 ═══════ -->
+<div id="oauth" class="subsection">
+<div class="subsection-title">OAuth 2.0 — Authorization Framework</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>OAuth 2.0 Flows — Authorization Code, PKCE, Client Credentials</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span><span class="badge badge-tag">Auth</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="callout callout-blue"><div class="callout-title">OAuth 2.0 is Authorization, not Authentication</div>OAuth gives an application limited access to a user's resources. Use OpenID Connect (OIDC) on top of OAuth for authentication (identity).</div>
+    <table>
+      <tr><th>Flow</th><th>When to Use</th><th>Tokens</th></tr>
+      <tr><td>Authorization Code + PKCE</td><td>Web apps, SPAs, mobile apps (recommended for all public clients)</td><td>Authorization code → access + refresh tokens</td></tr>
+      <tr><td>Client Credentials</td><td>Machine-to-machine (no user), backend services</td><td>Access token only (no refresh)</td></tr>
+      <tr><td>Device Code</td><td>Devices without browser (TV, CLI, IoT)</td><td>Polling until user authorizes on another device</td></tr>
+      <tr><td>Implicit (deprecated)</td><td>Old SPAs — never use, token in URL fragment exposed</td><td>Token directly (insecure)</td></tr>
+    </table>
+    <div class="arch-box">Authorization Code + PKCE Flow (recommended for SPAs/mobile):
+
+1. Client generates code_verifier (random 64 bytes) and
+   code_challenge = BASE64URL(SHA256(code_verifier))
+
+2. Client ── GET /authorize?
+              response_type=code
+              &client_id=xyz
+              &redirect_uri=https://app.com/callback
+              &scope=openid profile email
+              &state=random_csrf_token      ← CSRF protection
+              &code_challenge=ABCD...
+              &code_challenge_method=S256 ──────────────────► Auth Server
+
+3. User authenticates + consents on Auth Server
+
+4. Auth Server ── Redirect to https://app.com/callback?
+                  code=AUTHORIZATION_CODE
+                  &state=random_csrf_token ─────────────────► Client
+
+5. Client verifies state == original (CSRF check)
+
+6. Client ── POST /token
+              code=AUTHORIZATION_CODE
+              code_verifier=ORIGINAL_VERIFIER     ← PKCE proof
+              grant_type=authorization_code
+              redirect_uri=... ─────────────────────────────► Auth Server
+
+7. Auth Server verifies SHA256(code_verifier) == code_challenge
+   Auth Server ── { access_token, refresh_token, id_token } ► Client</div>
+    <div class="warn-box"><strong>Security pitfalls:</strong><br>
+    ❌ Never put access tokens in URL parameters (logged by servers/proxies)<br>
+    ❌ Don't skip state parameter validation (CSRF attack vector)<br>
+    ❌ Implicit flow — token in URL fragment cached in browser history<br>
+    ❌ Client secrets in mobile/SPA code — use PKCE instead<br>
+    ✅ Always validate redirect_uri server-side (open redirect attacks)
+    </div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Client Credentials &amp; Token Refresh</h3>
+    <div class="tag-row"><span class="badge badge-tag">Auth</span><span class="badge badge-tag">M2M</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-python">import httpx, time
+
+class OAuthClient:
+    def __init__(self, token_url, client_id, client_secret, scope):
+        self.token_url     = token_url
+        self.client_id     = client_id
+        self.client_secret = client_secret
+        self.scope         = scope
+        self._token        = None
+        self._expires_at   = 0
+
+    def get_access_token(self) -> str:
+        if self._token and time.time() < self._expires_at - 60:  # 60s buffer
+            return self._token
+        return self._refresh_token()
+
+    def _refresh_token(self) -> str:
+        resp = httpx.post(self.token_url, data={
+            "grant_type":    "client_credentials",
+            "client_id":     self.client_id,
+            "client_secret": self.client_secret,
+            "scope":         self.scope,
+        })
+        resp.raise_for_status()
+        data = resp.json()
+        self._token      = data["access_token"]
+        self._expires_at = time.time() + data["expires_in"]
+        return self._token
+
+    def request(self, method, url, **kwargs):
+        headers = kwargs.pop("headers", {})
+        headers["Authorization"] = f"Bearer {self.get_access_token()}"
+        return httpx.request(method, url, headers=headers, **kwargs)</code></pre>
+  </div>
+</div>
+
+</div><!-- oauth -->
+
+<!-- ═══════ SSO ═══════ -->
+<div id="sso" class="subsection">
+<div class="subsection-title">SSO — Single Sign-On</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>SSO Architecture — SAML vs OIDC</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span><span class="badge badge-tag">SSO</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th></th><th>SAML 2.0</th><th>OIDC (OpenID Connect)</th></tr>
+      <tr><td>Data format</td><td>XML assertions</td><td>JSON / JWT</td></tr>
+      <tr><td>Transport</td><td>HTTP redirect/POST (browser-based)</td><td>OAuth 2.0 flows (code, device)</td></tr>
+      <tr><td>Mobile/SPA support</td><td>Poor (XML heavy, redirect-based)</td><td>Excellent (JSON, API-friendly)</td></tr>
+      <tr><td>Enterprise adoption</td><td>Very high (legacy enterprise)</td><td>High and growing</td></tr>
+      <tr><td>ID providers</td><td>Okta, ADFS, Ping, Shibboleth</td><td>Google, Okta, Auth0, Azure AD, GitHub</td></tr>
+      <tr><td>Token</td><td>SAML Assertion (XML signed)</td><td>ID Token (JWT) + Access Token</td></tr>
+    </table>
+    <div class="arch-box">OIDC SSO Flow (web app):
+
+1. User visits app.example.com → not authenticated → redirect to IdP
+2. IdP (Okta/Auth0) authenticates user (credentials, MFA)
+3. IdP issues:
+   - id_token  (JWT) — who the user is (name, email, sub)
+   - access_token  — what the user can access
+   - refresh_token — get new access tokens without re-login
+4. App validates id_token signature (JWKs endpoint)
+5. App creates session ← SESSION TOKEN stored in httpOnly cookie
+
+Federation: Company uses Okta as IdP
+  Employee logs into Okta once → SSO into Salesforce, Jira, Github, Slack
+  Each SP trusts Okta's assertions. No per-app password.</div>
+    <div class="concept-box"><h4>Session Management in SSO</h4><ul>
+      <li><strong>SP Session:</strong> Each service provider maintains its own session (httpOnly cookie). Duration typically shorter than IdP session.</li>
+      <li><strong>IdP Session:</strong> Central session at identity provider. User only re-authenticates here.</li>
+      <li><strong>Single Logout (SLO):</strong> Terminating IdP session + propagating logout to all SPs. Often brittle — many apps use session TTL instead.</li>
+      <li><strong>Token expiry strategy:</strong> Short-lived access tokens (15min) + long-lived refresh tokens (7-30 days, rotated on use). Refresh token rotation prevents token theft.</li>
+    </ul></div>
+  </div>
+</div>
+
+</div><!-- sso -->
+
+<!-- ═══════ JWT ═══════ -->
+<div id="jwt" class="subsection">
+<div class="subsection-title">JWT — JSON Web Tokens</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>JWT Structure, Validation &amp; Security</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span><span class="badge badge-tag">JWT</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">JWT = Base64URL(Header) . Base64URL(Payload) . Base64URL(Signature)
+
+Header:  { "alg": "RS256", "typ": "JWT", "kid": "key-id-2024" }
+Payload: { "sub": "user123",         // subject (user id)
+           "iss": "https://auth.example.com",  // issuer
+           "aud": ["api.example.com"],  // audience
+           "exp": 1716825600,          // expiry (Unix timestamp)
+           "iat": 1716822000,          // issued at
+           "nbf": 1716822000,          // not before
+           "jti": "unique-token-id",   // JWT ID (for revocation)
+           "email": "alice@example.com",
+           "roles": ["user", "editor"] }
+Signature: RS256(base64(header) + "." + base64(payload), privateKey)</div>
+<pre><code class="language-python">import jwt, time
+from cryptography.hazmat.primitives import serialization
+
+# ── Verify a JWT (RS256) ───────────────────────────────────
+def verify_jwt(token: str, jwks_uri: str) -> dict:
+    """Fetch public key from JWKS endpoint and validate token."""
+    import httpx
+    header = jwt.get_unverified_header(token)
+    # Fetch JWKS and find matching key by kid
+    jwks = httpx.get(jwks_uri).json()
+    public_key = next(k for k in jwks["keys"] if k["kid"] == header["kid"])
+    return jwt.decode(
+        token,
+        jwt.algorithms.RSAAlgorithm.from_jwk(public_key),
+        algorithms=["RS256"],
+        audience="api.example.com",
+        issuer="https://auth.example.com",
+        options={"require": ["exp", "iat", "sub", "iss", "aud"]},
+    )
+
+# ── Security checks that JWT library handles ──────────────
+# ✅ Signature verification
+# ✅ Expiry (exp)
+# ✅ Not-before (nbf)
+# ✅ Issuer (iss)
+# ✅ Audience (aud)
+# ⚠  Revocation — JWT is stateless; use jti + revocation list in Redis</code></pre>
+    <div class="warn-box"><strong>JWT Security Vulnerabilities:</strong><br>
+    <strong>alg:none attack</strong> — Never trust the algorithm from the header. Always hardcode expected algorithm server-side.<br>
+    <strong>RS256 → HS256 confusion</strong> — An attacker changes alg to HS256 and signs with the server's public key (which is known). Server mistakenly uses HMAC with the public key string.<br>
+    <strong>No revocation</strong> — JWTs are valid until expiry. For logout, maintain a revocation list (Redis) and check jti on each request.
+    </div>
+    <div class="concept-box"><h4>HS256 vs RS256</h4>
+      <ul>
+        <li><strong>HS256 (HMAC-SHA256):</strong> Symmetric — same secret for sign and verify. Use only when signer == verifier (same service). Secret must be kept hidden from all parties.</li>
+        <li><strong>RS256 (RSA-SHA256):</strong> Asymmetric — private key signs, public key verifies. Auth server keeps private key; any resource server can verify with public key from JWKS endpoint. Preferred for distributed systems.</li>
+        <li><strong>ES256 (ECDSA-SHA256):</strong> Elliptic curve variant of RS256 — smaller signatures, faster verification, same security level with smaller key sizes.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div><!-- jwt -->
+
+<!-- ═══════ CRYPTOGRAPHY ═══════ -->
+<div id="crypto" class="subsection">
+<div class="subsection-title">Cryptography — Symmetric, Asymmetric &amp; Digital Signatures</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Symmetric vs Asymmetric Encryption</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span><span class="badge badge-tag">Cryptography</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th></th><th>Symmetric</th><th>Asymmetric</th></tr>
+      <tr><td>Keys</td><td>One shared secret key</td><td>Key pair: public + private</td></tr>
+      <tr><td>Speed</td><td>Fast (AES hardware acceleration)</td><td>~1000x slower (RSA)</td></tr>
+      <tr><td>Key distribution</td><td>Hard — how to share secret key?</td><td>Public key can be shared openly</td></tr>
+      <tr><td>Use cases</td><td>Bulk data encryption (files, TLS data)</td><td>Key exchange, signatures, TLS handshake</td></tr>
+      <tr><td>Algorithms</td><td>AES-256-GCM, ChaCha20-Poly1305</td><td>RSA-2048/4096, ECDSA (P-256), X25519</td></tr>
+      <tr><td>Mode concern</td><td>Use GCM (authenticated) not ECB/CBC</td><td>Never encrypt large data directly</td></tr>
+    </table>
+<pre><code class="language-python">from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+import os
+
+# ── AES-256-GCM (symmetric, authenticated encryption) ─────
+key   = AESGCM.generate_key(bit_length=256)  # 32 bytes
+aesgcm = AESGCM(key)
+nonce  = os.urandom(12)          # 96-bit nonce — NEVER reuse with same key
+aad    = b"authenticated but not encrypted metadata"
+
+ciphertext = aesgcm.encrypt(nonce, b"secret message", aad)
+plaintext  = aesgcm.decrypt(nonce, ciphertext, aad)
+# If AAD or ciphertext is tampered → InvalidTag exception (authentication)
+
+# ── RSA encryption/decryption ─────────────────────────────
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import hashes
+
+private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+public_key  = private_key.public_key()
+
+encrypted = public_key.encrypt(
+    b"secret",
+    padding.OAEP(mgf=padding.MGF1(hashes.SHA256()), algorithm=hashes.SHA256(), label=None)
+)
+decrypted = private_key.decrypt(encrypted,
+    padding.OAEP(mgf=padding.MGF1(hashes.SHA256()), algorithm=hashes.SHA256(), label=None)
+)
+
+# RSA practical limit: encrypt only small data (< key_size - overhead)
+# In TLS: RSA/ECDH exchange symmetric session key, then use AES for bulk</code></pre>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Digital Signatures &amp; Certificate Chain</h3>
+    <div class="tag-row"><span class="badge badge-tag">Cryptography</span><span class="badge badge-tag">PKI</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">Digital Signature (Non-repudiation + Integrity):
+
+Sign:    hash = SHA-256(message)
+         signature = RSA_privateKey_encrypt(hash)
+
+Verify:  hash1 = SHA-256(message)
+         hash2 = RSA_publicKey_decrypt(signature)
+         valid = (hash1 == hash2)
+
+Certificate Chain (PKI):
+Root CA (self-signed, trusted by OS)
+  └── Intermediate CA (signed by Root CA)
+        └── Server Certificate example.com (signed by Intermediate CA)
+
+Browser verification:
+1. Get server cert from TLS handshake
+2. Verify signature with Intermediate CA public key
+3. Verify Intermediate CA signature with Root CA
+4. Root CA is in trusted store → chain valid</div>
+<pre><code class="language-python">from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives import hashes, serialization
+
+# Sign a message (private key)
+signature = private_key.sign(
+    b"document content",
+    padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH),
+    hashes.SHA256()
+)
+
+# Verify (public key) — raises InvalidSignature if tampered
+try:
+    public_key.verify(
+        signature,
+        b"document content",
+        padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH),
+        hashes.SHA256()
+    )
+    print("Signature valid")
+except Exception:
+    print("Tampered!")</code></pre>
+  </div>
+</div>
+
+</div><!-- crypto -->
+
+<!-- ═══════ TLS ═══════ -->
+<div id="tls" class="subsection">
+<div class="subsection-title">TLS 1.3 Handshake</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>TLS 1.3 — Handshake &amp; What Changed from 1.2</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span><span class="badge badge-tag">TLS</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">TLS 1.3 Full Handshake (1 RTT):
+
+Client ── ClientHello ──────────────────────────────────► Server
+          Supported cipher suites (only AEAD: AES-GCM, ChaCha20)
+          Key share: Client ECDH ephemeral public key (X25519)
+          Supported TLS versions
+
+Server ── ServerHello ◄──────────────────────────────────
+          Selected cipher suite
+          Server ECDH ephemeral public key
+          [Both sides derive shared secret via ECDH — no more RSA key exchange]
+
+Server ── EncryptedExtensions, Certificate, CertificateVerify, Finished ◄──
+          (Everything after ServerHello is encrypted)
+
+Client ── Finished ──────────────────────────────────────► Server
+[Application data starts flowing — 1 RTT total]
+
+TLS 1.3 0-RTT Session Resumption:
+Client caches session ticket → next connection sends data immediately
+⚠ 0-RTT data has no replay protection — only use for idempotent GETs
+
+Removed in TLS 1.3 (security improvements):
+  ❌ RSA key exchange (no forward secrecy)
+  ❌ DH static key exchange
+  ❌ RC4, DES, 3DES, MD5, SHA-1
+  ❌ Compression (CRIME attack)
+  ❌ Renegotiation</div>
+    <div class="concept-box"><h4>Forward Secrecy (Perfect Forward Secrecy)</h4>
+      <p>TLS 1.3 mandates ECDHE (Ephemeral Diffie-Hellman). A new key pair is generated per session. Even if the server's private key is compromised later, past sessions cannot be decrypted because the ephemeral keys were discarded.</p>
+      <p>TLS 1.2 with RSA key exchange had NO forward secrecy — recording all traffic and later getting the private key allowed decryption of all past sessions.</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- tls -->
+
+<!-- ═══════ HASHING ═══════ -->
+<div id="hashing" class="subsection">
+<div class="subsection-title">Hashing — Integrity vs Password Storage</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>SHA-256 vs bcrypt vs PBKDF2 vs Argon2</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span><span class="badge badge-tag">Security</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Algorithm</th><th>Purpose</th><th>Speed</th><th>Salt</th><th>Recommendation</th></tr>
+      <tr><td>MD5</td><td>Legacy checksum</td><td>Very fast</td><td>No</td><td>Never for security</td></tr>
+      <tr><td>SHA-256</td><td>Data integrity, HMAC, digital signatures</td><td>Fast</td><td>No (use HMAC)</td><td>Good for integrity checks</td></tr>
+      <tr><td>SHA-3 / BLAKE3</td><td>Integrity, HMAC</td><td>Fast</td><td>No</td><td>Modern alternative to SHA-2</td></tr>
+      <tr><td>bcrypt</td><td>Password hashing</td><td>Slow (intentional)</td><td>Built-in</td><td>Good, widely supported</td></tr>
+      <tr><td>PBKDF2</td><td>Password / key derivation</td><td>Configurable</td><td>Required</td><td>FIPS compliant, use SHA-256</td></tr>
+      <tr><td>Argon2id</td><td>Password hashing</td><td>Slow + memory-hard</td><td>Built-in</td><td>Best current recommendation</td></tr>
+    </table>
+<pre><code class="language-python">import hashlib, hmac, os
+import bcrypt
+# pip install argon2-cffi
+from argon2 import PasswordHasher
+
+# ── SHA-256 for data integrity ─────────────────────────────
+digest = hashlib.sha256(b"file contents").hexdigest()
+
+# HMAC — keyed hash (prevents length extension attacks)
+mac = hmac.new(b"secret_key", b"message", hashlib.sha256).hexdigest()
+# Use hmac.compare_digest() for constant-time comparison (prevent timing attacks)
+valid = hmac.compare_digest(mac, received_mac)
+
+# ── bcrypt for passwords ───────────────────────────────────
+password = b"user_password_123"
+hashed   = bcrypt.hashpw(password, bcrypt.gensalt(rounds=12))  # cost=12
+verified = bcrypt.checkpw(password, hashed)  # True
+
+# ── Argon2id (recommended) ─────────────────────────────────
+ph = PasswordHasher(
+    time_cost=3,       # iterations
+    memory_cost=65536, # 64 MB
+    parallelism=4,     # threads
+)
+hashed   = ph.hash("user_password")
+try:
+    ph.verify(hashed, "user_password")  # True
+    # Check if rehash needed (parameters upgraded)
+    if ph.check_needs_rehash(hashed):
+        hashed = ph.hash("user_password")
+except Exception:
+    pass  # invalid password</code></pre>
+    <div class="warn-box"><strong>Why fast hashes (SHA-256) are bad for passwords:</strong> An attacker with a GPU can compute ~10 billion SHA-256 hashes/second. Argon2id at default settings: ~10 hashes/second. Brute-force becomes 10⁹× harder. Always use a password hashing function with configurable work factor.</div>
+    <div class="callout callout-blue"><div class="callout-title">Rainbow Table Defense</div>Never hash passwords without a per-user salt. Even if two users have the same password, their hashes will differ. bcrypt and Argon2 include a cryptographically random salt automatically.</div>
+  </div>
+</div>
+
+</div><!-- hashing -->
+
+</div><!-- content-area -->
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="main.js"></script>
+<script src="search-data.js"></script>
+<script src="search.js"></script>
+</body>
+</html>
+Signature: RS256(base64(header) + "." + base64(payload), privateKey)

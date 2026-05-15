@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker, Kubernetes &amp; AWS | Interview Prep</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<style>
+.arch-box { background:var(--bg-secondary); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:monospace; font-size:12px; color:var(--text-secondary); line-height:1.8; margin:12px 0; white-space:pre; overflow-x:auto; }
+.warn-box { background:rgba(248,81,73,.07); border:1px solid rgba(248,81,73,.25); border-radius:6px; padding:12px 14px; margin:10px 0; font-size:13px; color:var(--text-primary); }
+.warn-box strong { color:var(--accent-red); }
+.ok-box { background:rgba(63,185,80,.07); border:1px solid rgba(63,185,80,.25); border-radius:6px; padding:12px 14px; margin:10px 0; font-size:13px; }
+.ok-box strong { color:var(--accent-green); }
+.section-jump { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px; }
+.jump-btn { background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:5px 14px; font-size:12px; color:var(--text-secondary); text-decoration:none; transition:all .15s; }
+.jump-btn:hover { border-color:var(--accent-blue); color:var(--accent-blue); }
+.aws-badge { display:inline-block; background:rgba(255,153,0,.15); color:#ff9900; border:1px solid rgba(255,153,0,.3); border-radius:4px; padding:2px 8px; font-size:11px; font-weight:700; }
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">IP</div>
+    <div><h2>Interview Prep</h2><p>Full Stack Reference</p></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Pages</div>
+    <a href="index.html" class="nav-link">Dashboard</a>
+    <a href="dsa.html" class="nav-link">DSA — Python</a>
+    <a href="oop-lld.html" class="nav-link">OOP &amp; LLD — Java</a>
+    <a href="system-design.html" class="nav-link">System Design</a>
+    <a href="kafka.html" class="nav-link">Kafka &amp; Messaging</a>
+    <a href="os-concurrency.html" class="nav-link">OS &amp; Concurrency</a>
+    <a href="docker-aws.html" class="nav-link active">Docker &amp; AWS</a>
+    <a href="networking-security.html" class="nav-link">Networking &amp; Security</a>
+    <a href="databases.html" class="nav-link">Databases — SQL &amp; NoSQL</a>
+    <a href="alation.html" class="nav-link">Alation Focus <span class="nav-badge">HOT</span></a>
+  </div>
+  <div class="sidebar-footer"><kbd>Cmd K</kbd> to search</div>
+</nav>
+
+<main class="main">
+<div class="topbar"><h1>Docker, Kubernetes &amp; AWS</h1>
+  <button class="topbar-search-btn" onclick="window._spotlightOpen && window._spotlightOpen()">Search topics... <kbd>Cmd K</kbd></button></div>
+<div class="content-area">
+
+<div class="section-header">
+  <h1>Docker, Kubernetes &amp; AWS</h1>
+  <p>Containers, orchestration, and cloud architecture — from fundamentals to production patterns with trade-offs and bottlenecks.</p>
+</div>
+
+<div class="section-jump">
+  <a href="#docker" class="jump-btn"> Docker</a>
+  <a href="#kubernetes" class="jump-btn"> Kubernetes</a>
+  <a href="#aws-core" class="jump-btn"> AWS Core</a>
+  <a href="#aws-networking" class="jump-btn"> AWS Networking</a>
+  <a href="#aws-data" class="jump-btn"> AWS Data</a>
+  <a href="#aws-serverless" class="jump-btn"> Serverless &amp; Queues</a>
+  <a href="#aws-arch" class="jump-btn"> Architecture Patterns</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 1: DOCKER
+═══════════════════════════════════════════════ -->
+<div id="docker" class="subsection">
+<div class="subsection-title">Docker — Containers &amp; Images</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Container vs VM — Differences &amp; Trade-offs</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th></th><th>Virtual Machine (VM)</th><th>Container</th></tr>
+      <tr><td>Isolation</td><td>Full OS isolation (hypervisor)</td><td>Process isolation (shared OS kernel)</td></tr>
+      <tr><td>Boot time</td><td>Minutes</td><td>Milliseconds</td></tr>
+      <tr><td>Size</td><td>GBs (full OS image)</td><td>MBs (only app + libs)</td></tr>
+      <tr><td>Security</td><td>Strong (separate kernel)</td><td>Weaker (shared kernel, namespaces)</td></tr>
+      <tr><td>Overhead</td><td>High (hypervisor + full OS)</td><td>Near-zero (host kernel)</td></tr>
+      <tr><td>Portability</td><td>Slower (large images)</td><td>Fast (OCI images, Docker Hub)</td></tr>
+      <tr><td>Use case</td><td>Multi-OS, legacy apps, full isolation</td><td>Microservices, CI/CD, cloud-native</td></tr>
+    </table>
+    <div class="arch-box">VM Stack:                   Container Stack:
+┌─────────────────────┐    ┌─────────────────────┐
+│  Application        │    │ App A │ App B │ App C │
+├─────────────────────┤    ├───────┴───────┴───────┤
+│  Guest OS           │    │  Container Runtime    │
+├─────────────────────┤    │  (Docker / containerd)│
+│  Hypervisor         │    ├───────────────────────┤
+├─────────────────────┤    │  Host OS / Kernel     │
+│  Host Hardware      │    ├───────────────────────┤
+└─────────────────────┘    │  Host Hardware        │
+                           └───────────────────────┘
+
+Docker uses: Linux namespaces (PID, net, mnt, uts, ipc)
+             cgroups (CPU, memory, I/O limits)
+             Union filesystem (OverlayFS — layer-based)</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Docker Images — Layers, Union FS, Build Cache</h3>
+    <div class="tag-row"><span class="badge badge-tag">Docker</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="callout callout-blue"><div class="callout-title">Union Filesystem (OverlayFS)</div>Image = stack of read-only layers. Container adds writable layer on top. Layers are shared across images (same base layer stored once). Changes are copy-on-write to writable layer.</div>
+    <div class="arch-box">Image Layers (bottom to top):
+┌─────────────────────────┐  ← Writable container layer
+├─────────────────────────┤  ← COPY app/ .           (your code)
+├─────────────────────────┤  ← RUN pip install -r requirements.txt
+├─────────────────────────┤  ← COPY requirements.txt .
+├─────────────────────────┤  ← RUN apt-get install python3
+└─────────────────────────┘  ← FROM ubuntu:22.04 (base)
+
+Cache Invalidation: if layer N changes, all layers N+1, N+2... rebuild!
+→ Put rarely-changing things early (base, dependencies)
+→ Put frequently-changing things late (your application code)</div>
+<pre><code class="language-dockerfile"># Optimized Production Dockerfile (multi-stage)
+# Stage 1: Build
+FROM maven:3.9-openjdk-21 AS builder
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline -q  # cache deps layer separately
+COPY src ./src
+RUN mvn package -DskipTests -q
+
+# Stage 2: Runtime (minimal image)
+FROM eclipse-temurin:21-jre-alpine  # smaller: jre not jdk, alpine not ubuntu
+WORKDIR /app
+# Non-root user for security
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+COPY --from=builder /app/target/app.jar ./app.jar
+EXPOSE 8080
+# Use exec form (not shell form) for proper signal handling
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-jar", "app.jar"]</code></pre>
+    <div class="warn-box"><strong>Bottlenecks &amp; Anti-patterns:</strong><br>
+     <code>COPY . .</code> first → any file change rebuilds all layers<br>
+     <code>RUN apt-get update && apt-get install...</code> in separate layers (stale cache)<br>
+     Running as root in container (security risk)<br>
+     Large base images (ubuntu:latest = 77MB vs alpine = 7MB)<br>
+     Storing secrets in image layers (they persist even if deleted later)
+    </div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Docker Networking — Bridge, Host, Overlay</h3>
+    <div class="tag-row"><span class="badge badge-tag">Networking</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Network Mode</th><th>How</th><th>Use Case</th><th>Trade-off</th></tr>
+      <tr><td><strong>bridge</strong> (default)</td><td>Private virtual network on host; containers communicate by name within network</td><td>Single host multi-container apps</td><td>Must publish ports (-p 8080:80) to host</td></tr>
+      <tr><td><strong>host</strong></td><td>Container uses host's network namespace directly</td><td>Performance-critical, low latency</td><td>No isolation, port conflicts</td></tr>
+      <tr><td><strong>none</strong></td><td>No network</td><td>Fully isolated batch jobs</td><td>No connectivity</td></tr>
+      <tr><td><strong>overlay</strong></td><td>Multi-host virtual network (Docker Swarm/K8s)</td><td>Cross-host container communication</td><td>Encapsulation overhead (VXLAN)</td></tr>
+      <tr><td><strong>macvlan</strong></td><td>Container gets its own MAC/IP on physical network</td><td>Legacy apps needing real network presence</td><td>Requires promiscuous mode on NIC</td></tr>
+    </table>
+    <div class="callout callout-blue"><div class="callout-title">Container DNS</div>On user-defined bridge networks, Docker runs a built-in DNS. Containers resolve each other by container name. e.g., web service can <code>curl http://db:5432</code> — Docker resolves "db" to the database container IP automatically.</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Docker Compose — Multi-Container Apps</h3>
+    <div class="tag-row"><span class="badge badge-tag">Docker</span><span class="badge badge-tag">Dev</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-yaml"># docker-compose.yml — production-grade example
+version: '3.9'
+services:
+  api:
+    build: ./api
+    image: myapp/api:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - REDIS_URL=redis://cache:6379
+      - KAFKA_BROKERS=kafka:9092
+    depends_on:
+      postgres: { condition: service_healthy }  # wait until healthy
+      cache:    { condition: service_started }
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:   { cpus: '0.5', memory: 512M }
+        reservations: { memory: 256M }
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  postgres:
+    image: postgres:16-alpine
+    volumes:
+      - pg_data:/var/lib/postgresql/data  # named volume: persists data
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD_FILE: /run/secrets/pg_password  # use secrets not env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d mydb"]
+      interval: 5s
+      retries: 5
+
+  cache:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+
+volumes:
+  pg_data:  # named volume managed by Docker (survives container restart)
+
+# docker-compose up -d       -- start in background
+# docker-compose logs -f api -- tail service logs
+# docker-compose scale api=3 -- run 3 instances</code></pre>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Docker Volumes — Bind Mounts, Named Volumes, tmpfs</h3>
+    <div class="tag-row"><span class="badge badge-tag">Storage</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Type</th><th>Storage Location</th><th>Lifecycle</th><th>Use Case</th></tr>
+      <tr><td>Named Volume</td><td>Docker-managed (/var/lib/docker/volumes)</td><td>Persists until explicitly deleted</td><td>DB data, app data, production persistence</td></tr>
+      <tr><td>Bind Mount</td><td>Specific host path (e.g. ./src:/app/src)</td><td>Exists as long as host path exists</td><td>Dev mode: hot reload, config injection</td></tr>
+      <tr><td>tmpfs</td><td>Host RAM only</td><td>Container lifetime only</td><td>Sensitive data (secrets), high-speed temp</td></tr>
+    </table>
+<pre><code class="language-bash"># Named volume
+docker run -v myapp_data:/var/lib/mysql mysql:8
+
+# Bind mount (dev hot reload)
+docker run -v $(pwd)/src:/app/src -v $(pwd)/node_modules:/app/node_modules node:20
+
+# tmpfs (never written to disk)
+docker run --tmpfs /tmp:size=100m,mode=1777 myapp
+
+# Inspect volumes
+docker volume ls
+docker volume inspect myapp_data
+
+# Backup volume
+docker run --rm -v myapp_data:/source -v $(pwd):/backup alpine \
+  tar czf /backup/backup.tar.gz -C /source .</code></pre>
+  </div>
+</div>
+
+</div><!-- docker -->
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 2: KUBERNETES
+═══════════════════════════════════════════════ -->
+<div id="kubernetes" class="subsection">
+<div class="subsection-title">Kubernetes — Container Orchestration</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Kubernetes Architecture — Control Plane &amp; Nodes</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">Kubernetes Cluster:
+┌──────────────────────────────────────────────────────────────┐
+│  Control Plane                                               │
+│  ├── kube-apiserver     → REST API; all components talk here │
+│  ├── etcd               → Distributed KV store (cluster state)│
+│  ├── kube-scheduler     → Assigns pods to nodes              │
+│  ├── kube-controller-manager → Reconciliation loops          │
+│  └── cloud-controller  → Cloud provider integration          │
+├──────────────────────────────────────────────────────────────┤
+│  Worker Node 1              Worker Node 2                    │
+│  ├── kubelet (agent)        ├── kubelet                      │
+│  ├── kube-proxy (iptables)  ├── kube-proxy                   │
+│  ├── containerd             ├── containerd                   │
+│  ├── Pod A: [Container1]    ├── Pod C: [Container1]           │
+│  └── Pod B: [Container1]    └── Pod D: [Container1, C2]       │
+└──────────────────────────────────────────────────────────────┘</div>
+    <table>
+      <tr><th>Component</th><th>Role</th></tr>
+      <tr><td>etcd</td><td>Source of truth for all cluster state. Must be HA (3+ nodes). Loss = cluster state loss.</td></tr>
+      <tr><td>kube-apiserver</td><td>All requests go through here. Authentication, admission control, validation.</td></tr>
+      <tr><td>kube-scheduler</td><td>Watches for unscheduled pods. Selects best node based on resources, affinity, taints.</td></tr>
+      <tr><td>controller-manager</td><td>Runs control loops: ReplicaSet controller, Deployment controller, Node controller, etc.</td></tr>
+      <tr><td>kubelet</td><td>Agent on each node. Ensures containers in Pods are running and healthy.</td></tr>
+      <tr><td>kube-proxy</td><td>Maintains network rules (iptables/ipvs) for Service load balancing.</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Core Kubernetes Objects</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Object</th><th>What it does</th></tr>
+      <tr><td><strong>Pod</strong></td><td>Smallest deployable unit. 1+ containers sharing network/storage. Ephemeral — don't manage directly.</td></tr>
+      <tr><td><strong>Deployment</strong></td><td>Manages ReplicaSets; rolling updates, rollback. For stateless apps.</td></tr>
+      <tr><td><strong>StatefulSet</strong></td><td>Like Deployment but for stateful apps (DBs). Stable pod names, ordered startup, persistent volumes per pod.</td></tr>
+      <tr><td><strong>DaemonSet</strong></td><td>One pod per node. For cluster-wide agents: log collector (Fluentd), metrics (Prometheus Node Exporter).</td></tr>
+      <tr><td><strong>Service</strong></td><td>Stable virtual IP + DNS for a set of pods. Types: ClusterIP, NodePort, LoadBalancer, ExternalName.</td></tr>
+      <tr><td><strong>Ingress</strong></td><td>HTTP/HTTPS routing rules → Services. Host-based + path-based routing. Needs Ingress Controller (Nginx, Traefik).</td></tr>
+      <tr><td><strong>ConfigMap</strong></td><td>Non-sensitive config as key-value pairs, injected as env vars or files.</td></tr>
+      <tr><td><strong>Secret</strong></td><td>Base64-encoded sensitive data (not encrypted by default! Use sealed-secrets or Vault for real security).</td></tr>
+      <tr><td><strong>HPA</strong></td><td>Horizontal Pod Autoscaler: scales pods based on CPU/memory/custom metrics.</td></tr>
+      <tr><td><strong>PVC/PV</strong></td><td>PersistentVolumeClaim: requests storage. PersistentVolume: actual storage resource.</td></tr>
+    </table>
+<pre><code class="language-yaml"># Production Deployment manifest
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-service
+  labels: { app: api }
+spec:
+  replicas: 3
+  selector: { matchLabels: { app: api } }
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxSurge: 1, maxUnavailable: 0 }  # zero-downtime
+  template:
+    metadata: { labels: { app: api } }
+    spec:
+      containers:
+      - name: api
+        image: myapp/api:v1.2.3  # pin to digest in prod: @sha256:...
+        ports: [{ containerPort: 8080 }]
+        resources:
+          requests: { cpu: "100m", memory: "256Mi" }  # scheduler uses this
+          limits:   { cpu: "500m", memory: "512Mi" }  # OOMKilled if exceeded
+        readinessProbe:   # traffic only when ready
+          httpGet: { path: /ready, port: 8080 }
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:    # restart if unhealthy
+          httpGet: { path: /health, port: 8080 }
+          initialDelaySeconds: 15
+        env:
+        - name: DB_PASSWORD
+          valueFrom: { secretKeyRef: { name: db-secret, key: password } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: api-service }
+spec:
+  selector: { app: api }
+  ports: [{ port: 80, targetPort: 8080 }]
+  type: ClusterIP
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: api-hpa }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: api-service }
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource: { name: cpu, target: { type: Utilization, averageUtilization: 70 } }</code></pre>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Service Types, Ingress &amp; Service Mesh</h3>
+    <div class="tag-row"><span class="badge badge-tag">Networking</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Service Type</th><th>Accessible From</th><th>Use Case</th></tr>
+      <tr><td>ClusterIP (default)</td><td>Within cluster only</td><td>Internal microservice communication</td></tr>
+      <tr><td>NodePort</td><td>NodeIP:Port from outside</td><td>Dev/test; not for production</td></tr>
+      <tr><td>LoadBalancer</td><td>Cloud LB public IP</td><td>Expose single service externally; costs money per service</td></tr>
+      <tr><td>Ingress + IngressController</td><td>HTTP/HTTPS routing via single LB</td><td>Route multiple services via path/host — cost-effective</td></tr>
+    </table>
+    <div class="arch-box">Ingress Routing:
+Internet → ALB/NLB → Ingress Controller (Nginx pod)
+  api.example.com/v1/users  → api-service:80
+  api.example.com/v1/orders → order-service:80
+  app.example.com/          → frontend-service:80
+
+Service Mesh (Istio/Linkerd):
+  Sidecar proxy (Envoy) injected into each pod
+  → mTLS between all services
+  → Circuit breaking, retries, timeout
+  → Distributed tracing
+  → Traffic shifting (canary: 10% to v2, 90% to v1)</div>
+    <div class="warn-box"><strong>Bottleneck:</strong> Service mesh adds ~2ms latency per hop (sidecar proxy). Worth it for security and observability at scale, but overhead for small clusters.</div>
+  </div>
+</div>
+
+</div><!-- kubernetes -->
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 3: AWS CORE
+═══════════════════════════════════════════════ -->
+<div id="aws-core" class="subsection">
+<div class="subsection-title">AWS Core Services</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>EC2 — Elastic Compute Cloud</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">Compute</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Purchase Option</th><th>Discount</th><th>Best For</th></tr>
+      <tr><td>On-Demand</td><td>0%</td><td>Unpredictable, short-term workloads</td></tr>
+      <tr><td>Reserved (1–3yr)</td><td>Up to 72%</td><td>Steady-state baseline workloads</td></tr>
+      <tr><td>Spot Instances</td><td>Up to 90%</td><td>Fault-tolerant batch jobs, can be interrupted with 2-min notice</td></tr>
+      <tr><td>Savings Plans</td><td>Up to 66%</td><td>Flexible (compute family agnostic)</td></tr>
+      <tr><td>Dedicated Hosts</td><td>Variable</td><td>Compliance, licensing (SQL Server, Oracle)</td></tr>
+    </table>
+    <div class="grid-2">
+      <div class="concept-box">
+        <h4>Instance Families</h4>
+        <ul>
+          <li><strong>m — General Purpose:</strong> m7g, m6i (balanced CPU/memory)</li>
+          <li><strong>c — Compute Optimized:</strong> c7g (CPU-intensive, ML inference)</li>
+          <li><strong>r — Memory Optimized:</strong> r7i (in-memory DB, Redis, Kafka)</li>
+          <li><strong>i — Storage Optimized:</strong> i4i (NVMe SSD, Cassandra, HDFS)</li>
+          <li><strong>g — GPU:</strong> g5 (ML training, graphics)</li>
+          <li><strong>t — Burstable:</strong> t3 (dev/test, variable workloads)</li>
+        </ul>
+      </div>
+      <div class="concept-box">
+        <h4>EC2 Bottlenecks &amp; Best Practices</h4>
+        <ul>
+          <li>Network: use enhanced networking (ENA), placement groups for HPC</li>
+          <li>Storage I/O: use io2 Block Express for &gt;64K IOPS (RDBMS)</li>
+          <li>CPU: c instances for compute-bound; Graviton (ARM) = 20% cheaper, 40% better perf/watt</li>
+          <li>Right-sizing: use Compute Optimizer + CloudWatch metrics</li>
+          <li>Spot: use Spot with ASG + diversified instance types (fallback)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="concept-box"><h4>Auto Scaling Group (ASG)</h4>
+      <ul>
+        <li>Min/desired/max capacity; scales on CloudWatch metrics (CPU, custom)</li>
+        <li><strong>Target Tracking:</strong> "keep CPU at 60%" — simplest, recommended</li>
+        <li><strong>Step Scaling:</strong> different actions at different thresholds</li>
+        <li><strong>Predictive Scaling:</strong> ML-based forecast, scales in advance</li>
+        <li>Always pair with ELB — unhealthy instances replaced automatically</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>S3 — Simple Storage Service</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">Storage</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Storage Class</th><th>Use Case</th><th>Retrieval</th><th>Cost</th></tr>
+      <tr><td>S3 Standard</td><td>Frequently accessed (app assets, active data)</td><td>Immediate</td><td>$$$</td></tr>
+      <tr><td>S3 Standard-IA</td><td>Infrequent access, must be available quickly</td><td>Immediate</td><td>$$</td></tr>
+      <tr><td>S3 One Zone-IA</td><td>Recreatable data (thumbnails)</td><td>Immediate</td><td>$</td></tr>
+      <tr><td>S3 Intelligent-Tiering</td><td>Unknown access patterns — auto-moves between tiers</td><td>Immediate</td><td>$$+monitoring fee</td></tr>
+      <tr><td>S3 Glacier Instant</td><td>Archive, rare access but instant needed</td><td>Milliseconds</td><td>$</td></tr>
+      <tr><td>S3 Glacier Flexible</td><td>Archive, 12-hour retrieval OK</td><td>1–12 hours</td><td>¢</td></tr>
+      <tr><td>S3 Glacier Deep Archive</td><td>Long-term (7-10 year retention)</td><td>Up to 48 hours</td><td>¢¢</td></tr>
+    </table>
+    <div class="concept-box"><h4>S3 Key Features &amp; Best Practices</h4><ul>
+      <li><strong>Durability:</strong> 99.999999999% (11 9s) — stores across 3 AZs minimum</li>
+      <li><strong>Versioning:</strong> Enable on important buckets — protects from delete/overwrite</li>
+      <li><strong>Lifecycle rules:</strong> Auto-transition to cheaper tier or delete after N days</li>
+      <li><strong>Presigned URLs:</strong> Temporary access to private objects (e.g., 15-min download link)</li>
+      <li><strong>S3 Transfer Acceleration:</strong> Uses CloudFront edge for faster uploads globally</li>
+      <li><strong>Multipart upload:</strong> Required for &gt;5GB; recommended for &gt;100MB</li>
+      <li><strong>Block Public Access:</strong> Enable at account level — prevents accidental public exposure</li>
+      <li><strong>S3 Event Notifications:</strong> Trigger Lambda/SQS/SNS on put/delete (data processing pipeline)</li>
+    </ul></div>
+    <div class="warn-box"><strong>S3 Bottleneck:</strong> S3 has 3,500 PUT/COPY/POST/DELETE and 5,500 GET/HEAD requests per second per prefix. Distribute objects across multiple prefixes (don't use date prefix for high-throughput writes).</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>RDS &amp; Aurora — Managed Databases</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">Database</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th></th><th>RDS (Standard)</th><th>Aurora</th></tr>
+      <tr><td>Engines</td><td>MySQL, Postgres, MariaDB, Oracle, SQL Server</td><td>MySQL-compatible, Postgres-compatible</td></tr>
+      <tr><td>Storage</td><td>EBS volumes, manual scaling</td><td>Shared distributed storage, auto-scales to 128TB</td></tr>
+      <tr><td>Read Replicas</td><td>Up to 5, eventual consistency</td><td>Up to 15 Aurora Replicas, &lt;10ms lag</td></tr>
+      <tr><td>Failover</td><td>1–2 minutes (Multi-AZ standby)</td><td>~30 seconds (Aurora Replica promoted)</td></tr>
+      <tr><td>Performance</td><td>Baseline</td><td>5x MySQL, 3x Postgres performance</td></tr>
+      <tr><td>Cost</td><td>Lower for simple workloads</td><td>Higher base, better at scale</td></tr>
+    </table>
+    <div class="concept-box"><h4>Multi-AZ vs Read Replicas</h4><ul>
+      <li><strong>Multi-AZ:</strong> Synchronous standby in another AZ. Automatic failover. NOT for read scaling — standby is idle.</li>
+      <li><strong>Read Replicas:</strong> Async replication. Use for read scaling, analytics. Can be in different region.</li>
+      <li><strong>Aurora Serverless v2:</strong> Auto-scales compute capacity in fine-grained increments (0.5 ACU units). Good for variable workloads.</li>
+    </ul></div>
+    <div class="warn-box"><strong>RDS Bottlenecks:</strong><br>
+     Connection pool exhaustion — use RDS Proxy (connection pooling, IAM auth)<br>
+     Long-running queries blocking writes — use query timeout, read replica for analytics<br>
+     Storage I/O limit — use io1/io2 with provisioned IOPS for write-heavy workloads
+    </div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>ElastiCache — Redis &amp; Memcached</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">Cache</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th></th><th>Redis</th><th>Memcached</th></tr>
+      <tr><td>Data types</td><td>Rich (String, Hash, List, Set, ZSet, Geo, Streams)</td><td>Simple key-value only</td></tr>
+      <tr><td>Persistence</td><td>RDB + AOF options</td><td>No persistence</td></tr>
+      <tr><td>Replication</td><td>Primary + replicas, cluster mode</td><td>No replication</td></tr>
+      <tr><td>Multi-threading</td><td>Single-threaded (I/O multithreading in 6.0+)</td><td>Multi-threaded</td></tr>
+      <tr><td>Choose when</td><td>Session, leaderboards, pub/sub, complex data, persistence</td><td>Simple cache, multi-CPU, horizontal scale</td></tr>
+    </table>
+    <div class="concept-box"><h4>ElastiCache Redis — Cluster Mode</h4><ul>
+      <li><strong>Cluster disabled:</strong> Single primary + up to 5 replicas. All data on one shard. Simple.</li>
+      <li><strong>Cluster enabled:</strong> Sharded across up to 500 node groups. Scales horizontally. Cross-shard commands limited.</li>
+      <li><strong>Global Datastore:</strong> Cross-region replication for multi-region low-latency reads.</li>
+    </ul></div>
+  </div>
+</div>
+
+</div><!-- aws-core -->
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 4: AWS NETWORKING
+═══════════════════════════════════════════════ -->
+<div id="aws-networking" class="subsection">
+<div class="subsection-title">AWS Networking</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>VPC — Virtual Private Cloud</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-high">Must Know</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">VPC Architecture (Production):
+
+VPC: 10.0.0.0/16  (65,536 IPs)
+│
+├── Public Subnet AZ-a: 10.0.0.0/24   → Internet Gateway → public internet
+│   └── NAT Gateway (for private → internet outbound)
+│   └── ALB / NLB (load balancers)
+│   └── Bastion host (SSH jump server)
+│
+├── Private Subnet AZ-a: 10.0.10.0/24  → NO direct internet access
+│   └── EC2 App Servers, ECS tasks
+│   └── RDS (never in public subnet!)
+│
+├── Public Subnet AZ-b: 10.0.1.0/24   (for HA — multi-AZ)
+└── Private Subnet AZ-b: 10.0.11.0/24
+
+Route Tables:
+  Public:  0.0.0.0/0 → Internet Gateway
+  Private: 0.0.0.0/0 → NAT Gateway (outbound only)</div>
+    <table>
+      <tr><th>Component</th><th>Purpose</th></tr>
+      <tr><td>Internet Gateway (IGW)</td><td>Allows public subnet instances to communicate with internet</td></tr>
+      <tr><td>NAT Gateway</td><td>Allows private subnet instances to initiate outbound internet (not inbound)</td></tr>
+      <tr><td>Security Group</td><td>Stateful virtual firewall at instance level (allow rules only)</td></tr>
+      <tr><td>NACL</td><td>Stateless firewall at subnet level (allow + deny rules, order matters)</td></tr>
+      <tr><td>VPC Peering</td><td>Private network connection between two VPCs (no transitive routing)</td></tr>
+      <tr><td>Transit Gateway</td><td>Hub-and-spoke: connect many VPCs + on-prem (replaces VPC peering mesh)</td></tr>
+      <tr><td>VPC Endpoints</td><td>Private connection to AWS services (S3, DynamoDB) without NAT/IGW</td></tr>
+      <tr><td>PrivateLink</td><td>Expose services privately to other VPCs</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Load Balancers — ALB, NLB, CLB</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">Networking</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th></th><th>ALB (Application)</th><th>NLB (Network)</th><th>CLB (Classic, deprecated)</th></tr>
+      <tr><td>Layer</td><td>L7 (HTTP/HTTPS/WebSocket/gRPC)</td><td>L4 (TCP/UDP/TLS)</td><td>L4+L7</td></tr>
+      <tr><td>Routing</td><td>Path, host, header, query, IP</td><td>IP:Port only</td><td>Basic</td></tr>
+      <tr><td>Latency</td><td>~400ms overhead</td><td>~&lt;1ms (ultra low)</td><td>Medium</td></tr>
+      <tr><td>TLS offload</td><td>Yes (ACM certs)</td><td>Yes (passthrough optional)</td><td>Yes</td></tr>
+      <tr><td>WebSocket</td><td></td><td></td><td>Limited</td></tr>
+      <tr><td>Static IP</td><td> (DNS name)</td><td> (per-AZ Elastic IP)</td><td></td></tr>
+      <tr><td>Best for</td><td>Web apps, microservices, HTTP APIs</td><td>TCP/UDP, gaming, IoT, VoIP, Kubernetes service LoadBalancer</td><td>Legacy</td></tr>
+    </table>
+    <div class="callout callout-blue"><div class="callout-title">ALB Target Groups</div>Register targets as EC2 instances, IP addresses, Lambda functions, or another ALB. Health checks per target group. Weighted target groups for blue/green and canary deployments.</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>CloudFront — CDN &amp; Edge Caching</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">CDN</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">User Request Flow:
+User → DNS → CloudFront Edge (450+ PoPs globally)
+         → Cache HIT: serve from edge (&lt;5ms)
+         → Cache MISS: forward to Origin (S3 / ALB / custom HTTP)
+                    → Cache response at edge
+                    → Serve user
+
+Origins: S3, ALB, EC2, API Gateway, on-prem HTTP endpoint</div>
+    <div class="concept-box"><h4>CloudFront Key Features</h4><ul>
+      <li><strong>Signed URLs/Cookies:</strong> Time-limited access to private content (streaming, downloads)</li>
+      <li><strong>Lambda@Edge / CloudFront Functions:</strong> Run code at edge (auth, redirects, header manipulation)</li>
+      <li><strong>Origin Shield:</strong> Additional caching layer to protect origin from traffic spikes</li>
+      <li><strong>Field-Level Encryption:</strong> Encrypt specific POST fields at edge (credit cards)</li>
+      <li><strong>WAF integration:</strong> Block malicious requests at edge before they reach your origin</li>
+      <li><strong>Invalidation:</strong> /images/* to clear specific cached paths ($0.005/1000 paths)</li>
+    </ul></div>
+    <div class="warn-box"><strong>Cache Invalidation:</strong> CloudFront TTL-based. Use versioned file names (style.v1.2.3.css) instead of frequent invalidations for static assets.</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Route 53 — DNS &amp; Traffic Policies</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">DNS</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Routing Policy</th><th>Use Case</th></tr>
+      <tr><td>Simple</td><td>Single resource, no health checks</td></tr>
+      <tr><td>Failover</td><td>Active-passive: route to secondary if primary unhealthy</td></tr>
+      <tr><td>Weighted</td><td>Traffic splitting (10% to v2, 90% to v1) — canary releases</td></tr>
+      <tr><td>Latency-based</td><td>Route to region with lowest latency from user</td></tr>
+      <tr><td>Geolocation</td><td>Route based on user's geographic location (compliance, language)</td></tr>
+      <tr><td>Geoproximity</td><td>Shift traffic between regions using bias (traffic routing, migration)</td></tr>
+      <tr><td>Multivalue Answer</td><td>Return multiple IPs, client-side LB with health checks</td></tr>
+    </table>
+    <div class="callout callout-blue"><div class="callout-title">Route 53 Health Checks</div>Monitor endpoint health from multiple AWS regions. Integrate with failover routing. Can trigger CloudWatch alarms. Also supports monitoring CloudWatch metrics (so you can failover based on error rate, not just HTTP 200).</div>
+  </div>
+</div>
+
+</div><!-- aws-networking -->
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 5: AWS DATA
+═══════════════════════════════════════════════ -->
+<div id="aws-data" class="subsection">
+<div class="subsection-title">AWS Data &amp; Analytics</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>DynamoDB — NoSQL at Scale</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-high">Popular</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Data Model</h4><ul>
+      <li><strong>Table:</strong> Collection of items (no fixed schema except primary key)</li>
+      <li><strong>Partition Key:</strong> Determines partition (must have high cardinality). Hash-based.</li>
+      <li><strong>Sort Key:</strong> Optional. Enables range queries within a partition.</li>
+      <li><strong>GSI (Global Secondary Index):</strong> Query on non-key attributes. Separate partition+sort key.</li>
+      <li><strong>LSI (Local Secondary Index):</strong> Alternate sort key for same partition key.</li>
+    </ul></div>
+<pre><code class="language-python">import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('users')
+
+# PutItem
+table.put_item(Item={
+    'user_id': 'u123',        # Partition key
+    'email': 'user@example.com',
+    'created_at': 1716825600,
+    'profile': {'name': 'Alice', 'age': 30}
+})
+
+# GetItem (single item by PK)
+response = table.get_item(Key={'user_id': 'u123'})
+user = response['Item']
+
+# Query (items in a partition)
+response = table.query(
+    KeyConditionExpression='user_id = :uid AND created_at BETWEEN :start AND :end',
+    ExpressionAttributeValues={':uid': 'u123', ':start': 1700000000, ':end': 1716825600}
+)
+
+# Conditional write (atomic)
+table.update_item(
+    Key={'user_id': 'u123'},
+    UpdateExpression='SET #st = :active',
+    ConditionExpression='attribute_exists(user_id)',
+    ExpressionAttributeNames={'#st': 'status'},
+    ExpressionAttributeValues={':active': 'active'}
+)</code></pre>
+    <div class="warn-box"><strong>Hot Partition:</strong> If all writes hit one partition key (e.g., same date prefix), DynamoDB throttles. Distribute with high-cardinality keys or add random suffix (write sharding).<br>
+    <strong>DynamoDB Capacity:</strong> Provisioned (predictable, auto-scaling) or On-Demand (variable, more expensive). Use On-Demand for new tables or unpredictable traffic.</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>AWS Data Pipeline — Kinesis, Glue, Athena, Redshift</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">Analytics</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">Modern Data Pipeline on AWS:
+
+Sources → Kinesis Data Streams (real-time, like Kafka)
+        → Kinesis Firehose  (managed delivery to S3/Redshift/ES)
+        ↓
+        S3 Data Lake (Parquet/ORC format, partitioned by date/source)
+        ↓
+    ┌───────────────────────────────────────────┐
+    │ AWS Glue  (ETL, data catalog, crawlers)    │
+    │ Amazon Athena (serverless SQL on S3 data)  │
+    │ Amazon Redshift (data warehouse, OLAP)     │
+    └───────────────────────────────────────────┘
+        ↓
+    QuickSight (BI / dashboards)</div>
+    <table>
+      <tr><th>Service</th><th>Purpose</th><th>Best For</th></tr>
+      <tr><td>Kinesis Data Streams</td><td>Real-time stream ingestion (like Kafka but AWS-managed)</td><td>Real-time analytics, alerting, 1-7 day retention</td></tr>
+      <tr><td>Kinesis Firehose</td><td>Fully managed delivery to S3/Redshift/OpenSearch</td><td>Simple streaming ETL, no coding required</td></tr>
+      <tr><td>AWS Glue</td><td>Serverless ETL, data catalog</td><td>Batch ETL, schema discovery, data catalog for Athena</td></tr>
+      <tr><td>Amazon Athena</td><td>Interactive SQL on S3 (Presto under hood)</td><td>Ad-hoc queries on data lake, pay per query scanned</td></tr>
+      <tr><td>Amazon Redshift</td><td>Fully managed columnar data warehouse</td><td>Complex analytics, BI, large joins</td></tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- aws-data -->
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 6: SERVERLESS & MESSAGING
+═══════════════════════════════════════════════ -->
+<div id="aws-serverless" class="subsection">
+<div class="subsection-title">Serverless &amp; Messaging</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>AWS Lambda — Serverless Functions</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-high">Popular</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>How Lambda Works</h4><ul>
+      <li>Upload code (zip or container image up to 10GB)</li>
+      <li>Set memory (128MB–10GB), timeout (max 15 min), concurrency limit</li>
+      <li>AWS provisions execution environment (firecracker microVM) on invocation</li>
+      <li>Pay per invocation + GB-seconds of execution</li>
+      <li>Scale to 1000+ concurrent executions by default</li>
+    </ul></div>
+<pre><code class="language-python">import json, boto3, os
+
+def handler(event, context):
+    # event: the triggering event payload (API GW request, S3 event, SQS message)
+    # context: runtime info (function name, memory limit, remaining time)
+    
+    # Trigger sources: API Gateway, S3, SQS, SNS, DynamoDB Streams, EventBridge,
+    #                  Kinesis, ALB, Cognito, Step Functions, CloudWatch Events
+
+    # Example: S3 trigger
+    for record in event.get('Records', []):
+        bucket = record['s3']['bucket']['name']
+        key    = record['s3']['object']['key']
+        # Process file...
+    
+    # Warm vs Cold start
+    # Cold start: ~100ms (Python) to ~1s (Java) for first invocation after idle
+    # Warm: subsequent invocations reuse container (~1ms overhead)
+    
+    return {
+        'statusCode': 200,
+        'headers': {'Content-Type': 'application/json'},
+        'body': json.dumps({'message': 'Success'})
+    }
+
+# Best practices:
+# - Initialize clients outside handler (reused across warm invocations)
+db_client = boto3.client('rds-data')  # module-level initialization!</code></pre>
+    <div class="warn-box"><strong>Cold Start Bottleneck:</strong> Java Lambda cold starts ~1s. Mitigations: Provisioned Concurrency (keep N instances warm, costs money), Lambda SnapStart (Java — snapshot JVM state), use Python/Node for latency-sensitive.</div>
+    <div class="concept-box"><h4>Lambda Concurrency</h4><ul>
+      <li><strong>Unreserved:</strong> Shared pool (default 1000 per region)</li>
+      <li><strong>Reserved Concurrency:</strong> Guarantee N for a function; caps it to prevent throttling others</li>
+      <li><strong>Provisioned Concurrency:</strong> Pre-warm N instances → zero cold starts (costs $ always)</li>
+      <li>SQS trigger: Lambda scales to match SQS queue depth (up to concurrency limit)</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>SQS, SNS &amp; EventBridge</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">Messaging</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Service</th><th>Model</th><th>Best For</th></tr>
+      <tr><td>SQS Standard</td><td>Queue (pull-based), at-least-once, best-effort order</td><td>Decoupling, work queues, task distribution</td></tr>
+      <tr><td>SQS FIFO</td><td>Queue, exactly-once, strict order, 300 msg/s (3000 with batching)</td><td>Financial, inventory where order matters</td></tr>
+      <tr><td>SNS</td><td>Pub/Sub fan-out (push to SQS, Lambda, HTTP, email, SMS)</td><td>Fan-out to multiple consumers simultaneously</td></tr>
+      <tr><td>EventBridge</td><td>Event bus with routing rules (match JSON patterns)</td><td>Event-driven architectures, SaaS integrations, scheduled rules</td></tr>
+    </table>
+    <div class="arch-box">Fan-out Pattern (SNS + SQS):
+S3 Upload Event → SNS Topic
+                 ├── SQS Queue A → Lambda (thumbnail generation)
+                 ├── SQS Queue B → Lambda (virus scanning)
+                 └── SQS Queue C → Lambda (metadata extraction)
+
+Benefits: each consumer has own queue (independent rate/failure handling)
+          SNS delivers to all, SQS buffers for each consumer</div>
+    <div class="concept-box"><h4>SQS Key Properties</h4><ul>
+      <li><strong>Visibility Timeout:</strong> Message hidden from other consumers while being processed (default 30s)</li>
+      <li><strong>Message Retention:</strong> 1 min to 14 days (default 4 days)</li>
+      <li><strong>DLQ:</strong> After maxReceiveCount failures → moves to Dead Letter Queue</li>
+      <li><strong>Long Polling:</strong> Wait up to 20s for message (reduces empty responses + cost)</li>
+      <li><strong>Max message size:</strong> 256KB (use S3 for large payloads, store reference in message)</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>ECS vs EKS — Container Orchestration</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">Containers</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th></th><th>ECS (Elastic Container Service)</th><th>EKS (Elastic Kubernetes Service)</th></tr>
+      <tr><td>Control Plane</td><td>AWS proprietary</td><td>Kubernetes</td></tr>
+      <tr><td>Learning curve</td><td>Lower — AWS-native concepts</td><td>Higher — K8s expertise needed</td></tr>
+      <tr><td>Flexibility</td><td>AWS ecosystem only</td><td>Standard K8s (portable)</td></tr>
+      <tr><td>Cost</td><td>Free control plane + EC2/Fargate</td><td>$0.10/hr control plane + EC2/Fargate</td></tr>
+      <tr><td>Launch types</td><td>EC2 (manage servers) or Fargate (serverless)</td><td>EC2 or Fargate (for K8s)</td></tr>
+      <tr><td>Choose when</td><td>AWS-native team, simpler use case, cost-sensitive</td><td>Multi-cloud, existing K8s investment, more control</td></tr>
+    </table>
+    <div class="callout callout-blue"><div class="callout-title">Fargate — Serverless Containers</div>Run containers without managing EC2 instances. AWS provisions compute per task. Pay for vCPU + memory allocated. Great for: variable workloads, CI/CD build runners, low-ops teams. Downside: slower startup than EC2, no GPU support, higher per-unit cost.</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>IAM — Identity &amp; Access Management</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-high">Security Critical</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>IAM Concepts</h4><ul>
+      <li><strong>Users:</strong> Long-term identity (humans, CI/CD). Avoid; use Roles when possible.</li>
+      <li><strong>Groups:</strong> Collection of users with shared permissions.</li>
+      <li><strong>Roles:</strong> Temporary credentials assumed by AWS services, apps, or federated users. No stored credentials.</li>
+      <li><strong>Policies:</strong> JSON documents defining Allow/Deny on Actions/Resources.</li>
+      <li><strong>Conditions:</strong> Restrict by IP, MFA, time, tags.</li>
+    </ul></div>
+<pre><code class="language-json">// Least-privilege policy: Lambda can only read from specific S3 bucket
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:ListBucket"],
+      "Resource": [
+        "arn:aws:s3:::my-bucket",
+        "arn:aws:s3:::my-bucket/*"
+      ],
+      "Condition": {
+        "StringEquals": { "s3:prefix": ["uploads/"] }
+      }
+    }
+  ]
+}</code></pre>
+    <div class="warn-box"><strong>IAM Security Best Practices:</strong><br>
+     Principle of least privilege — only what's needed<br>
+     Use roles (not users) for EC2/Lambda/ECS<br>
+     Enable MFA on root and admin users<br>
+     Rotate access keys; better: use OIDC/SSO<br>
+     Use SCPs (Service Control Policies) in AWS Organizations<br>
+     Never put AWS credentials in code, Docker images, or Git repos
+    </div>
+  </div>
+</div>
+
+</div><!-- aws-serverless -->
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 7: AWS ARCHITECTURE PATTERNS
+═══════════════════════════════════════════════ -->
+<div id="aws-arch" class="subsection">
+<div class="subsection-title">AWS Architecture Patterns</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Typical 3-Tier Web Architecture on AWS</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">Architecture</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">Internet
+    ↓
+Route 53 (DNS, health check, failover)
+    ↓
+CloudFront (CDN — static assets, edge caching)
+    ↓
+WAF (Web Application Firewall — OWASP rules, rate limiting)
+    ↓
+ALB (Application Load Balancer — HTTP routing, SSL termination)
+    ↓
+Auto Scaling Group (EC2 / ECS / EKS — app servers)
+├── AZ-a: 2+ instances  └── AZ-b: 2+ instances
+    ↓
+┌─────────────────────────────────────────────┐
+│  RDS Aurora (Multi-AZ) ← Primary writes      │
+│  RDS Read Replicas     ← Read-heavy queries   │
+│  ElastiCache Redis     ← Session/cache layer  │
+│  S3                    ← Blob storage         │
+└─────────────────────────────────────────────┘
+    ↓
+CloudWatch (metrics, logs, alarms)
+X-Ray (distributed tracing)</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Event-Driven Serverless Architecture</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">Serverless</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">Client → API Gateway → Lambda (auth + route)
+                               ↓
+              ┌────────────────────────────────────┐
+              │ EventBridge (event bus)              │
+              │  Rule: order.created → SQS          │
+              │  Rule: payment.failed → SNS → email │
+              └────────────────────────────────────┘
+                  ↓
+              SQS → Lambda (order processor)
+                    Lambda (inventory updater)
+                    Lambda (notification sender)
+                  ↓
+              DynamoDB (orders table)
+              S3 (invoices, receipts)
+              Aurora Serverless (reports)</div>
+    <div class="concept-box"><h4>Serverless Trade-offs</h4><ul>
+      <li> No infrastructure management; auto-scale to zero</li>
+      <li> Pay-per-use (great for low/unpredictable traffic)</li>
+      <li> Cold starts add latency (&lt;1s but noticeable)</li>
+      <li> 15-minute max execution time (not for long jobs)</li>
+      <li> Stateless — use DynamoDB/ElastiCache for state</li>
+      <li> Vendor lock-in; local dev is harder</li>
+      <li> Difficult to debug distributed failures (use X-Ray)</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>AWS Well-Architected Framework — 6 Pillars</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-high">Interview</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Pillar</th><th>Key Principle</th><th>AWS Services</th></tr>
+      <tr><td> Security</td><td>Implement security at every layer; least privilege; encrypt in transit + at rest</td><td>IAM, KMS, WAF, Shield, CloudTrail, GuardDuty</td></tr>
+      <tr><td> Reliability</td><td>Recover from failures; test recovery; horizontal scale</td><td>Multi-AZ, ASG, Route53, CloudWatch, Backup</td></tr>
+      <tr><td> Performance Efficiency</td><td>Use right resource type; experiment; serverless</td><td>CloudFront, ElastiCache, Lambda, Graviton</td></tr>
+      <tr><td> Cost Optimization</td><td>Pay only for what you use; rightsize; spot instances</td><td>Cost Explorer, Reserved Instances, Savings Plans, Spot</td></tr>
+      <tr><td> Operational Excellence</td><td>Operations as code; make frequent small changes; learn from failure</td><td>CloudFormation/CDK, CodePipeline, CloudWatch, Systems Manager</td></tr>
+      <tr><td> Sustainability</td><td>Reduce environmental impact; use efficient resources</td><td>Graviton, Fargate spot, S3 Intelligent-Tiering</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Infrastructure as Code — CloudFormation &amp; CDK</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">DevOps</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this)">CloudFormation (YAML)</button>
+      <button class="tab-btn" onclick="switchTab(this)">CDK (Python)</button>
+    </div>
+    <div class="tab-pane active">
+<pre><code class="language-yaml"># CloudFormation — Infrastructure as YAML
+AWSTemplateFormatVersion: '2010-09-09'
+Description: API with Lambda and DynamoDB
+
+Parameters:
+  Environment: { Type: String, Default: prod }
+
+Resources:
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub orders-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: order_id, AttributeType: S }
+      KeySchema:
+        - { AttributeName: order_id, KeyType: HASH }
+
+  ApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub api-handler-${Environment}
+      Runtime: python3.12
+      Handler: index.handler
+      Code: { ZipFile: |
+        def handler(event, context):
+          return {'statusCode': 200, 'body': 'OK'}
+      }
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref OrdersTable
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement: [{Effect: Allow, Principal: {Service: lambda.amazonaws.com}, Action: sts:AssumeRole}]
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+Outputs:
+  TableName: { Value: !Ref OrdersTable }</code></pre>
+    </div>
+    <div class="tab-pane">
+<pre><code class="language-python"># AWS CDK — Infrastructure as Python code
+from aws_cdk import (App, Stack, Duration,
+                     aws_lambda as _lambda,
+                     aws_dynamodb as dynamodb,
+                     aws_apigateway as apigw,
+                     aws_iam as iam)
+from constructs import Construct
+
+class ApiStack(Stack):
+    def __init__(self, scope: Construct, id: str, **kwargs):
+        super().__init__(scope, id, **kwargs)
+
+        # DynamoDB Table
+        table = dynamodb.Table(self, "OrdersTable",
+            partition_key=dynamodb.Attribute(
+                name="order_id", type=dynamodb.AttributeType.STRING),
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+            removal_policy=RemovalPolicy.DESTROY  # for dev
+        )
+
+        # Lambda Function
+        handler = _lambda.Function(self, "ApiHandler",
+            runtime=_lambda.Runtime.PYTHON_3_12,
+            code=_lambda.Code.from_asset("lambda"),
+            handler="index.handler",
+            timeout=Duration.seconds(30),
+            environment={"TABLE_NAME": table.table_name}
+        )
+
+        # Grant Lambda read/write access to DynamoDB
+        table.grant_read_write_data(handler)
+
+        # API Gateway
+        api = apigw.RestApi(self, "OrdersApi")
+        orders = api.root.add_resource("orders")
+        orders.add_method("POST", apigw.LambdaIntegration(handler))
+
+app = App()
+ApiStack(app, "ApiStack", env={"account": "123456789", "region": "us-east-1"})
+app.synth()</code></pre>
+    </div>
+    <div class="ok-box"><strong>CDK vs CloudFormation:</strong> CDK generates CloudFormation under the hood. CDK has full programming language power (loops, conditions, abstractions). CloudFormation is more explicit. Both are infrastructure-as-code — version controlled, reproducible, reviewable.</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Observability on AWS — CloudWatch, X-Ray, OpenTelemetry</h3>
+    <div class="tag-row"><span class="aws-badge">AWS</span><span class="badge badge-tag">Monitoring</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Tool</th><th>What</th><th>Use For</th></tr>
+      <tr><td>CloudWatch Metrics</td><td>EC2/RDS/Lambda/custom metrics + dashboards</td><td>Alerts, autoscaling triggers, SLO monitoring</td></tr>
+      <tr><td>CloudWatch Logs</td><td>Log aggregation from all AWS services + custom</td><td>Centralized log search, Insights queries</td></tr>
+      <tr><td>CloudWatch Alarms</td><td>Threshold-based alerts → SNS/SQS/ASG actions</td><td>PagerDuty integration, auto-recovery</td></tr>
+      <tr><td>AWS X-Ray</td><td>Distributed tracing (service map, latency analysis)</td><td>Identify bottlenecks across Lambda/API GW/DynamoDB</td></tr>
+      <tr><td>CloudTrail</td><td>API activity audit log (who called what when)</td><td>Security auditing, compliance, incident investigation</td></tr>
+      <tr><td>AWS Config</td><td>Track config changes to AWS resources</td><td>Compliance, drift detection</td></tr>
+      <tr><td>Amazon Managed Grafana</td><td>Grafana dashboards connected to CloudWatch/Prometheus</td><td>Rich dashboards, open-source ecosystem</td></tr>
+    </table>
+    <div class="concept-box"><h4>CloudWatch Logs Insights Query Examples</h4>
+<pre style="font-size:11px; margin:4px 0">-- Find most common errors in Lambda
+fields @timestamp, @message
+| filter @message like /ERROR/
+| stats count(*) by bin(5m)
+
+-- Lambda cold start analysis
+fields @type, @duration, @billedDuration, @initDuration
+| filter @type = "REPORT"
+| stats avg(@initDuration) by bin(1h)</pre>
+    </div>
+  </div>
+</div>
+
+</div><!-- aws-arch -->
+
+</div><!-- content-area -->
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js"></script>
+<script src="main.js"></script>
+<script src="search-data.js"></script>
+<script src="search.js"></script>
+</body>
+</html>

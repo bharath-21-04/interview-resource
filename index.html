@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alation Interview Prep — Dashboard</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.hero { background: linear-gradient(135deg,rgba(88,166,255,.12),rgba(188,140,255,.08)); border:1px solid var(--border); border-radius:12px; padding:28px 32px; margin-bottom:28px; }
+.hero h1 { font-size:28px; font-weight:800; margin-bottom:6px; }
+.hero p { color:var(--text-secondary); font-size:15px; }
+.countdown { display:flex; gap:20px; margin-top:20px; }
+.count-item { text-align:center; }
+.count-num { font-size:36px; font-weight:800; color:var(--accent-blue); line-height:1; }
+.count-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; }
+.topic-nav { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-bottom:28px; }
+.topic-card { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:18px 16px; text-decoration:none; color:var(--text-primary); transition:all .15s; display:flex; flex-direction:column; gap:8px; }
+.topic-card:hover { border-color:var(--accent-blue); transform:translateY(-2px); box-shadow:0 4px 20px rgba(88,166,255,.15); }
+.topic-card .t-icon { font-size:28px; }
+.topic-card h3 { font-size:14px; font-weight:700; }
+.topic-card p { font-size:12px; color:var(--text-muted); }
+.topic-card .t-count { font-size:11px; color:var(--accent-blue); font-weight:600; margin-top:auto; }
+.interview-flow { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:20px; margin-bottom:24px; }
+.interview-flow h3 { font-size:15px; font-weight:700; margin-bottom:16px; }
+.flow-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.flow-item { text-align:center; padding:14px; background:var(--bg-secondary); border-radius:8px; border:1px solid var(--border); }
+.flow-item .f-time { font-size:22px; font-weight:800; color:var(--accent-yellow); }
+.flow-item h4 { font-size:13px; font-weight:700; margin:6px 0 4px; }
+.flow-item p { font-size:11px; color:var(--text-muted); }
+.quick-ref { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+</style>
+</head>
+<body>
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">IP</div>
+    <div><h2>Interview Prep</h2><p>Full Stack Reference</p></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Pages</div>
+    <a href="index.html" class="nav-link active">Dashboard</a>
+    <a href="dsa.html" class="nav-link">DSA — Python</a>
+    <a href="oop-lld.html" class="nav-link">OOP &amp; LLD — Java</a>
+    <a href="system-design.html" class="nav-link">System Design</a>
+    <a href="kafka.html" class="nav-link">Kafka &amp; Messaging</a>
+    <a href="os-concurrency.html" class="nav-link">OS &amp; Concurrency</a>
+    <a href="docker-aws.html" class="nav-link">Docker &amp; AWS</a>
+    <a href="networking-security.html" class="nav-link">Networking &amp; Security</a>
+    <a href="databases.html" class="nav-link">Databases — SQL &amp; NoSQL</a>
+    <a href="alation.html" class="nav-link">Alation Focus <span class="nav-badge">HOT</span></a>
+  </div>
+  <div class="sidebar-footer"><kbd>Cmd K</kbd> to search</div>
+</nav>
+
+<main class="main">
+  <div class="topbar">
+    <h1>Dashboard</h1>
+  <button class="topbar-search-btn" onclick="window._spotlightOpen && window._spotlightOpen()">Search topics... <kbd>Cmd K</kbd></button>
+  </div>
+  <div class="content-area">
+
+    <!-- HERO -->
+    <div class="hero">
+      <h1>Alation Interview Prep </h1>
+      <p>Everything you need for Monday's interview — DSA, OOP, System Design, Kafka &amp; more.</p>
+      <div class="countdown">
+        <div class="count-item"><div class="count-num" id="cnt-d">-</div><div class="count-label">Days</div></div>
+        <div class="count-item"><div class="count-num" id="cnt-h">-</div><div class="count-label">Hours</div></div>
+        <div class="count-item"><div class="count-num" id="cnt-m">-</div><div class="count-label">Mins</div></div>
+      </div>
+    </div>
+
+    <!-- INTERVIEW FLOW -->
+    <div class="interview-flow">
+      <h3> Interview Structure</h3>
+      <div class="flow-row">
+        <div class="flow-item">
+          <div class="f-time">10–15</div>
+          <h4>Introduction</h4>
+          <p>Problem Statements &amp; Clarifications</p>
+        </div>
+        <div class="flow-item">
+          <div class="f-time">40</div>
+          <h4>Coding (DSA)</h4>
+          <p>1 Problem · Approach → Code → Optimize</p>
+        </div>
+        <div class="flow-item">
+          <div class="f-time">35–40</div>
+          <h4>Low-Level Design</h4>
+          <p>OOP Design · Class Structure · Trade-offs</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOPIC NAVIGATION CARDS -->
+    <h2 style="font-size:16px;margin-bottom:14px;color:var(--text-secondary)">STUDY TOPICS</h2>
+    <div class="topic-nav">
+      <a href="dsa.html" class="topic-card">
+        <span class="t-icon"></span>
+        <h3>DSA — Python</h3>
+        <p>Arrays, Trees, Graphs, DP, Heaps, Sorting</p>
+        <span class="t-count">30+ Problems with Solutions</span>
+      </a>
+      <a href="oop-lld.html" class="topic-card">
+        <span class="t-icon"></span>
+        <h3>OOP &amp; LLD — Java</h3>
+        <p>SOLID, Patterns, Parking Lot, Library, ATM</p>
+        <span class="t-count">5 LLD Problems + Patterns</span>
+      </a>
+      <a href="system-design.html" class="topic-card">
+        <span class="t-icon"></span>
+        <h3>System Design</h3>
+        <p>CAP, Sharding, Caching, URL Shortener, Twitter</p>
+        <span class="t-count">10 Design Problems</span>
+      </a>
+      <a href="kafka.html" class="topic-card">
+        <span class="t-icon"></span>
+        <h3>Kafka &amp; Message Queues</h3>
+        <p>Topics, Partitions, Consumers, RabbitMQ, SQS</p>
+        <span class="t-count">Full Architecture Guide</span>
+      </a>
+      <a href="alation.html" class="topic-card" style="border-color:rgba(248,81,73,.3)">
+        <span class="t-icon"></span>
+        <h3>Alation Focus</h3>
+        <p>Company-specific patterns, Data Catalog Design</p>
+        <span class="t-count" style="color:var(--accent-red)">Must Review!</span>
+      </a>
+      <a href="os-concurrency.html" class="topic-card">
+        <span class="t-icon"></span>
+        <h3>OS &amp; Concurrency</h3>
+        <p>Threads, deadlocks, locks, rate limiting, Java concurrency</p>
+        <span class="t-count">Java + Python examples</span>
+      </a>
+      <a href="docker-aws.html" class="topic-card">
+        <span class="t-icon"></span>
+        <h3>Docker &amp; AWS</h3>
+        <p>Containers, Kubernetes, EC2, S3, Lambda, VPC, ECS</p>
+        <span class="t-count">Architecture diagrams</span>
+      </a>
+      <a href="networking-security.html" class="topic-card">
+        <span class="t-icon"></span>
+        <h3>Networking &amp; Security</h3>
+        <p>HTTP/2/3, TCP/UDP, OAuth 2.0, SSO, JWT, TLS, Cryptography</p>
+        <span class="t-count">Auth flows + crypto primitives</span>
+      </a>
+      <a href="databases.html" class="topic-card">
+        <span class="t-icon"></span>
+        <h3>Databases — SQL &amp; NoSQL</h3>
+        <p>Indexes, window functions, ACID, MongoDB, Cassandra, Redis</p>
+        <span class="t-count">Query patterns + NoSQL deep dives</span>
+      </a>
+    </div>
+
+    <!-- QUICK REFERENCE -->
+    <div class="quick-ref">
+      <!-- DSA Patterns -->
+      <div class="card">
+        <div class="card-header"><h3> Key DSA Patterns</h3></div>
+        <div class="card-body">
+          <table>
+            <tr><th>Pattern</th><th>When to Use</th></tr>
+            <tr><td><span class="badge badge-tag">Sliding Window</span></td><td>Contiguous subarray/substring</td></tr>
+            <tr><td><span class="badge badge-tag">Two Pointers</span></td><td>Sorted array, sum/pair problems</td></tr>
+            <tr><td><span class="badge badge-tag">BFS</span></td><td>Shortest path, level-order</td></tr>
+            <tr><td><span class="badge badge-tag">DFS</span></td><td>Explore all paths, backtracking</td></tr>
+            <tr><td><span class="badge badge-tag">Binary Search</span></td><td>Sorted data, minimize/maximize</td></tr>
+            <tr><td><span class="badge badge-tag">DP</span></td><td>Overlapping subproblems, optimal sub</td></tr>
+            <tr><td><span class="badge badge-tag">Heap</span></td><td>K-th element, streaming data</td></tr>
+            <tr><td><span class="badge badge-tag">Union-Find</span></td><td>Connected components</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Interview Tips -->
+      <div class="card">
+        <div class="card-header"><h3> Interview Strategy</h3></div>
+        <div class="card-body">
+          <div class="timeline">
+            <div class="timeline-item">
+              <h4>1. Understand (2–3 min)</h4>
+              <p>Repeat the problem. Clarify input size, constraints, edge cases.</p>
+            </div>
+            <div class="timeline-item">
+              <h4>2. Brute Force First (2 min)</h4>
+              <p>Verbally state the naive O(n²) or O(2ⁿ) approach.</p>
+            </div>
+            <div class="timeline-item">
+              <h4>3. Optimize (5 min)</h4>
+              <p>Identify the right pattern. Think about what data structure reduces complexity.</p>
+            </div>
+            <div class="timeline-item">
+              <h4>4. Code (15–20 min)</h4>
+              <p>Write clean code. Name variables well. Think aloud.</p>
+            </div>
+            <div class="timeline-item">
+              <h4>5. Test (5 min)</h4>
+              <p>Trace through examples. Check edge cases: empty, single element, negatives.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Complexity Cheatsheet -->
+      <div class="card">
+        <div class="card-header"><h3>⏱ Complexity Cheatsheet</h3></div>
+        <div class="card-body">
+          <table>
+            <tr><th>Algorithm</th><th>Time</th><th>Space</th></tr>
+            <tr><td>Binary Search</td><td>O(log n)</td><td>O(1)</td></tr>
+            <tr><td>Merge Sort</td><td>O(n log n)</td><td>O(n)</td></tr>
+            <tr><td>Quick Sort</td><td>O(n log n) avg</td><td>O(log n)</td></tr>
+            <tr><td>BFS / DFS</td><td>O(V+E)</td><td>O(V)</td></tr>
+            <tr><td>Hash Table Ops</td><td>O(1) avg</td><td>O(n)</td></tr>
+            <tr><td>Heap Push/Pop</td><td>O(log n)</td><td>O(n)</td></tr>
+            <tr><td>Trie Insert</td><td>O(L)</td><td>O(L)</td></tr>
+            <tr><td>DP (2D table)</td><td>O(m×n)</td><td>O(m×n)</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Python Syntax Quick Ref -->
+      <div class="card">
+        <div class="card-header"><h3> Python Quick Ref</h3></div>
+        <div class="card-body">
+          <pre><code class="language-python"># Collections
+from collections import defaultdict, Counter, deque
+import heapq
+
+d = defaultdict(int)        # default value 0
+c = Counter([1,1,2,3])      # freq map
+q = deque([1,2,3])          # O(1) popleft
+q.appendleft(0); q.popleft()
+
+# Heap (min-heap by default)
+heap = []; heapq.heapify(heap)
+heapq.heappush(heap, 5)
+heapq.heappop(heap)         # min element
+# Max-heap: push -val, pop -val
+
+# Sort
+arr.sort(key=lambda x: x[1])
+sorted(arr, reverse=True)
+
+# Two Pointers
+l, r = 0, len(arr)-1
+while l &lt; r:
+    # ... process
+    l += 1; r -= 1
+
+# Binary Search
+import bisect
+bisect.bisect_left(arr, x)  # leftmost pos</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alation Hot Topics -->
+    <div style="margin-top:24px">
+      <div class="callout callout-red">
+        <div class="callout-title"> Alation Most-Asked Topics</div>
+        Graph traversal (BFS/DFS) · LRU Cache · Clone Graph · Design Data Catalog · Kafka event streaming · LLD: Metadata Management System · Sliding Window · Top-K with Heap · SQL &amp; Index design
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// Countdown
+function updateCountdown() {
+  const now = new Date();
+  // Next Monday
+  const day = now.getDay();
+  const daysUntilMonday = day === 0 ? 1 : (8 - day) % 7 || 7;
+  const target = new Date(now);
+  target.setDate(now.getDate() + daysUntilMonday);
+  target.setHours(9, 0, 0, 0);
+  const diff = target - now;
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  document.getElementById('cnt-d').textContent = d;
+  document.getElementById('cnt-h').textContent = h;
+  document.getElementById('cnt-m').textContent = m;
+}
+updateCountdown();
+setInterval(updateCountdown, 60000);
+</script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="search-data.js"></script>
+<script src="search.js"></script>
+</body>
+</html>

@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OOP &amp; LLD All Java Patterns | Alation Prep</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<style>
+.pattern-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin:12px 0}
+.pattern-chip{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;font-weight:600;color:var(--text-secondary);text-decoration:none;transition:all .15s;display:block;text-align:center}
+.pattern-chip:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.pattern-chip.creational{border-left:3px solid var(--accent-green)}
+.pattern-chip.structural{border-left:3px solid var(--accent-blue)}
+.pattern-chip.behavioral{border-left:3px solid var(--accent-orange)}
+.pattern-label{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;margin-bottom:6px}
+.label-c{background:rgba(63,185,80,.15);color:var(--accent-green)}
+.label-s{background:rgba(88,166,255,.15);color:var(--accent-blue)}
+.label-b{background:rgba(255,166,0,.15);color:var(--accent-orange)}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">IP</div>
+    <div><h2>Interview Prep</h2><p>Full Stack Reference</p></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Pages</div>
+    <a href="index.html" class="nav-link">Dashboard</a>
+    <a href="dsa.html" class="nav-link">DSA — Python</a>
+    <a href="oop-lld.html" class="nav-link active">OOP &amp; LLD — Java</a>
+    <a href="system-design.html" class="nav-link">System Design</a>
+    <a href="kafka.html" class="nav-link">Kafka &amp; Messaging</a>
+    <a href="os-concurrency.html" class="nav-link">OS &amp; Concurrency</a>
+    <a href="docker-aws.html" class="nav-link">Docker &amp; AWS</a>
+    <a href="networking-security.html" class="nav-link">Networking &amp; Security</a>
+    <a href="databases.html" class="nav-link">Databases — SQL &amp; NoSQL</a>
+    <a href="alation.html" class="nav-link">Alation Focus <span class="nav-badge">HOT</span></a>
+  </div>
+  <div class="sidebar-footer"><kbd>Cmd K</kbd> to search</div>
+</nav>
+
+<main class="main">
+<div class="topbar"><h1>OOP &amp; LLD All 23 Java Design Patterns</h1>
+  <button class="topbar-search-btn" onclick="window._spotlightOpen && window._spotlightOpen()">Search topics... <kbd>Cmd K</kbd></button></div>
+<div class="content-area">
+<div class="section-header">
+  <h1>OOP, SOLID &amp; All Design Patterns</h1>
+  <p>SOLID Principles All 23 GoF Patterns (Creational, Structural, Behavioral) LLD Examples</p>
+</div>
+
+<!-- QUICK NAV -->
+<div class="pattern-grid">
+  <a href="#solid" class="pattern-chip" style="border-left:3px solid var(--accent-purple)">SOLID Principles</a>
+  <a href="#singleton" class="pattern-chip creational">Singleton</a>
+  <a href="#factory-method" class="pattern-chip creational">Factory Method</a>
+  <a href="#abstract-factory" class="pattern-chip creational">Abstract Factory</a>
+  <a href="#builder" class="pattern-chip creational">Builder</a>
+  <a href="#prototype" class="pattern-chip creational">Prototype</a>
+  <a href="#adapter" class="pattern-chip structural">Adapter</a>
+  <a href="#bridge" class="pattern-chip structural">Bridge</a>
+  <a href="#composite" class="pattern-chip structural">Composite</a>
+  <a href="#decorator" class="pattern-chip structural">Decorator</a>
+  <a href="#facade" class="pattern-chip structural">Facade</a>
+  <a href="#flyweight" class="pattern-chip structural">Flyweight</a>
+  <a href="#proxy" class="pattern-chip structural">Proxy</a>
+  <a href="#chain" class="pattern-chip behavioral">Chain of Resp.</a>
+  <a href="#command" class="pattern-chip behavioral">Command</a>
+  <a href="#iterator" class="pattern-chip behavioral">Iterator</a>
+  <a href="#mediator" class="pattern-chip behavioral">Mediator</a>
+  <a href="#memento" class="pattern-chip behavioral">Memento</a>
+  <a href="#observer" class="pattern-chip behavioral">Observer</a>
+  <a href="#state" class="pattern-chip behavioral">State</a>
+  <a href="#strategy" class="pattern-chip behavioral">Strategy</a>
+  <a href="#template" class="pattern-chip behavioral">Template Method</a>
+  <a href="#visitor" class="pattern-chip behavioral">Visitor</a>
+  <a href="#lld" class="pattern-chip" style="border-left:3px solid var(--accent-red)">LLD Examples</a>
+</div>
+
+<!-- ===== SOLID ===== -->
+<div class="subsection" id="solid">
+<div class="subsection-title">SOLID Principles</div>
+<div class="grid-2">
+<div class="card">
+  <div class="card-header"><h3>S Single Responsibility</h3></div>
+  <div class="card-body">
+    <div class="concept-box"><ul>
+      <li>A class should have only ONE reason to change</li>
+      <li>Wrong: UserService handles auth, email, and DB</li>
+      <li>Right: AuthService, EmailService, UserRepository separate concerns</li>
+    </ul></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header"><h3>O Open/Closed</h3></div>
+  <div class="card-body">
+    <div class="concept-box"><ul>
+      <li>Open for extension, closed for modification</li>
+      <li>Add new behavior by adding new classes, not editing old ones</li>
+      <li>Use interfaces + polymorphism. E.g.: new PaymentMethod new class, not if/else</li>
+    </ul></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header"><h3>L Liskov Substitution</h3></div>
+  <div class="card-body">
+    <div class="concept-box"><ul>
+      <li>Subclass must be substitutable for parent without breaking</li>
+      <li>If Square extends Rectangle and overrides setWidth to also set height violates LSP</li>
+      <li>Subclasses should not restrict or change base class contracts</li>
+    </ul></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header"><h3>I Interface Segregation</h3></div>
+  <div class="card-body">
+    <div class="concept-box"><ul>
+      <li>Clients should not depend on methods they dont use</li>
+      <li>Split fat interfaces into smaller, focused ones</li>
+      <li>Flyable, Swimmable, Walkable rather than one Animal interface with all</li>
+    </ul></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header"><h3>D Dependency Inversion</h3></div>
+  <div class="card-body">
+    <div class="concept-box"><ul>
+      <li>Depend on abstractions (interfaces), not concrete implementations</li>
+      <li>High-level modules should not depend on low-level modules</li>
+      <li>OrderService depends on IPaymentGateway, not on StripePaymentGateway directly</li>
+    </ul></div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ===== CREATIONAL PATTERNS ===== -->
+<div class="subsection">
+<div class="subsection-title"><span class="label-c">Creational</span> Patterns Object Creation</div>
+
+<!-- Singleton -->
+<div class="problem-card" id="singleton">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-c">Creational</span> <h3 style="display:inline;margin-left:8px">Singleton</h3></div>
+    <div class="tag-row"><span class="badge badge-tag">Very Common</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Ensure a class has only ONE instance; provide global access point.</h4>
+    <ul>
+      <li><strong>Use when:</strong> config manager, connection pool, logger, cache, registry</li>
+      <li><strong>Pitfall:</strong> hidden global state, hard to test (mock difficult), can be anti-pattern if overused</li>
+    </ul></div>
+    <pre><code class="language-java">// Thread-safe Singleton: Double-Checked Locking
+public class DatabaseConnectionPool {
+    // volatile ensures visibility across threads
+    private static volatile DatabaseConnectionPool instance;
+    private final List&lt;Connection&gt; pool;
+
+    private DatabaseConnectionPool() {
+        pool = initializePool(10);
+    }
+
+    public static DatabaseConnectionPool getInstance() {
+        if (instance == null) {                    // First check (no lock)
+            synchronized (DatabaseConnectionPool.class) {
+                if (instance == null) {            // Second check (with lock)
+                    instance = new DatabaseConnectionPool();
+                }
+            }
+        }
+        return instance;
+    }
+}
+
+// Better: Enum Singleton (Bill Pugh, thread-safe, serialization-safe)
+public enum AppConfig {
+    INSTANCE;
+    private final Properties props = loadProperties();
+    public String get(String key) { return props.getProperty(key); }
+}
+// Usage: AppConfig.INSTANCE.get("db.url")</code></pre>
+  </div>
+</div>
+
+<!-- Factory Method -->
+<div class="problem-card" id="factory-method">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-c">Creational</span> <h3 style="display:inline;margin-left:8px">Factory Method</h3></div>
+    <div class="tag-row"><span class="badge badge-tag">Very Common</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Define interface for creating object, let subclasses decide which class to instantiate.</h4>
+    <ul>
+      <li><strong>Use when:</strong> exact type of object unknown until runtime; delegate creation to subclasses</li>
+      <li><strong>Real-world:</strong> Javas Calendar.getInstance(), JDBC DriverManager.getConnection()</li>
+    </ul></div>
+    <pre><code class="language-java">// Product interface
+interface Notification {
+    void send(String message);
+}
+
+// Concrete products
+class EmailNotification implements Notification {
+    public void send(String message) { System.out.println("Email: " + message); }
+}
+class SMSNotification implements Notification {
+    public void send(String message) { System.out.println("SMS: " + message); }
+}
+class PushNotification implements Notification {
+    public void send(String message) { System.out.println("Push: " + message); }
+}
+
+// Factory (could also be static factory method)
+class NotificationFactory {
+    public static Notification create(String type) {
+        return switch (type) {
+            case "EMAIL" -> new EmailNotification();
+            case "SMS"   -> new SMSNotification();
+            case "PUSH"  -> new PushNotification();
+            default -> throw new IllegalArgumentException("Unknown type: " + type);
+        };
+    }
+}
+
+// Usage: open/closed - add new type without modifying existing code
+Notification n = NotificationFactory.create("EMAIL");
+n.send("Hello!");</code></pre>
+  </div>
+</div>
+
+<!-- Abstract Factory -->
+<div class="problem-card" id="abstract-factory">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-c">Creational</span> <h3 style="display:inline;margin-left:8px">Abstract Factory</h3></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Create families of related objects without specifying concrete classes.</h4>
+    <ul>
+      <li><strong>Difference from Factory Method:</strong> produces a FAMILY of related objects; Factory Method produces ONE type</li>
+      <li><strong>Use when:</strong> UI toolkit (Windows vs Mac), cloud providers (AWS vs GCP), themes (Dark vs Light)</li>
+    </ul></div>
+    <pre><code class="language-java">// Abstract products
+interface Button  { void render(); }
+interface Checkbox { void render(); }
+
+// Concrete products for Windows
+class WindowsButton  implements Button   { public void render() { System.out.println("Windows Button"); } }
+class WindowsCheckbox implements Checkbox { public void render() { System.out.println("Windows Checkbox"); } }
+
+// Concrete products for Mac
+class MacButton   implements Button   { public void render() { System.out.println("Mac Button"); } }
+class MacCheckbox implements Checkbox { public void render() { System.out.println("Mac Checkbox"); } }
+
+// Abstract Factory interface
+interface UIFactory {
+    Button createButton();
+    Checkbox createCheckbox();
+}
+
+// Concrete factories
+class WindowsUIFactory implements UIFactory {
+    public Button createButton()   { return new WindowsButton(); }
+    public Checkbox createCheckbox() { return new WindowsCheckbox(); }
+}
+class MacUIFactory implements UIFactory {
+    public Button createButton()   { return new MacButton(); }
+    public Checkbox createCheckbox() { return new MacCheckbox(); }
+}
+
+// Client code doesn't know about Windows or Mac
+class Application {
+    private final UIFactory factory;
+    Application(UIFactory factory) { this.factory = factory; }
+    void buildUI() {
+        Button btn = factory.createButton();
+        Checkbox cb = factory.createCheckbox();
+        btn.render(); cb.render();
+    }
+}
+// Usage: new Application(new MacUIFactory()).buildUI();</code></pre>
+  </div>
+</div>
+
+<!-- Builder -->
+<div class="problem-card" id="builder">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-c">Creational</span> <h3 style="display:inline;margin-left:8px">Builder</h3></div>
+    <div class="tag-row"><span class="badge badge-tag">Very Common</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Construct complex objects step by step. Separate construction from representation.</h4>
+    <ul>
+      <li><strong>Use when:</strong> object has many optional params; avoid telescoping constructor anti-pattern</li>
+      <li><strong>Real-world:</strong> StringBuilder, Lombok @Builder, AlertDialog.Builder (Android)</li>
+    </ul></div>
+    <pre><code class="language-java">public class HttpRequest {
+    // Required fields
+    private final String url;
+    private final String method;
+    // Optional fields
+    private final Map&lt;String, String&gt; headers;
+    private final String body;
+    private final int timeoutMs;
+
+    private HttpRequest(Builder builder) {
+        this.url = builder.url;
+        this.method = builder.method;
+        this.headers = Collections.unmodifiableMap(builder.headers);
+        this.body = builder.body;
+        this.timeoutMs = builder.timeoutMs;
+    }
+
+    public static class Builder {
+        private final String url;         // required
+        private final String method;      // required
+        private Map&lt;String, String&gt; headers = new HashMap&lt;&gt;();
+        private String body;
+        private int timeoutMs = 30_000;
+
+        public Builder(String url, String method) {
+            this.url = url;
+            this.method = method;
+        }
+        public Builder header(String k, String v) { headers.put(k, v); return this; }
+        public Builder body(String body)           { this.body = body; return this; }
+        public Builder timeout(int ms)             { this.timeoutMs = ms; return this; }
+        public HttpRequest build()                 { return new HttpRequest(this); }
+    }
+}
+
+// Usage: fluent, readable, no null params
+HttpRequest req = new HttpRequest.Builder("https://api.alation.com", "POST")
+    .header("Authorization", "Bearer token123")
+    .body("{\"name\":\"test\"}")
+    .timeout(5000)
+    .build();</code></pre>
+  </div>
+</div>
+
+<!-- Prototype -->
+<div class="problem-card" id="prototype">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-c">Creational</span> <h3 style="display:inline;margin-left:8px">Prototype</h3></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Clone existing objects without depending on their concrete classes.</h4>
+    <ul>
+      <li><strong>Use when:</strong> object creation is expensive (DB/network), need many similar objects with small differences</li>
+      <li><strong>Real-world:</strong> Object.clone(), Spring bean scope=prototype, cell division in games</li>
+      <li><strong>Deep vs Shallow clone:</strong> deep clone copies all nested objects; shallow copies references only</li>
+    </ul></div>
+    <pre><code class="language-java">public class QueryTemplate implements Cloneable {
+    private String sql;
+    private Map&lt;String, Object&gt; params;
+    private int timeoutSeconds;
+
+    public QueryTemplate deepClone() {
+        try {
+            QueryTemplate clone = (QueryTemplate) super.clone();
+            clone.params = new HashMap&lt;&gt;(this.params); // Deep copy map
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+
+// Prototype Registry pattern
+class ShapeRegistry {
+    private Map&lt;String, Shape&gt; prototypes = new HashMap&lt;&gt;();
+
+    public void register(String key, Shape shape) {
+        prototypes.put(key, shape);
+    }
+    public Shape get(String key) {
+        return prototypes.get(key).deepClone(); // Clone, not original
+    }
+}
+
+// Usage: create many circles with slight differences without new + setup
+Shape circle = registry.get("circle"); // cloned from prototype
+circle.setColor("red");
+circle.draw();</code></pre>
+  </div>
+</div>
+</div>
+
+<!-- ===== STRUCTURAL PATTERNS ===== -->
+<div class="subsection">
+<div class="subsection-title"><span class="label-s">Structural</span> Patterns Object Composition</div>
+
+<!-- Adapter -->
+<div class="problem-card" id="adapter">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-s">Structural</span> <h3 style="display:inline;margin-left:8px">Adapter</h3></div>
+    <div class="tag-row"><span class="badge badge-tag">Very Common</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Convert incompatible interface into one clients expect. "Wrapper that translates interfaces."</h4>
+    <ul>
+      <li><strong>Use when:</strong> integrating legacy code, third-party libraries with different interface, API migration</li>
+      <li><strong>Real-world:</strong> Javas Arrays.asList(), InputStreamReader(InputStream), JDBC adapters</li>
+    </ul></div>
+    <pre><code class="language-java">// Target interface (what client expects)
+interface DataCatalogConnector {
+    List&lt;TableMetadata&gt; getTables(String database);
+}
+
+// Adaptee (legacy/third-party with different interface)
+class LegacyMetadataService {
+    public ResultSet executeQuery(String sql) { /* old API */ return null; }
+    public Map&lt;String, Object&gt; getSchemaInfo(String dbName) { return Map.of(); }
+}
+
+// Adapter: wraps LegacyMetadataService, implements target interface
+class LegacyMetadataAdapter implements DataCatalogConnector {
+    private final LegacyMetadataService legacy;
+
+    LegacyMetadataAdapter(LegacyMetadataService legacy) {
+        this.legacy = legacy;
+    }
+
+    @Override
+    public List&lt;TableMetadata&gt; getTables(String database) {
+        // Translate: call legacy API, convert response to new format
+        Map&lt;String, Object&gt; info = legacy.getSchemaInfo(database);
+        return convertToTableMetadata(info); // mapping logic
+    }
+}
+
+// Client uses target interface only, doesn't know about Legacy
+DataCatalogConnector connector = new LegacyMetadataAdapter(new LegacyMetadataService());
+List&lt;TableMetadata&gt; tables = connector.getTables("analytics");</code></pre>
+  </div>
+</div>
+
+<!-- Bridge -->
+<div class="problem-card" id="bridge">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-s">Structural</span> <h3 style="display:inline;margin-left:8px">Bridge</h3></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Decouple abstraction from implementation so they can vary independently.</h4>
+    <ul>
+      <li><strong>Use when:</strong> both abstraction and implementation need extension independently</li>
+      <li><strong>Vs Adapter:</strong> Bridge designed upfront; Adapter retrofits existing code</li>
+      <li><strong>Real-world:</strong> JDBC (SQL abstraction multiple DB drivers), device remotes</li>
+    </ul></div>
+    <pre><code class="language-java">// Implementation interface
+interface MessageSender {
+    void sendMessage(String recipient, String content);
+}
+
+// Concrete implementations
+class EmailSender implements MessageSender {
+    public void sendMessage(String to, String content) {
+        System.out.println("Email to " + to + ": " + content);
+    }
+}
+class SlackSender implements MessageSender {
+    public void sendMessage(String channel, String content) {
+        System.out.println("Slack #" + channel + ": " + content);
+    }
+}
+
+// Abstraction (references implementation via bridge)
+abstract class Notification {
+    protected MessageSender sender; // Bridge
+    Notification(MessageSender sender) { this.sender = sender; }
+    abstract void notify(String recipient, String message);
+}
+
+// Refined abstractions
+class AlertNotification extends Notification {
+    AlertNotification(MessageSender sender) { super(sender); }
+    public void notify(String r, String m) {
+        sender.sendMessage(r, "[ALERT] " + m);
+    }
+}
+class InfoNotification extends Notification {
+    InfoNotification(MessageSender sender) { super(sender); }
+    public void notify(String r, String m) {
+        sender.sendMessage(r, "[INFO] " + m);
+    }
+}
+
+// Mix and match independently
+new AlertNotification(new SlackSender()).notify("ops-channel", "DB is down!");
+new InfoNotification(new EmailSender()).notify("user@co.com", "Report ready");</code></pre>
+  </div>
+</div>
+
+<!-- Composite -->
+<div class="problem-card" id="composite">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-s">Structural</span> <h3 style="display:inline;margin-left:8px">Composite</h3></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Compose objects into tree structures. Treat individual objects and groups uniformly.</h4>
+    <ul>
+      <li><strong>Use when:</strong> tree structures (files/folders, org charts, UI components, menus)</li>
+      <li><strong>Key:</strong> both Leaf and Composite implement same Component interface</li>
+    </ul></div>
+    <pre><code class="language-java">// Component interface (uniform treatment)
+interface FileSystemItem {
+    String getName();
+    long getSize();
+    void display(String indent);
+}
+
+// Leaf
+class File implements FileSystemItem {
+    private final String name;
+    private final long size;
+    File(String name, long size) { this.name = name; this.size = size; }
+    public String getName() { return name; }
+    public long getSize()   { return size; }
+    public void display(String indent) {
+        System.out.println(indent + "- " + name + " (" + size + "B)");
+    }
+}
+
+// Composite (can contain leaves OR other composites)
+class Directory implements FileSystemItem {
+    private final String name;
+    private final List&lt;FileSystemItem&gt; children = new ArrayList&lt;&gt;();
+    Directory(String name) { this.name = name; }
+    public void add(FileSystemItem item) { children.add(item); }
+    public String getName() { return name; }
+    public long getSize() {
+        return children.stream().mapToLong(FileSystemItem::getSize).sum();
+    }
+    public void display(String indent) {
+        System.out.println(indent + "+ " + name + "/");
+        children.forEach(c -> c.display(indent + "  "));
+    }
+}
+
+// Client treats files and directories uniformly
+Directory root = new Directory("src");
+root.add(new File("Main.java", 1200));
+Directory utils = new Directory("utils");
+utils.add(new File("Helper.java", 800));
+root.add(utils);
+root.display(""); // Works recursively</code></pre>
+  </div>
+</div>
+
+<!-- Decorator -->
+<div class="problem-card" id="decorator">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-s">Structural</span> <h3 style="display:inline;margin-left:8px">Decorator</h3></div>
+    <div class="tag-row"><span class="badge badge-tag">Very Common</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Add behavior to objects dynamically without altering their class.</h4>
+    <ul>
+      <li><strong>Use when:</strong> add responsibilities to objects at runtime; avoid subclass explosion</li>
+      <li><strong>Real-world:</strong> Java I/O streams (BufferedInputStream wraps InputStream), Spring AOP, middleware</li>
+    </ul></div>
+    <pre><code class="language-java">interface DataSource {
+    void writeData(String data);
+    String readData();
+}
+
+class FileDataSource implements DataSource {
+    private final String filename;
+    FileDataSource(String fn) { this.filename = fn; }
+    public void writeData(String data) { /* write to file */ }
+    public String readData()           { return /* read from file */ "raw data"; }
+}
+
+// Base decorator (wraps another DataSource)
+abstract class DataSourceDecorator implements DataSource {
+    protected final DataSource wrapped;
+    DataSourceDecorator(DataSource wrapped) { this.wrapped = wrapped; }
+    public void writeData(String data) { wrapped.writeData(data); }
+    public String readData()           { return wrapped.readData(); }
+}
+
+// Concrete decorators
+class EncryptionDecorator extends DataSourceDecorator {
+    EncryptionDecorator(DataSource wrapped) { super(wrapped); }
+    public void writeData(String data) { super.writeData(encrypt(data)); }
+    public String readData()           { return decrypt(super.readData()); }
+    private String encrypt(String d)   { return "[ENC]" + d + "[/ENC]"; }
+    private String decrypt(String d)   { return d.replace("[ENC]","").replace("[/ENC]",""); }
+}
+class CompressionDecorator extends DataSourceDecorator {
+    CompressionDecorator(DataSource wrapped) { super(wrapped); }
+    public void writeData(String data) { super.writeData(compress(data)); }
+    public String readData()           { return decompress(super.readData()); }
+    private String compress(String d)   { return "ZIP(" + d + ")"; }
+    private String decompress(String d) { return d.replace("ZIP(","").replace(")",""); }
+}
+
+// Stack decorators at runtime
+DataSource source = new CompressionDecorator(
+                        new EncryptionDecorator(
+                            new FileDataSource("data.bin")));
+source.writeData("Hello"); // compressed then encrypted then written</code></pre>
+  </div>
+</div>
+
+<!-- Facade -->
+<div class="problem-card" id="facade">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-s">Structural</span> <h3 style="display:inline;margin-left:8px">Facade</h3></div>
+    <div class="tag-row"><span class="badge badge-tag">Very Common</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Provide a simplified interface to a complex subsystem.</h4>
+    <ul>
+      <li><strong>Use when:</strong> simplify complex API for common use cases; hide subsystem complexity</li>
+      <li><strong>Real-world:</strong> Hibernate SessionFactory, SLF4J (facade over log implementations), API Gateway</li>
+    </ul></div>
+    <pre><code class="language-java">// Complex subsystem classes
+class VideoDecoder {
+    VideoFile decode(String filename) { return new VideoFile(filename); }
+}
+class AudioMixer { 
+    AudioTrack fix(VideoFile video) { return new AudioTrack(); } 
+}
+class BitrateConverter { 
+    String convert(VideoFile file, String format) { return format + " version"; } 
+}
+class CodecFactory {
+    Codec extract(VideoFile file) { return new H264Codec(); }
+}
+
+// Facade: simple interface over the complex video subsystem
+class VideoConverter {
+    private final VideoDecoder decoder = new VideoDecoder();
+    private final AudioMixer mixer = new AudioMixer();
+    private final BitrateConverter bitrateConverter = new BitrateConverter();
+    private final CodecFactory codecFactory = new CodecFactory();
+
+    public File convertVideo(String filename, String format) {
+        VideoFile file = decoder.decode(filename);
+        Codec codec = codecFactory.extract(file);
+        AudioTrack audio = mixer.fix(file);
+        String result = bitrateConverter.convert(file, format);
+        return new File(result + ".mp4");
+    }
+}
+
+// Client only needs to know about Facade
+VideoConverter converter = new VideoConverter();
+File mp4 = converter.convertVideo("funny.ogg", "mp4");</code></pre>
+  </div>
+</div>
+
+<!-- Flyweight -->
+<div class="problem-card" id="flyweight">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-s">Structural</span> <h3 style="display:inline;margin-left:8px">Flyweight</h3></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Use sharing to support large numbers of fine-grained objects efficiently.</h4>
+    <ul>
+      <li><strong>Key:</strong> Separate intrinsic state (shared, immutable) from extrinsic state (unique, passed by client)</li>
+      <li><strong>Use when:</strong> millions of similar objects consuming too much memory</li>
+      <li><strong>Real-world:</strong> Java String pool, character rendering in text editors, game sprites</li>
+    </ul></div>
+    <pre><code class="language-java">// Flyweight: shared, immutable intrinsic state
+class TreeType {
+    private final String name;     // shared
+    private final String color;    // shared  
+    private final String texture;  // shared
+    
+    TreeType(String name, String color, String texture) {
+        this.name = name; this.color = color; this.texture = texture;
+    }
+    void draw(int x, int y) { // x, y are extrinsic - passed in
+        System.out.printf("Drawing %s tree at (%d,%d)%n", name, x, y);
+    }
+}
+
+// Flyweight Factory (cache and reuse)
+class TreeTypeFactory {
+    private static final Map&lt;String, TreeType&gt; cache = new HashMap&lt;&gt;();
+    
+    public static TreeType getTreeType(String name, String color, String texture) {
+        String key = name + "_" + color;
+        return cache.computeIfAbsent(key, k -> new TreeType(name, color, texture));
+    }
+}
+
+// Tree: only stores extrinsic state + reference to flyweight
+class Tree {
+    private final int x, y;        // extrinsic (unique per tree)
+    private final TreeType type;   // shared flyweight
+
+    Tree(int x, int y, TreeType type) { this.x = x; this.y = y; this.type = type; }
+    void draw() { type.draw(x, y); }
+}
+
+// Usage: 1 million trees, but only 3 TreeType objects in memory
+for (int i = 0; i &lt; 1_000_000; i++) {
+    TreeType oak = TreeTypeFactory.getTreeType("Oak", "green", "rough");
+    new Tree(rand.nextInt(1000), rand.nextInt(1000), oak).draw();
+}</code></pre>
+  </div>
+</div>
+
+<!-- Proxy -->
+<div class="problem-card" id="proxy">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-s">Structural</span> <h3 style="display:inline;margin-left:8px">Proxy</h3></div>
+    <div class="tag-row"><span class="badge badge-tag">Very Common</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Provide surrogate/placeholder for another object to control access.</h4>
+    <ul>
+      <li><strong>Types:</strong> Virtual (lazy init), Protection (access control), Remote (RPC), Caching, Logging</li>
+      <li><strong>Real-world:</strong> Spring @Transactional (proxy), Hibernate lazy loading, Java RMI, JDK Dynamic Proxy</li>
+    </ul></div>
+    <pre><code class="language-java">interface DataService {
+    String getData(String id);
+}
+
+class RealDataService implements DataService {
+    public String getData(String id) {
+        // Expensive DB/network call
+        System.out.println("Fetching " + id + " from DB...");
+        return "data_for_" + id;
+    }
+}
+
+// Caching Proxy
+class CachingDataServiceProxy implements DataService {
+    private final DataService realService;
+    private final Map&lt;String, String&gt; cache = new HashMap&lt;&gt;();
+    
+    CachingDataServiceProxy(DataService realService) {
+        this.realService = realService;
+    }
+    
+    public String getData(String id) {
+        if (cache.containsKey(id)) {
+            System.out.println("Cache hit for " + id);
+            return cache.get(id);
+        }
+        String result = realService.getData(id); // delegate to real
+        cache.put(id, result);
+        return result;
+    }
+}
+
+// Protection Proxy (access control)
+class SecureDataServiceProxy implements DataService {
+    private final DataService realService;
+    private final String userRole;
+    
+    SecureDataServiceProxy(DataService real, String role) {
+        this.realService = real; this.userRole = role;
+    }
+    
+    public String getData(String id) {
+        if (!"admin".equals(userRole)) throw new SecurityException("Access denied");
+        return realService.getData(id);
+    }
+}
+
+// Client code same for both proxy and real service
+DataService service = new CachingDataServiceProxy(new RealDataService());
+service.getData("user-123"); // DB call
+service.getData("user-123"); // Cache hit!</code></pre>
+  </div>
+</div>
+</div>
+
+<!-- ===== BEHAVIORAL PATTERNS ===== -->
+<div class="subsection">
+<div class="subsection-title"><span class="label-b">Behavioral</span> Patterns Object Communication</div>
+
+<!-- Chain of Responsibility -->
+<div class="problem-card" id="chain">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-b">Behavioral</span> <h3 style="display:inline;margin-left:8px">Chain of Responsibility</h3></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Pass requests along a chain of handlers. Each handler decides to process or pass forward.</h4>
+    <ul>
+      <li><strong>Use when:</strong> request handled by one of multiple handlers; auth middleware chains, event handling</li>
+      <li><strong>Real-world:</strong> Java Servlet Filters, Spring Security filter chain, exception handlers</li>
+    </ul></div>
+    <pre><code class="language-java">abstract class RequestHandler {
+    protected RequestHandler next;
+    
+    public RequestHandler setNext(RequestHandler next) {
+        this.next = next;
+        return next; // allows chaining
+    }
+    
+    public abstract void handle(HttpRequest request);
+    
+    protected void passToNext(HttpRequest request) {
+        if (next != null) next.handle(request);
+        else System.out.println("Request rejected: no handler processed it");
+    }
+}
+
+class AuthHandler extends RequestHandler {
+    public void handle(HttpRequest request) {
+        if (request.hasValidToken()) {
+            System.out.println("Auth: passed");
+            passToNext(request);
+        } else {
+            System.out.println("Auth: rejected - invalid token");
+        }
+    }
+}
+
+class RateLimitHandler extends RequestHandler {
+    public void handle(HttpRequest request) {
+        if (!isRateLimited(request.getClientId())) {
+            System.out.println("RateLimit: passed");
+            passToNext(request);
+        } else {
+            System.out.println("RateLimit: rejected - too many requests");
+        }
+    }
+    private boolean isRateLimited(String id) { return false; }
+}
+
+class LoggingHandler extends RequestHandler {
+    public void handle(HttpRequest request) {
+        System.out.println("Logging request: " + request.getUrl());
+        passToNext(request); // always passes
+    }
+}
+
+// Build chain: Auth RateLimit Logging
+RequestHandler chain = new AuthHandler();
+chain.setNext(new RateLimitHandler()).setNext(new LoggingHandler());
+chain.handle(new HttpRequest("/api/data", "Bearer valid_token"));</code></pre>
+  </div>
+</div>
+
+<!-- Command -->
+<div class="problem-card" id="command">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-b">Behavioral</span> <h3 style="display:inline;margin-left:8px">Command</h3></div>
+    <div class="tag-row"><span class="badge badge-tag">Common</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Encapsulate a request as an object. Supports undo, queuing, logging operations.</h4>
+    <ul>
+      <li><strong>Use when:</strong> undo/redo, operation queuing, transaction logs, macro recording</li>
+      <li><strong>Real-world:</strong> Java Runnable/Callable (command objects), Spring Batch, Event Sourcing</li>
+    </ul></div>
+    <pre><code class="language-java">interface Command {
+    void execute();
+    void undo();
+}
+
+// Receiver
+class TextEditor {
+    private StringBuilder text = new StringBuilder();
+    public void write(String s) { text.append(s); }
+    public void deleteLast(int n) { text.delete(text.length()-n, text.length()); }
+    public String getText() { return text.toString(); }
+}
+
+// Concrete commands
+class WriteCommand implements Command {
+    private final TextEditor editor;
+    private final String text;
+    
+    WriteCommand(TextEditor editor, String text) {
+        this.editor = editor; this.text = text;
+    }
+    public void execute() { editor.write(text); }
+    public void undo()    { editor.deleteLast(text.length()); }
+}
+
+// Invoker (tracks command history for undo)
+class CommandManager {
+    private final Deque&lt;Command&gt; history = new ArrayDeque&lt;&gt;();
+    
+    public void executeCommand(Command cmd) {
+        cmd.execute();
+        history.push(cmd);
+    }
+    public void undo() {
+        if (!history.isEmpty()) history.pop().undo();
+    }
+}
+
+// Usage
+TextEditor editor = new TextEditor();
+CommandManager manager = new CommandManager();
+manager.executeCommand(new WriteCommand(editor, "Hello "));
+manager.executeCommand(new WriteCommand(editor, "World"));
+System.out.println(editor.getText()); // Hello World
+manager.undo();
+System.out.println(editor.getText()); // Hello</code></pre>
+  </div>
+</div>
+
+<!-- Iterator -->
+<div class="problem-card" id="iterator">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-b">Behavioral</span> <h3 style="display:inline;margin-left:8px">Iterator</h3></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Provide sequential access to elements without exposing underlying structure.</h4>
+    <ul>
+      <li><strong>Use when:</strong> need to traverse collection without knowing its internal representation</li>
+      <li><strong>Real-world:</strong> Java Iterator, Iterable, for-each loop (all collections), database cursor</li>
+    </ul></div>
+    <pre><code class="language-java">// Custom tree iterator (in-order traversal)
+class BinaryTree&lt;T extends Comparable&lt;T&gt;&gt; implements Iterable&lt;T&gt; {
+    private Node&lt;T&gt; root;
+
+    static class Node&lt;T&gt; {
+        T value; Node&lt;T&gt; left, right;
+        Node(T value) { this.value = value; }
+    }
+
+    @Override
+    public Iterator&lt;T&gt; iterator() {
+        return new InOrderIterator&lt;&gt;(root);
+    }
+
+    static class InOrderIterator&lt;T&gt; implements Iterator&lt;T&gt; {
+        private final Deque&lt;Node&lt;T&gt;&gt; stack = new ArrayDeque&lt;&gt;();
+
+        InOrderIterator(Node&lt;T&gt; root) { pushLeft(root); }
+
+        private void pushLeft(Node&lt;T&gt; node) {
+            while (node != null) { stack.push(node); node = node.left; }
+        }
+
+        public boolean hasNext() { return !stack.isEmpty(); }
+
+        public T next() {
+            Node&lt;T&gt; node = stack.pop();
+            pushLeft(node.right);
+            return node.value;
+        }
+    }
+}
+
+// Usage: client uses for-each without knowing about tree structure
+BinaryTree&lt;Integer&gt; tree = new BinaryTree&lt;&gt;();
+// ... add nodes
+for (int val : tree) { System.out.println(val); } // in-order traversal</code></pre>
+  </div>
+</div>
+
+<!-- Mediator -->
+<div class="problem-card" id="mediator">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-b">Behavioral</span> <h3 style="display:inline;margin-left:8px">Mediator</h3></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Reduce direct coupling between objects by routing all communication through a mediator.</h4>
+    <ul>
+      <li><strong>Use when:</strong> too many direct relationships between objects; chat room, event bus, air traffic control</li>
+      <li><strong>Real-world:</strong> Spring ApplicationEventPublisher, chat application, MVC Controller</li>
+    </ul></div>
+    <pre><code class="language-java">interface ChatMediator {
+    void sendMessage(String message, User sender);
+    void addUser(User user);
+}
+
+class ChatRoom implements ChatMediator {
+    private List&lt;User&gt; users = new ArrayList&lt;&gt;();
+    
+    public void addUser(User user) { users.add(user); }
+    
+    public void sendMessage(String message, User sender) {
+        users.stream()
+             .filter(u -> u != sender)  // don't send to self
+             .forEach(u -> u.receive(message, sender.getName()));
+    }
+}
+
+abstract class User {
+    protected ChatMediator mediator;
+    protected String name;
+    User(ChatMediator mediator, String name) {
+        this.mediator = mediator; this.name = name;
+    }
+    public String getName() { return name; }
+    public void send(String message)              { mediator.sendMessage(message, this); }
+    public abstract void receive(String msg, String from);
+}
+
+class ChatUser extends User {
+    ChatUser(ChatMediator mediator, String name) { super(mediator, name); }
+    public void receive(String msg, String from) {
+        System.out.println(name + " received from " + from + ": " + msg);
+    }
+}
+
+// Users don't know about each other - all through mediator
+ChatRoom room = new ChatRoom();
+User alice = new ChatUser(room, "Alice");
+User bob   = new ChatUser(room, "Bob");
+room.addUser(alice); room.addUser(bob);
+alice.send("Hello everyone!"); // bob receives, not alice</code></pre>
+  </div>
+</div>
+
+<!-- Memento -->
+<div class="problem-card" id="memento">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-b">Behavioral</span> <h3 style="display:inline;margin-left:8px">Memento</h3></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Capture and restore object state without violating encapsulation.</h4>
+    <ul>
+      <li><strong>Use when:</strong> undo/redo, snapshots, save/restore game state, transaction rollback</li>
+      <li><strong>Different from Command:</strong> stores state (not operation); Command stores operation</li>
+    </ul></div>
+    <pre><code class="language-java">// Originator: object whose state we want to save
+class Editor {
+    private String content;
+    private int cursorPosition;
+
+    public void type(String text) {
+        content = (content == null ? "" : content) + text;
+        cursorPosition = content.length();
+    }
+
+    // Creates a snapshot (memento)
+    public EditorMemento save() {
+        return new EditorMemento(content, cursorPosition);
+    }
+
+    // Restores from snapshot
+    public void restore(EditorMemento memento) {
+        this.content = memento.getContent();
+        this.cursorPosition = memento.getCursorPosition();
+    }
+    
+    public String getContent() { return content; }
+}
+
+// Memento: stores the snapshot (immutable)
+class EditorMemento {
+    private final String content;
+    private final int cursorPosition;
+    EditorMemento(String content, int cursor) {
+        this.content = content; this.cursorPosition = cursor;
+    }
+    String getContent()      { return content; }
+    int getCursorPosition()  { return cursorPosition; }
+}
+
+// Caretaker: manages snapshots (doesn't inspect memento content)
+class UndoHistory {
+    private final Deque&lt;EditorMemento&gt; history = new ArrayDeque&lt;&gt;();
+    public void push(EditorMemento m) { history.push(m); }
+    public EditorMemento pop()        { return history.isEmpty() ? null : history.pop(); }
+}
+
+// Usage
+Editor editor = new Editor();
+UndoHistory history = new UndoHistory();
+editor.type("Hello");
+history.push(editor.save());
+editor.type(" World");
+System.out.println(editor.getContent()); // Hello World
+editor.restore(history.pop());
+System.out.println(editor.getContent()); // Hello</code></pre>
+  </div>
+</div>
+
+<!-- Observer -->
+<div class="problem-card" id="observer">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-b">Behavioral</span> <h3 style="display:inline;margin-left:8px">Observer (Event Listener)</h3></div>
+    <div class="tag-row"><span class="badge badge-tag">Very Common</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Define one-to-many dependency; when subject changes, all observers notified automatically.</h4>
+    <ul>
+      <li><strong>Use when:</strong> event systems, pub/sub, MVC (model notifies views), reactive systems</li>
+      <li><strong>Real-world:</strong> Java EventListener, RxJava, Spring ApplicationEvent, Kafka consumers</li>
+    </ul></div>
+    <pre><code class="language-java">// Observer interface
+interface MetadataChangeListener {
+    void onMetadataChanged(MetadataEvent event);
+}
+
+// Subject (Observable)
+class DataCatalogAsset {
+    private String name;
+    private String description;
+    private final List&lt;MetadataChangeListener&gt; listeners = new ArrayList&lt;&gt;();
+    
+    public void subscribe(MetadataChangeListener listener) { listeners.add(listener); }
+    public void unsubscribe(MetadataChangeListener listener) { listeners.remove(listener); }
+    
+    private void notifyListeners(MetadataEvent event) {
+        listeners.forEach(l -> l.onMetadataChanged(event));
+    }
+    
+    public void updateDescription(String desc) {
+        String old = this.description;
+        this.description = desc;
+        notifyListeners(new MetadataEvent("DESCRIPTION_CHANGED", old, desc, this.name));
+    }
+}
+
+// Concrete observers
+class AuditLogger implements MetadataChangeListener {
+    public void onMetadataChanged(MetadataEvent event) {
+        System.out.println("AUDIT: " + event.getAsset() + " changed: " + event.getType());
+    }
+}
+
+class SearchIndexer implements MetadataChangeListener {
+    public void onMetadataChanged(MetadataEvent event) {
+        System.out.println("INDEX: Re-indexing " + event.getAsset() + " in Elasticsearch");
+    }
+}
+
+// Usage: loosely coupled
+DataCatalogAsset asset = new DataCatalogAsset();
+asset.subscribe(new AuditLogger());
+asset.subscribe(new SearchIndexer());
+asset.updateDescription("Revenue data table"); // Both observers notified</code></pre>
+  </div>
+</div>
+
+<!-- State -->
+<div class="problem-card" id="state">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-b">Behavioral</span> <h3 style="display:inline;margin-left:8px">State</h3></div>
+    <div class="tag-row"><span class="badge badge-tag">Common</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Allow object to alter behavior when internal state changes. Looks like class changed.</h4>
+    <ul>
+      <li><strong>Use when:</strong> object with many states with complex transitions; vending machine, TCP, orders, traffic light</li>
+      <li><strong>Vs Strategy:</strong> State transitions itself; Strategy is set from outside</li>
+    </ul></div>
+    <pre><code class="language-java">interface OrderState {
+    void confirm(Order order);
+    void ship(Order order);
+    void deliver(Order order);
+    void cancel(Order order);
+}
+
+class Order {
+    private OrderState state = new PendingState(); // initial state
+    private String id;
+
+    public void setState(OrderState state) { this.state = state; }
+    
+    public void confirm()  { state.confirm(this); }
+    public void ship()     { state.ship(this); }
+    public void deliver()  { state.deliver(this); }
+    public void cancel()   { state.cancel(this); }
+}
+
+class PendingState implements OrderState {
+    public void confirm(Order o) {
+        System.out.println("Order confirmed");
+        o.setState(new ConfirmedState());
+    }
+    public void ship(Order o)    { System.out.println("Cannot ship: not confirmed"); }
+    public void deliver(Order o) { System.out.println("Cannot deliver: not shipped"); }
+    public void cancel(Order o)  { System.out.println("Order cancelled"); o.setState(new CancelledState()); }
+}
+
+class ConfirmedState implements OrderState {
+    public void confirm(Order o) { System.out.println("Already confirmed"); }
+    public void ship(Order o)    { System.out.println("Order shipped"); o.setState(new ShippedState()); }
+    public void deliver(Order o) { System.out.println("Not shipped yet"); }
+    public void cancel(Order o)  { System.out.println("Order cancelled"); o.setState(new CancelledState()); }
+}
+
+class ShippedState implements OrderState {
+    public void confirm(Order o) { System.out.println("Already shipped"); }
+    public void ship(Order o)    { System.out.println("Already shipped"); }
+    public void deliver(Order o) { System.out.println("Delivered!"); o.setState(new DeliveredState()); }
+    public void cancel(Order o)  { System.out.println("Cannot cancel: already shipped"); }
+}
+
+class DeliveredState implements OrderState {
+    public void confirm(Order o) { System.out.println("Order complete"); }
+    public void ship(Order o)    { System.out.println("Order complete"); }
+    public void deliver(Order o) { System.out.println("Already delivered"); }
+    public void cancel(Order o)  { System.out.println("Cannot cancel: delivered"); }
+}
+
+class CancelledState implements OrderState {
+    public void confirm(Order o) { System.out.println("Order cancelled, cannot proceed"); }
+    public void ship(Order o)    { System.out.println("Order cancelled"); }
+    public void deliver(Order o) { System.out.println("Order cancelled"); }
+    public void cancel(Order o)  { System.out.println("Already cancelled"); }
+}</code></pre>
+  </div>
+</div>
+
+<!-- Strategy -->
+<div class="problem-card" id="strategy">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-b">Behavioral</span> <h3 style="display:inline;margin-left:8px">Strategy</h3></div>
+    <div class="tag-row"><span class="badge badge-tag">Very Common</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Define family of algorithms, encapsulate each, make them interchangeable at runtime.</h4>
+    <ul>
+      <li><strong>Use when:</strong> need to switch algorithm/behavior at runtime; replace if/else chains</li>
+      <li><strong>Real-world:</strong> Java Comparator, Spring Security AuthenticationStrategy, payment processors</li>
+    </ul></div>
+    <pre><code class="language-java">// Strategy interface
+interface SortStrategy {
+    void sort(int[] data);
+}
+
+// Concrete strategies
+class QuickSortStrategy implements SortStrategy {
+    public void sort(int[] data) { System.out.println("QuickSort O(n log n)"); Arrays.sort(data); }
+}
+class BubbleSortStrategy implements SortStrategy {
+    public void sort(int[] data) {
+        System.out.println("BubbleSort O(n^2)");
+        // bubble sort implementation...
+    }
+}
+class MergeSortStrategy implements SortStrategy {
+    public void sort(int[] data) { System.out.println("MergeSort O(n log n) stable"); }
+}
+
+// Context: uses strategy
+class DataProcessor {
+    private SortStrategy strategy;
+    
+    public DataProcessor(SortStrategy strategy) { this.strategy = strategy; }
+    
+    // Can swap strategy at runtime!
+    public void setStrategy(SortStrategy strategy) { this.strategy = strategy; }
+    
+    public void process(int[] data) {
+        System.out.println("Processing " + data.length + " elements");
+        strategy.sort(data);
+    }
+}
+
+// Usage: choose strategy based on data size
+DataProcessor processor = new DataProcessor(new QuickSortStrategy());
+if (data.length &lt; 10) processor.setStrategy(new BubbleSortStrategy());
+processor.process(data);</code></pre>
+  </div>
+</div>
+
+<!-- Template Method -->
+<div class="problem-card" id="template">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-b">Behavioral</span> <h3 style="display:inline;margin-left:8px">Template Method</h3></div>
+    <div class="tag-row"><span class="badge badge-tag">Common</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Define skeleton of an algorithm in base class; let subclasses fill in steps.</h4>
+    <ul>
+      <li><strong>Use when:</strong> multiple classes share same algorithm skeleton but differ in specific steps</li>
+      <li><strong>Vs Strategy:</strong> Template Method uses inheritance; Strategy uses composition</li>
+      <li><strong>Real-world:</strong> Java AbstractList, Spring JdbcTemplate, HttpServlet.service()</li>
+    </ul></div>
+    <pre><code class="language-java">// Abstract class defines template
+abstract class DataImporter {
+    // Template method: defines the algorithm skeleton
+    public final void importData(String source) {
+        connect(source);           // step 1
+        List&lt;String&gt; raw = extract();  // step 2 (hook - subclass implements)
+        List&lt;Object&gt; data = transform(raw); // step 3 (hook)
+        load(data);                // step 4 (hook)
+        disconnect();              // step 5
+        System.out.println("Import complete: " + data.size() + " records");
+    }
+    
+    protected abstract void connect(String source);
+    protected abstract List&lt;String&gt; extract();
+    protected abstract List&lt;Object&gt; transform(List&lt;String&gt; raw);
+    
+    protected void load(List&lt;Object&gt; data) {
+        System.out.println("Loading " + data.size() + " records to DB");
+    }
+    protected void disconnect() { System.out.println("Disconnecting"); }
+}
+
+// Subclass: only overrides variable parts
+class CSVImporter extends DataImporter {
+    protected void connect(String src) { System.out.println("Opening CSV: " + src); }
+    protected List&lt;String&gt; extract()   { return List.of("row1", "row2"); }
+    protected List&lt;Object&gt; transform(List&lt;String&gt; raw) {
+        return raw.stream().map(r -> (Object)r.split(",")).toList();
+    }
+}
+
+class JSONImporter extends DataImporter {
+    protected void connect(String src) { System.out.println("Connecting to JSON API: " + src); }
+    protected List&lt;String&gt; extract()   { return List.of("{}", "{}"); }
+    protected List&lt;Object&gt; transform(List&lt;String&gt; raw) {
+        return raw.stream().map(r -> (Object)parseJson(r)).toList();
+    }
+    private Object parseJson(String s) { return Map.of(); }
+}
+
+// Usage
+new CSVImporter().importData("users.csv");
+new JSONImporter().importData("https://api.alation.com/assets");</code></pre>
+  </div>
+</div>
+
+<!-- Visitor -->
+<div class="problem-card" id="visitor">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <div><span class="label-b">Behavioral</span> <h3 style="display:inline;margin-left:8px">Visitor</h3></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Intent: Add new operations to existing class hierarchy without modifying the classes.</h4>
+    <ul>
+      <li><strong>Use when:</strong> need to add many unrelated operations to stable class hierarchy; compilers (AST traversal)</li>
+      <li><strong>Double dispatch:</strong> runtime dispatch based on BOTH visitor type AND element type</li>
+      <li><strong>Real-world:</strong> Java compiler, XML/JSON parsers, code analysis tools</li>
+    </ul></div>
+    <pre><code class="language-java">// Element hierarchy
+interface MetadataElement {
+    void accept(MetadataVisitor visitor);
+}
+
+class TableMetadata implements MetadataElement {
+    String name, schema;
+    int rowCount;
+    TableMetadata(String name, String schema, int rowCount) {
+        this.name = name; this.schema = schema; this.rowCount = rowCount;
+    }
+    public void accept(MetadataVisitor visitor) { visitor.visitTable(this); }
+}
+
+class ColumnMetadata implements MetadataElement {
+    String name, type;
+    boolean nullable;
+    ColumnMetadata(String name, String type, boolean nullable) {
+        this.name = name; this.type = type; this.nullable = nullable;
+    }
+    public void accept(MetadataVisitor visitor) { visitor.visitColumn(this); }
+}
+
+// Visitor interface
+interface MetadataVisitor {
+    void visitTable(TableMetadata table);
+    void visitColumn(ColumnMetadata column);
+}
+
+// Add new operations WITHOUT modifying TableMetadata/ColumnMetadata
+class DataQualityScorer implements MetadataVisitor {
+    public void visitTable(TableMetadata t) {
+        System.out.println("Quality score for table " + t.name + ": " + (t.rowCount &gt; 0 ? "GOOD" : "EMPTY"));
+    }
+    public void visitColumn(ColumnMetadata c) {
+        System.out.println("Column " + c.name + " nullable=" + c.nullable + " risk: " + (c.nullable ? "HIGH" : "LOW"));
+    }
+}
+
+class DocumentationChecker implements MetadataVisitor {
+    public void visitTable(TableMetadata t) {
+        System.out.println("Table " + t.name + " needs documentation: " + (t.schema.isEmpty() ? "YES" : "NO"));
+    }
+    public void visitColumn(ColumnMetadata c) {
+        System.out.println("Column " + c.name + " type=" + c.type);
+    }
+}
+
+// Usage: iterate elements and apply any visitor
+List&lt;MetadataElement&gt; elements = List.of(
+    new TableMetadata("orders", "public", 1000),
+    new ColumnMetadata("order_id", "BIGINT", false),
+    new ColumnMetadata("notes", "TEXT", true)
+);
+
+MetadataVisitor qualityChecker = new DataQualityScorer();
+elements.forEach(e -> e.accept(qualityChecker));
+
+MetadataVisitor docChecker = new DocumentationChecker();
+elements.forEach(e -> e.accept(docChecker));</code></pre>
+  </div>
+</div>
+</div>
+
+<!-- ===== LLD EXAMPLES ===== -->
+<div class="subsection" id="lld">
+<div class="subsection-title">LLD Design Examples</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Design a Parking Lot System</h3>
+    <div class="tag-row"><span class="badge badge-tag">LLD Classic</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Classes needed:</h4><ul>
+      <li>ParkingLot (Singleton), ParkingFloor, ParkingSlot, Vehicle, Ticket, PaymentService</li>
+      <li>Slot types: Handicapped, Compact, Large, Motorcycle</li>
+      <li>Vehicle types: Car, Truck, Motorcycle, Van</li>
+    </ul></div>
+    <pre><code class="language-java">enum SlotType { MOTORCYCLE, COMPACT, LARGE, HANDICAPPED }
+enum VehicleType { MOTORCYCLE, CAR, TRUCK, VAN }
+
+class Vehicle {
+    protected String licensePlate;
+    protected VehicleType type;
+    Vehicle(String plate, VehicleType type) { this.licensePlate = plate; this.type = type; }
+}
+
+class ParkingSlot {
+    private final String id;
+    private final SlotType type;
+    private Vehicle parkedVehicle;
+    
+    public boolean isAvailable() { return parkedVehicle == null; }
+    public boolean canFit(Vehicle v) {
+        return isAvailable() &amp;&amp; switch(v.type) {
+            case MOTORCYCLE -> type == SlotType.MOTORCYCLE || type == SlotType.COMPACT;
+            case CAR        -> type == SlotType.COMPACT || type == SlotType.LARGE;
+            case TRUCK, VAN -> type == SlotType.LARGE;
+        };
+    }
+    public void park(Vehicle v)  { this.parkedVehicle = v; }
+    public void vacate()         { this.parkedVehicle = null; }
+}
+
+class ParkingFloor {
+    private final int level;
+    private final List&lt;ParkingSlot&gt; slots;
+    
+    public Optional&lt;ParkingSlot&gt; findAvailableSlot(Vehicle vehicle) {
+        return slots.stream().filter(s -> s.canFit(vehicle)).findFirst();
+    }
+}
+
+class ParkingLot {
+    private static ParkingLot instance;
+    private final List&lt;ParkingFloor&gt; floors;
+    private final Map&lt;String, Ticket&gt; activeTickets = new HashMap&lt;&gt;();
+    
+    private ParkingLot(List&lt;ParkingFloor&gt; floors) { this.floors = floors; }
+    
+    public static synchronized ParkingLot getInstance(List&lt;ParkingFloor&gt; floors) {
+        if (instance == null) instance = new ParkingLot(floors);
+        return instance;
+    }
+    
+    public Ticket park(Vehicle vehicle) {
+        for (ParkingFloor floor : floors) {
+            Optional&lt;ParkingSlot&gt; slot = floor.findAvailableSlot(vehicle);
+            if (slot.isPresent()) {
+                slot.get().park(vehicle);
+                Ticket ticket = new Ticket(vehicle, slot.get(), LocalDateTime.now());
+                activeTickets.put(ticket.getId(), ticket);
+                return ticket;
+            }
+        }
+        throw new RuntimeException("Parking lot is full");
+    }
+    
+    public double exit(String ticketId) {
+        Ticket ticket = activeTickets.remove(ticketId);
+        ticket.getSlot().vacate();
+        return calculateFee(ticket);
+    }
+    
+    private double calculateFee(Ticket ticket) {
+        long hours = ChronoUnit.HOURS.between(ticket.getEntryTime(), LocalDateTime.now());
+        return Math.max(1, hours) * getRatePerHour(ticket.getVehicle().type);
+    }
+}</code></pre>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Design an Elevator System</h3>
+    <div class="tag-row"><span class="badge badge-tag">LLD Classic</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Key Components &amp; Decisions:</h4><ul>
+      <li><strong>ElevatorController</strong>: manages all elevators, dispatches requests (Strategy pattern for scheduling)</li>
+      <li><strong>Elevator</strong>: state machine (IDLE, MOVING_UP, MOVING_DOWN, MAINTENANCE)</li>
+      <li><strong>Scheduling Algorithms</strong>: FCFS, SCAN (elevator algorithm), LOOK</li>
+      <li><strong>SCAN/LOOK</strong>: elevator continues in one direction, picks up requests along the way (like a disk seek algorithm)</li>
+    </ul></div>
+    <pre><code class="language-java">enum Direction { UP, DOWN, IDLE }
+enum ElevatorStatus { IDLE, MOVING, DOOR_OPEN, MAINTENANCE }
+
+class Elevator {
+    private int currentFloor;
+    private Direction direction;
+    private ElevatorStatus status;
+    private final TreeSet&lt;Integer&gt; upRequests   = new TreeSet&lt;&gt;();
+    private final TreeSet&lt;Integer&gt; downRequests = new TreeSet&lt;&gt;(Comparator.reverseOrder());
+    
+    public void addRequest(int floor) {
+        if (floor &gt; currentFloor) upRequests.add(floor);
+        else downRequests.add(floor);
+    }
+    
+    // SCAN algorithm: serve all floors in current direction, then reverse
+    public void step() {
+        if (direction == Direction.UP &amp;&amp; !upRequests.isEmpty()) {
+            currentFloor = upRequests.first(); upRequests.remove(currentFloor);
+            System.out.println("Elevator at floor " + currentFloor);
+        } else if (!downRequests.isEmpty()) {
+            direction = Direction.DOWN;
+            currentFloor = downRequests.first(); downRequests.remove(currentFloor);
+        } else if (!upRequests.isEmpty()) {
+            direction = Direction.UP;
+        } else {
+            direction = Direction.IDLE; status = ElevatorStatus.IDLE;
+        }
+    }
+}
+
+// Controller dispatches to nearest available elevator
+class ElevatorController {
+    private final List&lt;Elevator&gt; elevators;
+    
+    public void requestElevator(int floor, Direction direction) {
+        // Find nearest idle elevator, or least-loaded
+        Elevator best = elevators.stream()
+            .min(Comparator.comparingInt(e -> Math.abs(e.getCurrentFloor() - floor)))
+            .orElseThrow();
+        best.addRequest(floor);
+    }
+}</code></pre>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Design a Library Management System</h3>
+    <div class="tag-row"><span class="badge badge-tag">LLD</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Key Entities:</h4><ul>
+      <li>Book (ISBN, title, copies), BookItem (physical copy, barcode), Member, Loan, Fine, Catalog</li>
+      <li>Patterns: Strategy (search), Observer (overdue notifications), Singleton (library), Builder (search criteria)</li>
+    </ul></div>
+    <pre><code class="language-java">class Book {
+    private final String isbn;
+    private final String title;
+    private final List&lt;String&gt; authors;
+    private final List&lt;BookItem&gt; copies = new ArrayList&lt;&gt;();
+    
+    public Optional&lt;BookItem&gt; getAvailableCopy() {
+        return copies.stream().filter(BookItem::isAvailable).findFirst();
+    }
+}
+
+class BookItem {
+    private final String barcode;
+    private BookStatus status; // AVAILABLE, LOANED, RESERVED, LOST
+    private Member loanedTo;
+    private LocalDate dueDate;
+    
+    public boolean isAvailable() { return status == BookStatus.AVAILABLE; }
+}
+
+class Loan {
+    private final BookItem bookItem;
+    private final Member member;
+    private final LocalDate issueDate;
+    private final LocalDate dueDate;
+    private LocalDate returnDate;
+    
+    public double calculateFine() {
+        if (returnDate == null || !returnDate.isAfter(dueDate)) return 0.0;
+        long overdueDays = ChronoUnit.DAYS.between(dueDate, returnDate);
+        return overdueDays * 0.50; // $0.50/day fine
+    }
+}
+
+class Library {
+    // Strategy pattern for search
+    interface SearchStrategy {
+        List&lt;Book&gt; search(String query, List&lt;Book&gt; catalog);
+    }
+    
+    class TitleSearch implements SearchStrategy {
+        public List&lt;Book&gt; search(String q, List&lt;Book&gt; catalog) {
+            return catalog.stream().filter(b -> b.getTitle().toLowerCase().contains(q.toLowerCase())).toList();
+        }
+    }
+    
+    public Loan issueBook(String isbn, Member member) {
+        Book book = findByISBN(isbn).orElseThrow();
+        BookItem copy = book.getAvailableCopy().orElseThrow(() -> new RuntimeException("No copies available"));
+        copy.setStatus(BookStatus.LOANED);
+        return new Loan(copy, member, LocalDate.now(), LocalDate.now().plusDays(14));
+    }
+}</code></pre>
+  </div>
+</div>
+
+</div><!-- end lld -->
+
+<!-- ═══════════════════════════════════════════════════
+     JAVA 8+ — FUNCTIONAL INTERFACES & STREAMS
+═══════════════════════════════════════════════ -->
+<div id="java8-functional" class="subsection">
+<div class="subsection-title">Java 8 — Functional Interfaces, Lambda &amp; Method References</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Core Functional Interfaces — Function, BiFunction, Predicate, Consumer, Supplier</h3>
+    <div class="tag-row"><span class="badge badge-tag">Java 8</span><span class="badge badge-high">Must Know</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Interface</th><th>Signature</th><th>Method</th><th>Use Case</th></tr>
+      <tr><td><code>Function&lt;T,R&gt;</code></td><td>T R</td><td><code>apply(T)</code></td><td>Transform a value</td></tr>
+      <tr><td><code>BiFunction&lt;T,U,R&gt;</code></td><td>(T,U) R</td><td><code>apply(T,U)</code></td><td>Combine two values</td></tr>
+      <tr><td><code>Predicate&lt;T&gt;</code></td><td>T boolean</td><td><code>test(T)</code></td><td>Filter / condition</td></tr>
+      <tr><td><code>BiPredicate&lt;T,U&gt;</code></td><td>(T,U) boolean</td><td><code>test(T,U)</code></td><td>Two-arg condition</td></tr>
+      <tr><td><code>Consumer&lt;T&gt;</code></td><td>T void</td><td><code>accept(T)</code></td><td>Side-effect action</td></tr>
+      <tr><td><code>BiConsumer&lt;T,U&gt;</code></td><td>(T,U) void</td><td><code>accept(T,U)</code></td><td>Map.forEach</td></tr>
+      <tr><td><code>Supplier&lt;T&gt;</code></td><td>() T</td><td><code>get()</code></td><td>Lazy factory, memoize</td></tr>
+      <tr><td><code>UnaryOperator&lt;T&gt;</code></td><td>T T</td><td><code>apply(T)</code></td><td>Modify in-place type</td></tr>
+      <tr><td><code>BinaryOperator&lt;T&gt;</code></td><td>(T,T) T</td><td><code>apply(T,T)</code></td><td>Reduce two to one</td></tr>
+    </table>
+<pre><code class="language-java">import java.util.function.*;
+
+// ── Function<T, R> ──────────────────────────────────────────
+Function&lt;String, Integer&gt; strLen = String::length;
+Function&lt;String, String&gt;  upper  = String::toUpperCase;
+
+// compose: upper.compose(strLen) — wrong types; use andThen for chaining
+Function&lt;String, String&gt; trimThenUpper = ((Function&lt;String,String&gt; String::trim).andThen(String::toUpperCase);
+System.out.println(trimThenUpper.apply("  hello  ")); // "HELLO"
+
+// ── BiFunction<T, U, R> ────────────────────────────────────
+BiFunction&lt;String, Integer, String&gt; repeat = (s, n) -> s.repeat(n);
+System.out.println(repeat.apply("ab", 3)); // "ababab"
+
+// andThen on BiFunction (applies another Function to the result)
+BiFunction&lt;Integer, Integer, Integer&gt; add    = Integer::sum;
+Function&lt;Integer, String&gt;             format = n -> "Result: " + n;
+BiFunction&lt;Integer, Integer, String&gt;  addFmt = add.andThen(format);
+System.out.println(addFmt.apply(3, 4)); // "Result: 7"
+
+// ── Predicate<T> ───────────────────────────────────────────
+Predicate&lt;String&gt; nonEmpty = s -> !s.isEmpty();
+Predicate&lt;String&gt; hasDigit  = s -> s.chars().anyMatch(Character::isDigit);
+
+// Compose predicates
+Predicate&lt;String&gt; validPassword = nonEmpty.and(hasDigit);
+Predicate&lt;String&gt; reject        = nonEmpty.negate();
+Predicate&lt;String&gt; either        = nonEmpty.or(hasDigit);
+
+// ── Consumer<T> ─────────────────────────────────────────────
+Consumer&lt;String&gt; print  = System.out::println;
+Consumer&lt;String&gt; log    = s -> System.err.println("[LOG] " + s);
+Consumer&lt;String&gt; both   = print.andThen(log);  // chain side effects
+
+// BiConsumer — used in Map.forEach
+Map&lt;String, Integer&gt; scores = Map.of("Alice", 95, "Bob", 87);
+BiConsumer&lt;String, Integer&gt; printScore = (k, v) -> System.out.println(k + ": " + v);
+scores.forEach(printScore);
+
+// ── Supplier<T> ─────────────────────────────────────────────
+Supplier&lt;List&lt;String&gt;&gt; listFactory = ArrayList::new;
+List&lt;String&gt; list = listFactory.get();
+
+// Lazy initialization pattern
+Supplier&lt;ExpensiveObject&gt; lazy = () -> new ExpensiveObject();
+// Object not created until lazy.get() is called</code></pre>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Method References — 4 Types with Examples</h3>
+    <div class="tag-row"><span class="badge badge-tag">Java 8</span><span class="badge badge-tag">Lambda</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Type</th><th>Syntax</th><th>Equivalent Lambda</th></tr>
+      <tr><td>Static method</td><td><code>ClassName::staticMethod</code></td><td><code>x -> ClassName.staticMethod(x)</code></td></tr>
+      <tr><td>Instance method (specific object)</td><td><code>instance::method</code></td><td><code>x -> instance.method(x)</code></td></tr>
+      <tr><td>Instance method (arbitrary object)</td><td><code>ClassName::instanceMethod</code></td><td><code>x -> x.instanceMethod()</code></td></tr>
+      <tr><td>Constructor</td><td><code>ClassName::new</code></td><td><code>(args) -> new ClassName(args)</code></td></tr>
+    </table>
+<pre><code class="language-java">// 1. Static method reference
+Function&lt;String, Integer&gt;  parseInt  = Integer::parseInt;   // Integer.parseInt(s)
+Function&lt;Double, Double&gt;   abs       = Math::abs;
+BiFunction&lt;Integer,Integer,Integer&gt; max = Integer::max;
+
+// 2. Instance method of specific object
+String prefix = "Hello";
+Predicate&lt;String&gt; startsWith = prefix::startsWith;   // s -> prefix.startsWith(s) — wait, wrong
+Supplier&lt;Integer&gt; len        = prefix::length;        // () -> prefix.length()
+
+// 3. Instance method of arbitrary object (most common in streams)
+Function&lt;String, String&gt;    toUpper   = String::toUpperCase;  // s -> s.toUpperCase()
+Function&lt;String, Integer&gt;   strLength = String::length;
+Predicate&lt;String&gt;           isEmpty   = String::isEmpty;
+Comparator&lt;String&gt;          cmp       = String::compareTo;
+
+// 4. Constructor reference
+Supplier&lt;ArrayList&lt;String&gt;&gt; newList   = ArrayList::new;
+Function&lt;Integer, int[]&gt;    newArray  = int[]::new;
+
+// Practical example — sorting
+List&lt;String&gt; names = List.of("Charlie", "Alice", "Bob");
+names.stream()
+     .sorted(String::compareTo)         // method ref for Comparator
+     .forEach(System.out::println);     // method ref for Consumer</code></pre>
+  </div>
+</div>
+
+</div><!-- java8-functional -->
+
+<div id="java8-streams" class="subsection">
+<div class="subsection-title">Java 8 — Streams API</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Stream Pipeline — Intermediate &amp; Terminal Operations</h3>
+    <div class="tag-row"><span class="badge badge-tag">Java 8</span><span class="badge badge-high">Must Know</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Stream Pipeline</h4>
+      <p><strong>Source</strong> zero or more <strong>Intermediate ops</strong> (lazy) one <strong>Terminal op</strong> (triggers execution)</p>
+      <p>Streams are <strong>not reusable</strong> — consuming a stream closes it. Intermediate ops return a new Stream; they don't process data until a terminal op is called.</p>
+    </div>
+<pre><code class="language-java">import java.util.*;
+import java.util.stream.*;
+import java.util.function.*;
+
+List&lt;String&gt; names = List.of("Alice", "Bob", "Charlie", "Adam", "Betty");
+
+// ── Intermediate operations (lazy, return Stream) ──────────
+// filter — keep elements matching predicate
+Stream&lt;String&gt; aNames = names.stream().filter(n -> n.startsWith("A"));
+
+// map — transform T → R
+Stream&lt;Integer&gt; lengths = names.stream().map(String::length);
+
+// flatMap — T → Stream&lt;R&gt; (flatten nested structure)
+List&lt;List&lt;Integer&gt;&gt; nested = List.of(List.of(1,2), List.of(3,4));
+List&lt;Integer&gt; flat = nested.stream()
+    .flatMap(Collection::stream)
+    .collect(Collectors.toList());  // [1, 2, 3, 4]
+
+// distinct, sorted, limit, skip, peek
+names.stream()
+     .filter(n -> n.length() > 3)
+     .distinct()
+     .sorted(Comparator.reverseOrder())
+     .limit(3)
+     .peek(n -> System.out.println("Processing: " + n))  // debug, not for side effects
+     .collect(Collectors.toList());
+
+// ── Terminal operations (eager, trigger pipeline) ──────────
+// collect
+List&lt;String&gt; upper = names.stream()
+    .map(String::toUpperCase)
+    .collect(Collectors.toList());
+
+// reduce — fold into single value
+int totalLen = names.stream()
+    .mapToInt(String::length)
+    .sum();                             // shorthand; also: .reduce(0, Integer::sum)
+
+Optional&lt;String&gt; longest = names.stream()
+    .reduce((a, b) -> a.length() >= b.length() ? a : b);
+
+// count, min, max, findFirst, findAny, anyMatch, allMatch, noneMatch
+long count   = names.stream().filter(n -> n.contains("a")).count();
+boolean any  = names.stream().anyMatch(n -> n.startsWith("Z"));
+Optional&lt;String&gt; first = names.stream().filter(n -> n.length() == 3).findFirst();</code></pre>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Collectors — groupingBy, partitioningBy, joining, toMap</h3>
+    <div class="tag-row"><span class="badge badge-tag">Java 8</span><span class="badge badge-tag">Streams</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-java">import java.util.stream.Collectors;
+
+record Employee(String name, String dept, int salary) {}
+List&lt;Employee&gt; employees = List.of(
+    new Employee("Alice", "Eng", 95000),
+    new Employee("Bob",   "Eng", 88000),
+    new Employee("Carol", "HR",  72000),
+    new Employee("Dan",   "HR",  68000)
+);
+
+// ── groupingBy ─────────────────────────────────────────────
+Map&lt;String, List&lt;Employee&gt;&gt; byDept =
+    employees.stream().collect(Collectors.groupingBy(Employee::dept));
+
+// With downstream collector — count per dept
+Map&lt;String, Long&gt; countByDept =
+    employees.stream().collect(Collectors.groupingBy(Employee::dept, Collectors.counting()));
+
+// Average salary per dept
+Map&lt;String, Double&gt; avgSalary =
+    employees.stream().collect(Collectors.groupingBy(Employee::dept,
+        Collectors.averagingInt(Employee::salary)));
+
+// Nested grouping — dept → salary bucket → names
+Map&lt;String, Map&lt;String, List&lt;String&gt;&gt;&gt; nested =
+    employees.stream().collect(Collectors.groupingBy(Employee::dept,
+        Collectors.groupingBy(
+            e -> e.salary() >= 80000 ? "senior" : "junior",
+            Collectors.mapping(Employee::name, Collectors.toList()))));
+
+// ── partitioningBy ─────────────────────────────────────────
+Map&lt;Boolean, List&lt;Employee&gt;&gt; seniorJunior =
+    employees.stream().collect(Collectors.partitioningBy(e -> e.salary() >= 80000));
+
+// ── joining ────────────────────────────────────────────────
+String csv    = employees.stream().map(Employee::name).collect(Collectors.joining(", "));
+String report = employees.stream().map(Employee::name)
+    .collect(Collectors.joining(", ", "[", "]")); // "[Alice, Bob, Carol, Dan]"
+
+// ── toMap ──────────────────────────────────────────────────
+Map&lt;String, Integer&gt; nameSalary =
+    employees.stream().collect(Collectors.toMap(Employee::name, Employee::salary));
+
+// Merge function for duplicate keys
+Map&lt;String, Integer&gt; deptMaxSalary =
+    employees.stream().collect(Collectors.toMap(
+        Employee::dept,
+        Employee::salary,
+        Integer::max));   // merge: keep higher salary on duplicate dept key
+
+// ── summarizingInt ─────────────────────────────────────────
+IntSummaryStatistics stats =
+    employees.stream().collect(Collectors.summarizingInt(Employee::salary));
+System.out.println(stats.getMax() + " / " + stats.getAverage());</code></pre>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Optional, Comparator Chains &amp; Parallel Streams</h3>
+    <div class="tag-row"><span class="badge badge-tag">Java 8</span><span class="badge badge-tag">Optional</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this)">Optional</button>
+      <button class="tab-btn" onclick="switchTab(this)">Comparator</button>
+      <button class="tab-btn" onclick="switchTab(this)">Parallel Streams</button>
+    </div>
+    <div class="tab-pane active">
+<pre><code class="language-java">// Optional — avoid NullPointerException, express optionality in type
+Optional&lt;String&gt; opt = Optional.of("hello");
+Optional&lt;String&gt; empty = Optional.empty();
+Optional&lt;String&gt; nullable = Optional.ofNullable(maybeNull);
+
+// Extract value
+String val = opt.get();                          // throws if empty — avoid
+String val2 = opt.orElse("default");            // safe default
+String val3 = opt.orElseGet(() -> compute());   // lazy default
+String val4 = opt.orElseThrow(IllegalArgumentException::new);
+
+// Transform
+Optional&lt;Integer&gt; len = opt.map(String::length);           // Optional&lt;Integer&gt;
+Optional&lt;String&gt; upper = opt.map(String::toUpperCase);
+Optional&lt;String&gt; nested = opt.flatMap(s -> Optional.of(s.trim())); // avoid Optional&lt;Optional&gt;
+
+// Filter
+Optional&lt;String&gt; filtered = opt.filter(s -> s.length() > 3);
+
+// Side effects
+opt.ifPresent(System.out::println);
+opt.ifPresentOrElse(System.out::println, () -> System.out.println("empty")); // Java 9
+
+// Chaining Optional in service layer
+Optional&lt;User&gt; user = userRepo.findById(id)
+    .filter(User::isActive)
+    .map(u -> { u.setLastSeen(now()); return u; });</code></pre>
+    </div>
+    <div class="tab-pane">
+<pre><code class="language-java">// Comparator.comparing — declarative chaining
+List&lt;Employee&gt; sorted = employees.stream()
+    .sorted(Comparator.comparing(Employee::dept)
+                      .thenComparing(Employee::salary, Comparator.reverseOrder())
+                      .thenComparing(Employee::name))
+    .collect(Collectors.toList());
+
+// Null-safe
+Comparator&lt;Employee&gt; nullSafe =
+    Comparator.comparing(Employee::dept, Comparator.nullsLast(Comparator.naturalOrder()));
+
+// naturalOrder / reverseOrder
+List&lt;Integer&gt; nums = List.of(3,1,4,1,5,9);
+nums.stream().sorted(Comparator.reverseOrder()).forEach(System.out::println);</code></pre>
+    </div>
+    <div class="tab-pane">
+<pre><code class="language-java">// Parallel streams — uses ForkJoinPool.commonPool()
+long count = LongStream.range(0, 1_000_000)
+    .parallel()
+    .filter(n -> n % 2 == 0)
+    .count();
+
+// When to use parallel:
+//  CPU-bound, large datasets (>10k elements)
+//  Stateless, independent operations (map, filter)
+//  I/O bound (blocks threads in shared pool)
+//  Operations with shared mutable state
+//  Small datasets — overhead > benefit
+//  Ordered operations (findFirst may be slow parallel)
+
+// Custom ForkJoinPool (don't pollute common pool)
+ForkJoinPool pool = new ForkJoinPool(4);
+List&lt;String&gt; result = pool.submit(() ->
+    names.parallelStream()
+         .map(String::toUpperCase)
+         .collect(Collectors.toList())
+).get();</code></pre>
+    </div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Real-World Stream Patterns — Practical Examples</h3>
+    <div class="tag-row"><span class="badge badge-tag">Java 8</span><span class="badge badge-tag">Streams</span></div>
+    <span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<pre><code class="language-java">// ── Pattern 1: Word frequency count ────────────────────────
+String text = "the cat sat on the mat the cat";
+Map&lt;String, Long&gt; freq = Arrays.stream(text.split("\\s+"))
+    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+// Sort by frequency descending
+freq.entrySet().stream()
+    .sorted(Map.Entry.&lt;String,Long&gt;comparingByValue().reversed())
+    .limit(5)
+    .forEach(e -> System.out.println(e.getKey() + ": " + e.getValue()));
+
+// ── Pattern 2: Flatten nested lists and deduplicate ────────
+List&lt;List&lt;String&gt;&gt; matrix = List.of(List.of("a","b","c"), List.of("b","c","d"));
+List&lt;String&gt; unique = matrix.stream()
+    .flatMap(List::stream)
+    .distinct()
+    .sorted()
+    .collect(Collectors.toList()); // [a, b, c, d]
+
+// ── Pattern 3: Group and transform ────────────────────────
+// Max salary employee per department
+Map&lt;String, Optional&lt;Employee&gt;&gt; topEarner =
+    employees.stream().collect(
+        Collectors.groupingBy(Employee::dept,
+            Collectors.maxBy(Comparator.comparingInt(Employee::salary))));
+
+// ── Pattern 4: Build index map from list ───────────────────
+Map&lt;Integer, String&gt; idxMap = IntStream.range(0, names.size())
+    .boxed()
+    .collect(Collectors.toMap(Function.identity(), names::get));
+
+// ── Pattern 5: Aggregate stats ────────────────────────────
+OptionalDouble avgSalaryOpt = employees.stream()
+    .mapToInt(Employee::salary)
+    .average();
+
+// ── Pattern 6: Chained BiFunction for transformation pipeline
+BiFunction&lt;String, String, String&gt; concat   = (a, b) -> a + b;
+BiFunction&lt;String, String, Integer&gt; compareLen = (a, b) -> Integer.compare(a.length(), b.length());
+
+// andThen: apply Function to the result of BiFunction
+BiFunction&lt;String, String, String&gt; concatUpper = concat.andThen(String::toUpperCase);
+System.out.println(concatUpper.apply("hello", " world")); // "HELLO WORLD"</code></pre>
+  </div>
+</div>
+
+</div><!-- java8-streams -->
+
+</div><!-- content-area -->
+</main>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+<script src="main.js"></script>
+<script src="search-data.js"></script>
+<script src="search.js"></script>
+</body>
+</html>

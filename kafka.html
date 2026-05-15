@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kafka &amp; Message Queues | Alation Prep</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<style>
+.arch-box { background:var(--bg-secondary); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:monospace; font-size:12px; color:var(--text-secondary); line-height:1.8; margin:12px 0; white-space:pre; overflow-x:auto; }
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">IP</div>
+    <div><h2>Interview Prep</h2><p>Full Stack Reference</p></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Pages</div>
+    <a href="index.html" class="nav-link">Dashboard</a>
+    <a href="dsa.html" class="nav-link">DSA — Python</a>
+    <a href="oop-lld.html" class="nav-link">OOP &amp; LLD — Java</a>
+    <a href="system-design.html" class="nav-link">System Design</a>
+    <a href="kafka.html" class="nav-link active">Kafka &amp; Messaging</a>
+    <a href="os-concurrency.html" class="nav-link">OS &amp; Concurrency</a>
+    <a href="docker-aws.html" class="nav-link">Docker &amp; AWS</a>
+    <a href="networking-security.html" class="nav-link">Networking &amp; Security</a>
+    <a href="databases.html" class="nav-link">Databases — SQL &amp; NoSQL</a>
+    <a href="alation.html" class="nav-link">Alation Focus <span class="nav-badge">HOT</span></a>
+  </div>
+  <div class="sidebar-footer"><kbd>Cmd K</kbd> to search</div>
+</nav>
+
+<main class="main">
+<div class="topbar"><h1>Kafka &amp; Message Queues</h1>
+  <button class="topbar-search-btn" onclick="window._spotlightOpen && window._spotlightOpen()">Search topics... <kbd>Cmd K</kbd></button></div>
+<div class="content-area">
+<div class="section-header">
+  <h1>Apache Kafka &amp; Message Queues</h1>
+  <p>Distributed streaming, message queue architectures, and real-world patterns.</p>
+</div>
+
+<!-- ═══ KAFKA FUNDAMENTALS ═══ -->
+<div class="subsection">
+<div class="subsection-title">Apache Kafka — Core Architecture</div>
+
+<div class="callout callout-blue">
+  <div class="callout-title">What is Kafka?</div>
+  Apache Kafka is a <strong>distributed event streaming platform</strong>. It acts as a highly scalable, fault-tolerant message bus. Think of it as a durable commit log where producers append events and consumers read them at their own pace.
+</div>
+
+<!-- Architecture Overview -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Kafka Architecture Overview</h3>
+    <div class="tag-row"><span class="badge badge-tag">Core</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">                    KAFKA CLUSTER
+┌──────────────────────────────────────────────────────────┐
+│                                                          │
+│  Topic: "user-events"  (3 Partitions, RF=2)              │
+│                                                          │
+│  Partition 0: [msg0][msg1][msg4][msg7] → Broker 1 (Lead) │
+│                                          Broker 2 (Replica)│
+│  Partition 1: [msg2][msg5][msg8]       → Broker 2 (Lead) │
+│                                          Broker 3 (Replica)│
+│  Partition 2: [msg3][msg6][msg9]       → Broker 3 (Lead) │
+│                                          Broker 1 (Replica)│
+└──────────────────────────────────────────────────────────┘
+
+Producers → write to partitions (key-based or round-robin)
+Consumers (in Consumer Group) → each partition read by ONE consumer
+ZooKeeper / KRaft → cluster metadata, leader election</div>
+    <div class="grid-2" style="margin-top:14px">
+      <div class="concept-box">
+        <h4>Key Components</h4>
+        <ul>
+          <li><strong>Broker</strong>: Kafka server that stores and serves messages</li>
+          <li><strong>Topic</strong>: Named stream of records (like a DB table)</li>
+          <li><strong>Partition</strong>: Ordered, immutable log — unit of parallelism</li>
+          <li><strong>Offset</strong>: Position of a message in partition (0-indexed)</li>
+          <li><strong>Producer</strong>: Publishes records to topics</li>
+          <li><strong>Consumer</strong>: Reads records from topics</li>
+          <li><strong>Consumer Group</strong>: Set of consumers sharing load</li>
+          <li><strong>Replication Factor</strong>: Number of partition copies</li>
+        </ul>
+      </div>
+      <div class="concept-box">
+        <h4>Key Properties</h4>
+        <ul>
+          <li><strong>Durability</strong>: Messages persisted to disk (configurable retention)</li>
+          <li><strong>High Throughput</strong>: Millions of msgs/sec via sequential I/O, batching</li>
+          <li><strong>Fault Tolerant</strong>: Replication across brokers</li>
+          <li><strong>Scalable</strong>: Add partitions/brokers independently</li>
+          <li><strong>Ordered</strong>: Per-partition ordering guaranteed</li>
+          <li><strong>Replay</strong>: Consumers can re-read from any offset</li>
+          <li><strong>Decoupled</strong>: Producer/consumer don't know each other</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Topics and Partitions -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Topics, Partitions &amp; Offsets</h3>
+    <div class="tag-row"><span class="badge badge-tag">Core</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Concept</th><th>Detail</th></tr>
+      <tr><td><strong>Topic</strong></td><td>Logical category of messages. e.g., "order-events", "user-activity"</td></tr>
+      <tr><td><strong>Partition</strong></td><td>Physical split of topic. Enables parallel consumption. Messages ordered within a partition.</td></tr>
+      <tr><td><strong>Partition Key</strong></td><td>hash(key) % numPartitions. Same key → same partition → ordering guarantee per key</td></tr>
+      <tr><td><strong>Offset</strong></td><td>Sequential ID of message in partition. Consumer tracks its offset. Can replay from any offset.</td></tr>
+      <tr><td><strong>Log Retention</strong></td><td>Configurable by time (7 days) or size (1GB). Can be unlimited for event sourcing.</td></tr>
+      <tr><td><strong>Replication Factor</strong></td><td>RF=3 means 3 copies of each partition. Leader handles reads/writes, replicas are standby.</td></tr>
+      <tr><td><strong>ISR</strong></td><td>In-Sync Replicas — replicas that are caught up with leader. Message acked when ISR all confirm.</td></tr>
+    </table>
+    <div class="callout callout-orange">
+      <div class="callout-title">How Many Partitions?</div>
+      Start with: max(target throughput / producer throughput, target throughput / consumer throughput). Can increase partitions but cannot decrease. Common: 3, 6, 12, 24 per topic.
+    </div>
+  </div>
+</div>
+
+<!-- Consumer Groups -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Consumer Groups &amp; Rebalancing</h3>
+    <div class="tag-row"><span class="badge badge-tag">Core</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">Topic "orders" — 4 Partitions
+
+Consumer Group A (Order Processor):
+├── Consumer 1 → Partition 0, 1
+└── Consumer 2 → Partition 2, 3
+
+Consumer Group B (Analytics):
+├── Consumer 1 → Partition 0, 1
+├── Consumer 2 → Partition 2
+└── Consumer 3 → Partition 3
+
+Adding Consumer to Group A:
+├── Consumer 1 → Partition 0
+├── Consumer 2 → Partition 1
+├── Consumer 3 → Partition 2  ← new
+└── [Partition 3 unassigned until Consumer 4 joins]
+
+If consumers > partitions → some consumers are idle!</div>
+    <div class="concept-box"><h4>Offset Management</h4><ul>
+      <li><code>auto.commit.enable=true</code> — commits offsets automatically (at-least-once risk)</li>
+      <li><strong>Manual commit</strong>: commitSync() after processing → exactly-once semantics</li>
+      <li>Offsets stored in <code>__consumer_offsets</code> internal topic</li>
+      <li><strong>earliest</strong>: start from beginning of topic</li>
+      <li><strong>latest</strong>: start from latest messages only</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- Delivery Semantics -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Delivery Semantics</h3>
+    <div class="tag-row"><span class="badge badge-tag">Critical</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Semantic</th><th>Behavior</th><th>Config</th><th>Use Case</th></tr>
+      <tr><td><strong>At Most Once</strong></td><td>Messages may be lost, never duplicated</td><td>acks=0, auto-commit before processing</td><td>Metrics, logs where loss OK</td></tr>
+      <tr><td><strong>At Least Once</strong></td><td>No loss, but may be duplicated</td><td>acks=all, manual commit after processing</td><td>Most use cases with idempotent consumers</td></tr>
+      <tr><td><strong>Exactly Once</strong></td><td>No loss, no duplication</td><td>enable.idempotence=true + transactions</td><td>Financial, order processing</td></tr>
+    </table>
+    <div class="callout callout-green">
+      <div class="callout-title">Producer acks Setting</div>
+      <strong>acks=0</strong>: Fire and forget (fastest, no guarantee) | <strong>acks=1</strong>: Leader ack (fast, leader failure = loss) | <strong>acks=all</strong>: All ISR ack (slowest, no loss)
+    </div>
+  </div>
+</div>
+
+<!-- Kafka Code Examples -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Kafka — Code Examples (Java)</h3>
+    <div class="tag-row"><span class="badge badge-tag">Code</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this)">Producer</button>
+      <button class="tab-btn" onclick="switchTab(this)">Consumer</button>
+      <button class="tab-btn" onclick="switchTab(this)">Streams</button>
+    </div>
+    <div class="tab-pane active">
+<pre><code class="language-java">import org.apache.kafka.clients.producer.*;
+import java.util.Properties;
+
+public class MetadataEventProducer {
+    public static void main(String[] args) {
+        Properties props = new Properties();
+        props.put("bootstrap.servers", "localhost:9092");
+        props.put("key.serializer",   "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("acks", "all");              // strongest durability
+        props.put("retries", 3);
+        props.put("enable.idempotence", "true");  // exactly-once
+
+        KafkaProducer&lt;String, String&gt; producer = new KafkaProducer&lt;&gt;(props);
+
+        // tableId as key → same table's events go to same partition → ordered
+        String key   = "table:users";
+        String value = "{\"event\":\"schema_change\",\"table\":\"users\",\"ts\":1234567890}";
+
+        ProducerRecord&lt;String, String&gt; record =
+            new ProducerRecord&lt;&gt;("metadata-events", key, value);
+
+        // Async with callback
+        producer.send(record, (metadata, exception) -&gt; {
+            if (exception != null) {
+                System.err.println("Send failed: " + exception.getMessage());
+            } else {
+                System.out.printf("Sent to partition=%d offset=%d%n",
+                    metadata.partition(), metadata.offset());
+            }
+        });
+
+        producer.flush();
+        producer.close();
+    }
+}</code></pre>
+    </div>
+    <div class="tab-pane">
+<pre><code class="language-java">import org.apache.kafka.clients.consumer.*;
+import java.time.Duration;
+import java.util.*;
+
+public class MetadataEventConsumer {
+    public static void main(String[] args) {
+        Properties props = new Properties();
+        props.put("bootstrap.servers", "localhost:9092");
+        props.put("group.id", "search-indexer-group");
+        props.put("key.deserializer",   "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("auto.offset.reset", "earliest");    // start from beginning if no offset
+        props.put("enable.auto.commit", "false");       // manual commit for at-least-once
+
+        KafkaConsumer&lt;String, String&gt; consumer = new KafkaConsumer&lt;&gt;(props);
+        consumer.subscribe(List.of("metadata-events"));
+
+        try {
+            while (true) {
+                ConsumerRecords&lt;String, String&gt; records =
+                    consumer.poll(Duration.ofMillis(100));
+
+                for (ConsumerRecord&lt;String, String&gt; record : records) {
+                    System.out.printf("topic=%s partition=%d offset=%d key=%s value=%s%n",
+                        record.topic(), record.partition(), record.offset(),
+                        record.key(), record.value());
+
+                    // Process: update search index
+                    processMetadataEvent(record.value());
+                }
+
+                // Commit after processing all records in batch
+                consumer.commitSync();
+            }
+        } finally {
+            consumer.close();
+        }
+    }
+
+    static void processMetadataEvent(String event) {
+        // Update Elasticsearch index, notify watchers, etc.
+        System.out.println("Indexing: " + event);
+    }
+}</code></pre>
+    </div>
+    <div class="tab-pane">
+<pre><code class="language-java">import org.apache.kafka.streams.*;
+import org.apache.kafka.streams.kstream.*;
+import java.util.Properties;
+
+// Kafka Streams: process and transform streams within Kafka
+public class EventAggregator {
+    public static void main(String[] args) {
+        Properties props = new Properties();
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG,    "event-aggregator");
+        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+
+        StreamsBuilder builder = new StreamsBuilder();
+
+        // Read from input topic
+        KStream&lt;String, String&gt; events =
+            builder.stream("metadata-events");
+
+        // Filter only schema change events
+        KStream&lt;String, String&gt; schemaChanges =
+            events.filter((key, value) -&gt; value.contains("schema_change"));
+
+        // Count events per table (tumbling window: 1 hour)
+        KTable&lt;Windowed&lt;String&gt;, Long&gt; eventCounts = schemaChanges
+            .groupByKey()
+            .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofHours(1)))
+            .count();
+
+        // Write results to output topic
+        eventCounts.toStream()
+            .map((key, count) -&gt; KeyValue.pair(key.key(), count.toString()))
+            .to("schema-change-stats");
+
+        KafkaStreams streams = new KafkaStreams(builder.build(), props);
+        streams.start();
+        Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
+    }
+}</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- Kafka Use Cases -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Kafka Use Cases at Alation-like Systems</h3>
+    <div class="tag-row"><span class="badge badge-high">Important</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Use Case</th><th>Kafka Role</th><th>Topics</th></tr>
+      <tr><td>Metadata Change Propagation</td><td>When a table schema changes in source DB, publish event → all consumers (search index, lineage graph, notifications) update</td><td>metadata-changes</td></tr>
+      <tr><td>Audit Log</td><td>Every user action (view, edit, comment on data) streamed to Kafka → audit trail, analytics</td><td>user-activity</td></tr>
+      <tr><td>Search Index Updates</td><td>Incremental search index updates via change events (CDC from DB → Kafka → Elasticsearch)</td><td>cdc-events</td></tr>
+      <tr><td>Data Quality Alerts</td><td>Data quality checks run, publish violations → notification workers send alerts to data owners</td><td>quality-alerts</td></tr>
+      <tr><td>Connector Status</td><td>Metadata crawlers publish status → monitoring dashboards</td><td>connector-status</td></tr>
+    </table>
+    <div class="arch-box">Alation Metadata Pipeline:
+
+Source DB (Snowflake/Redshift)
+         ↓ CDC (Debezium)
+    Kafka Topic: "source-metadata"
+         ↓
+    Kafka Consumers:
+    ├── Search Indexer → Elasticsearch
+    ├── Lineage Updater → Graph DB (Neo4j)
+    ├── Cache Invalidator → Redis
+    └── Notification Worker → Email/Slack alerts</div>
+  </div>
+</div>
+
+</div><!-- end Kafka -->
+
+<!-- ═══ MESSAGE QUEUES ═══ -->
+<div class="subsection">
+<div class="subsection-title">Message Queue Patterns</div>
+
+<!-- Kafka vs RabbitMQ -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Kafka vs RabbitMQ vs SQS</h3>
+    <div class="tag-row"><span class="badge badge-tag">Comparison</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Feature</th><th>Kafka</th><th>RabbitMQ</th><th>Amazon SQS</th></tr>
+      <tr><td><strong>Type</strong></td><td>Event streaming log</td><td>Traditional message broker</td><td>Managed queue (AWS)</td></tr>
+      <tr><td><strong>Message Retention</strong></td><td>Days/weeks (replay)</td><td>Until consumed</td><td>Up to 14 days</td></tr>
+      <tr><td><strong>Throughput</strong></td><td>Millions/sec</td><td>Thousands/sec</td><td>Managed scaling</td></tr>
+      <tr><td><strong>Ordering</strong></td><td>Per-partition</td><td>Per-queue (FIFO)</td><td>SQS FIFO queues</td></tr>
+      <tr><td><strong>Routing</strong></td><td>Topic → partitions</td><td>Exchanges (direct, fanout, topic)</td><td>Simple queues</td></tr>
+      <tr><td><strong>Consumer Groups</strong></td><td>Yes (competing consumers)</td><td>Competing consumers</td><td>Multiple consumers</td></tr>
+      <tr><td><strong>Replay</strong></td><td>Yes (by offset)</td><td>No</td><td>No</td></tr>
+      <tr><td><strong>Best For</strong></td><td>Event streaming, analytics, audit log</td><td>Task queues, RPC, complex routing</td><td>Simple decoupling, AWS native</td></tr>
+    </table>
+    <div class="callout callout-blue"><div class="callout-title">Interview Answer</div>Use Kafka when you need: high throughput, replay, multiple consumers reading same data, event sourcing. Use RabbitMQ for: complex routing, request-reply, smaller scale. Use SQS for: AWS-native, serverless, simple queuing.</div>
+  </div>
+</div>
+
+<!-- Dead Letter Queue -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Dead Letter Queue (DLQ)</h3>
+    <div class="tag-row"><span class="badge badge-tag">Reliability</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>What is a DLQ?</h4><p style="color:var(--text-secondary);font-size:13px">A special queue that receives messages that cannot be processed after N retries. Prevents poison messages from blocking the queue.</p></div>
+    <div class="arch-box">Normal Flow:
+Producer → Queue → Consumer → Success → Ack
+                       ↓
+              Processing Fails (retry 1, 2, 3)
+                       ↓ (max retries exceeded)
+              Dead Letter Queue → Alert/Manual Review</div>
+    <div class="concept-box"><h4>DLQ Best Practices</h4><ul>
+      <li>Alert on messages entering DLQ (metrics, PagerDuty)</li>
+      <li>Include original message + metadata (retry count, error reason)</li>
+      <li>Tools to replay DLQ messages after fixing root cause</li>
+      <li>Kafka: create separate topic "events-dlq", consumer publishes failed messages there</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- Outbox Pattern -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Transactional Outbox Pattern</h3>
+    <div class="tag-row"><span class="badge badge-tag">Reliability</span><span class="badge badge-tag">Exactly-Once</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="callout callout-orange"><div class="callout-title">Problem</div>How do you atomically update the DB AND publish a Kafka message? If DB write succeeds but Kafka publish fails → inconsistency!</div>
+    <div class="arch-box">Solution: Transactional Outbox
+
+1. BEGIN TRANSACTION
+   INSERT INTO orders (id, status) VALUES (123, 'placed')
+   INSERT INTO outbox (event_type, payload) VALUES ('ORDER_PLACED', '...')
+   COMMIT
+
+2. Outbox Relay Process (polls outbox table):
+   SELECT * FROM outbox WHERE sent = false
+   → Publish to Kafka
+   → UPDATE outbox SET sent = true
+
+OR: Use Debezium (CDC) to read DB transaction log → publish to Kafka
+    (no polling needed, near real-time)</div>
+  </div>
+</div>
+
+<!-- Message Ordering -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Message Ordering Guarantees</h3>
+    <div class="tag-row"><span class="badge badge-tag">Design</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Scope</th><th>Kafka Guarantee</th></tr>
+      <tr><td>Within a partition</td><td> Strictly ordered (messages appended sequentially)</td></tr>
+      <tr><td>Across partitions</td><td> No global ordering</td></tr>
+      <tr><td>For a specific key</td><td> All messages with same key go to same partition → ordered</td></tr>
+    </table>
+    <div class="callout callout-green"><div class="callout-title">Pattern: Ordering by Entity</div>Use entity ID (user_id, order_id) as partition key. All events for a given entity are ordered. This is the Kafka best practice for event-driven systems.</div>
+  </div>
+</div>
+
+<!-- Schema Registry -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Schema Registry &amp; Avro</h3>
+    <div class="tag-row"><span class="badge badge-tag">Production</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Why Schema Registry?</h4><ul>
+      <li>Producer and consumer must agree on message format</li>
+      <li>Schema Registry stores Avro/Protobuf/JSON schemas</li>
+      <li>Producer registers schema, consumer fetches it by ID</li>
+      <li>Schema evolution: <strong>backward compatible</strong> (add optional fields), <strong>forward compatible</strong> (remove fields)</li>
+    </ul></div>
+<pre><code class="language-json">// Avro Schema for Metadata Event
+{
+  "type": "record",
+  "name": "MetadataEvent",
+  "namespace": "com.alation.events",
+  "fields": [
+    {"name": "eventId",    "type": "string"},
+    {"name": "eventType",  "type": "string"},
+    {"name": "tableId",    "type": "long"},
+    {"name": "tableName",  "type": "string"},
+    {"name": "timestamp",  "type": "long"},
+    {"name": "userId",     "type": ["null", "string"], "default": null}
+  ]
+}</code></pre>
+  </div>
+</div>
+
+<!-- Kafka Design Interview Question -->
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3> Interview Q: Design a Real-time Metadata Change System</h3>
+    <div class="tag-row"><span class="badge badge-high">Must Know</span></div>
+    <span class="toggle-icon">▶</span>
+  </div>
+  <div class="problem-card-body">
+    <div class="callout callout-red"><div class="callout-title">Scenario</div>"Design a system where when a table's schema changes in a data warehouse, all downstream consumers (search index, lineage graph, data owners) are notified in real-time."</div>
+    <div class="steps">
+      <div class="step"><div><strong>CDC Layer</strong>: Debezium reads database transaction log → publishes to Kafka topic "schema-changes"</div></div>
+      <div class="step"><div><strong>Kafka Topics</strong>: "schema-changes" (3 partitions, RF=3, key=table_id for ordering)</div></div>
+      <div class="step"><div><strong>Consumer Group 1 - Search Indexer</strong>: Updates Elasticsearch with new schema → search reflects changes within seconds</div></div>
+      <div class="step"><div><strong>Consumer Group 2 - Lineage Updater</strong>: Updates graph DB with new column relationships</div></div>
+      <div class="step"><div><strong>Consumer Group 3 - Notifier</strong>: Sends email/Slack to table owners and stewards</div></div>
+      <div class="step"><div><strong>DLQ</strong>: Failed events go to "schema-changes-dlq" → alert on-call team</div></div>
+      <div class="step"><div><strong>Exactly-Once</strong>: Transactional outbox pattern ensures schema change written to DB and published atomically</div></div>
+    </div>
+    <div class="arch-box">Snowflake Schema Change
+         ↓
+    Debezium (CDC) → Kafka: "schema-changes" (key=table_id)
+         ↓
+    ┌────────────────────────────────────────┐
+    │  Consumer Group: search-indexer         │ → Elasticsearch
+    │  Consumer Group: lineage-updater        │ → Neo4j
+    │  Consumer Group: notification-service  │ → Email/Slack
+    └────────────────────────────────────────┘
+         ↓ (failures)
+    Kafka: "schema-changes-dlq" → Alert + Manual Review</div>
+  </div>
+</div>
+
+</div><!-- end MQ -->
+
+</div><!-- content-area -->
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="main.js"></script>
+<script src="search-data.js"></script>
+<script src="search.js"></script>
+</body>
+</html>
