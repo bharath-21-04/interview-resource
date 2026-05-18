@@ -65,7 +65,9 @@
   <a href="#distributed">Distributed</a>
   <a href="#network">Networking</a>
   <a href="#security">Auth &amp; Security</a>
+  <a href="#hld-concepts">HLD Concepts</a>
   <a href="#interview-qs">Interview Questions</a>
+  <a href="#hld-qs">HLD Questions</a>
 </div>
 
 <!-- ===== FUNDAMENTALS ===== -->
@@ -781,6 +783,461 @@ Session (Stateful):
 </div>
 </div>
 
+<!-- ===== HLD CONCEPTS ===== -->
+<div class="subsection" id="hld-concepts">
+<div class="subsection-title">High-Level Design (HLD) Concepts</div>
+
+<div class="callout callout-blue">
+  <div class="callout-title">HLD Interview Framework — Always Follow This</div>
+  <strong>Step 1 — Clarify (5 min):</strong> Functional requirements (what features?), Non-functional (scale, latency, consistency, availability). <strong>Step 2 — Estimate (3 min):</strong> DAU, RPS, Storage, Bandwidth. <strong>Step 3 — High-Level (5 min):</strong> Draw major components: clients, LBs, services, DBs, caches, queues. <strong>Step 4 — API Design (3 min):</strong> Endpoints, request/response schema. <strong>Step 5 — Deep Dive (15 min):</strong> Critical components, bottlenecks, tradeoffs. <strong>Step 6 — Wrap Up (3 min):</strong> Failure modes, monitoring, future scaling.
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Back-of-Envelope Estimation Cheat Sheet</h3>
+    <div class="tag-row"><span class="badge badge-tag">Must Know</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="grid-2">
+      <div class="concept-box"><h4>Powers of 2 &amp; Data Sizes</h4>
+        <table>
+          <tr><th>Unit</th><th>Value</th></tr>
+          <tr><td>1 KB</td><td>10³ bytes = 1,000 bytes</td></tr>
+          <tr><td>1 MB</td><td>10⁶ bytes</td></tr>
+          <tr><td>1 GB</td><td>10⁹ bytes</td></tr>
+          <tr><td>1 TB</td><td>10¹² bytes</td></tr>
+          <tr><td>1 PB</td><td>10¹⁵ bytes</td></tr>
+          <tr><td>1 char / 1 UUID</td><td>1 B / 36 B</td></tr>
+          <tr><td>1 image (compressed)</td><td>~300 KB</td></tr>
+          <tr><td>1 video min (720p)</td><td>~50 MB</td></tr>
+        </table>
+      </div>
+      <div class="concept-box"><h4>Latency Numbers Every Engineer Knows</h4>
+        <table>
+          <tr><th>Operation</th><th>Latency</th></tr>
+          <tr><td>L1 cache read</td><td>0.5 ns</td></tr>
+          <tr><td>RAM access</td><td>100 ns</td></tr>
+          <tr><td>SSD random read</td><td>100 µs</td></tr>
+          <tr><td>HDD seek</td><td>10 ms</td></tr>
+          <tr><td>Redis GET (same DC)</td><td>~0.5 ms</td></tr>
+          <tr><td>DB query (indexed)</td><td>~1-5 ms</td></tr>
+          <tr><td>Cross-DC round trip</td><td>~150 ms</td></tr>
+          <tr><td>1 GB network transfer</td><td>~10 ms (10Gbps)</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="concept-box" style="margin-top:10px"><h4>Quick Estimation Formulas</h4><ul>
+      <li><strong>RPS from DAU:</strong> DAU × avg_requests_per_day / 86,400 (seconds/day)</li>
+      <li><strong>Peak RPS:</strong> avg_RPS × 2–3× (typical peak-to-average ratio)</li>
+      <li><strong>Storage per year:</strong> write_RPS × record_size × 86,400 × 365</li>
+      <li><strong>Bandwidth:</strong> peak_RPS × avg_response_size (bytes/s → MB/s)</li>
+      <li><strong>Rule of thumb:</strong> 1M DAU → ~12 RPS avg for a simple app; 100M DAU → 1,200 RPS avg</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Architecture Styles: Monolith → SOA → Microservices → Serverless → Event-Driven</h3>
+    <div class="tag-row"><span class="badge badge-tag">Architecture</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Style</th><th>Description</th><th>Best For</th><th>Avoid When</th></tr>
+      <tr><td><strong>Monolith</strong></td><td>All modules in one deployable unit</td><td>Early-stage, small team, &lt;100K DAU</td><td>Different components need independent scaling</td></tr>
+      <tr><td><strong>SOA</strong></td><td>Services communicate via ESB/SOAP</td><td>Enterprise with legacy integration</td><td>Greenfield cloud-native projects</td></tr>
+      <tr><td><strong>Microservices</strong></td><td>Small autonomous services, REST/gRPC</td><td>Large teams, independent scaling, different tech stacks</td><td>Small teams (operational overhead kills velocity)</td></tr>
+      <tr><td><strong>Serverless (FaaS)</strong></td><td>Functions triggered by events, no server management</td><td>Irregular traffic, event processing, glue code</td><td>Long-running jobs, latency-critical (cold starts)</td></tr>
+      <tr><td><strong>Event-Driven</strong></td><td>Services communicate via events (Kafka)</td><td>Async workflows, decoupling producers from consumers</td><td>When immediate consistency is required</td></tr>
+    </table>
+    <div class="arch-box">Evolutionary Path:
+Monolith (Day 1)
+      Identify bounded contexts (user service, order service, payment)
+Modular Monolith (extract modules with clear interfaces)
+      When specific module hits scaling limits
+Microservices (extract high-scale components first: search, recommendations)
+      For unpredictable spiky traffic
+Serverless (image resizing, scheduled jobs, webhooks)</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Storage Systems — Object, Block, File Storage</h3>
+    <div class="tag-row"><span class="badge badge-tag">Infrastructure</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Type</th><th>How</th><th>Access</th><th>Use Cases</th><th>Examples</th></tr>
+      <tr><td><strong>Object Storage</strong></td><td>Flat namespace of objects (key=path, value=blob)</td><td>HTTP (GET/PUT), eventual consistency</td><td>Images, videos, backups, static assets, data lake</td><td>S3, GCS, Azure Blob</td></tr>
+      <tr><td><strong>Block Storage</strong></td><td>Raw blocks, like virtual disk; OS mounts as filesystem</td><td>Low-latency I/O (iSCSI, NVMe)</td><td>Database volumes, VMs, boot disks</td><td>AWS EBS, Azure Disk</td></tr>
+      <tr><td><strong>File Storage (NFS)</strong></td><td>Hierarchical filesystem, shared across instances</td><td>NFS/SMB mount</td><td>Shared config, CMS assets, ML training data</td><td>AWS EFS, Azure Files</td></tr>
+      <tr><td><strong>In-Memory</strong></td><td>RAM-based, volatile (or durable with persistence)</td><td>Sub-millisecond</td><td>Cache, sessions, leaderboards, queues</td><td>Redis, Memcached</td></tr>
+      <tr><td><strong>Columnar Store</strong></td><td>Store data column-by-column (efficient for analytics)</td><td>SQL</td><td>OLAP, data warehouse, aggregation queries</td><td>Snowflake, BigQuery, Redshift</td></tr>
+    </table>
+    <div class="callout callout-blue"><div class="callout-title">Rule of Thumb</div>User uploads → Object Storage (S3). Database needs disk → Block Storage (EBS). Shared files between instances → File Storage (EFS). Analytics at scale → Columnar Store (BigQuery/Snowflake).</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Message Queues &amp; Event Streaming — Deep Dive</h3>
+    <div class="tag-row"><span class="badge badge-tag">Critical</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th></th><th>Kafka</th><th>RabbitMQ</th><th>AWS SQS</th><th>AWS SNS</th></tr>
+      <tr><td>Model</td><td>Pub/Sub + Log (pull)</td><td>AMQP queue (push)</td><td>Queue (pull)</td><td>Topic fan-out (push)</td></tr>
+      <tr><td>Retention</td><td>Days/weeks (log-based)</td><td>Until consumed</td><td>14 days max</td><td>N/A (fire-and-forget)</td></tr>
+      <tr><td>Ordering</td><td>Per partition</td><td>Per queue</td><td>FIFO queue option</td><td>No</td></tr>
+      <tr><td>Throughput</td><td>Millions/sec</td><td>50K–100K/sec</td><td>Managed, high</td><td>Managed</td></tr>
+      <tr><td>Consumer groups</td><td>Yes (replay, multiple)</td><td>Competing consumers</td><td>No (one consumer)</td><td>Multiple subscriptions</td></tr>
+      <tr><td>Best For</td><td>Event streaming, audit log, real-time pipelines</td><td>Task queues, RPC</td><td>Decoupling AWS services</td><td>Fan-out notifications</td></tr>
+    </table>
+    <div class="concept-box" style="margin-top:10px"><h4>Message Delivery Semantics</h4><ul>
+      <li><strong>At-most-once</strong>: fire-and-forget. May lose messages. Best for logging/metrics where loss is OK.</li>
+      <li><strong>At-least-once</strong>: retry until ack. May duplicate. Consumer must be idempotent. Kafka default.</li>
+      <li><strong>Exactly-once</strong>: hardest to achieve. Kafka Transactions + idempotent producer. Use for financial events.</li>
+    </ul></div>
+    <div class="concept-box"><h4>When to Use a Message Queue in HLD</h4><ul>
+      <li><strong>Decouple services:</strong> Order service publishes, Inventory/Email/Notification consume independently</li>
+      <li><strong>Absorb traffic spikes:</strong> Queue acts as buffer; downstream processes at sustainable rate</li>
+      <li><strong>Async workflows:</strong> Video transcoding, report generation, email sending don't block API response</li>
+      <li><strong>Event sourcing:</strong> Kafka as immutable ordered event log</li>
+      <li><strong>Fan-out:</strong> One event triggers multiple downstream consumers in parallel</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Data Processing — Batch vs Stream vs Lambda Architecture</h3>
+    <div class="tag-row"><span class="badge badge-tag">Data Engineering</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Model</th><th>Latency</th><th>Throughput</th><th>Complexity</th><th>Tools</th><th>Use Case</th></tr>
+      <tr><td><strong>Batch Processing</strong></td><td>Hours</td><td>Very High</td><td>Low</td><td>Spark, Hadoop MapReduce</td><td>Daily reports, ML training, ETL</td></tr>
+      <tr><td><strong>Stream Processing</strong></td><td>Seconds–ms</td><td>High</td><td>Medium</td><td>Kafka Streams, Flink, Spark Streaming</td><td>Real-time dashboards, fraud detection, alerting</td></tr>
+      <tr><td><strong>Micro-batch</strong></td><td>Minutes</td><td>High</td><td>Low-Med</td><td>Spark Structured Streaming</td><td>Near-real-time analytics (acceptable delay)</td></tr>
+    </table>
+    <div class="concept-box" style="margin-top:10px"><h4>Lambda Architecture</h4><ul>
+      <li><strong>Batch Layer:</strong> Processes all historical data (S3 → Spark → data warehouse). Accurate but slow.</li>
+      <li><strong>Speed Layer:</strong> Processes real-time stream (Kafka → Flink). Low latency but approximate.</li>
+      <li><strong>Serving Layer:</strong> Merges batch + speed layer results for queries.</li>
+      <li><strong>Kappa Architecture (simpler):</strong> Only stream processing layer; reprocess history by replaying Kafka. Eliminates batch/speed duplication. Preferred modern approach.</li>
+    </ul></div>
+    <div class="arch-box">Data Pipeline (typical modern stack):
+Raw events Kafka (stream)
+         Flink / Spark Streaming (real-time transform, aggregate)
+         Redis (for live dashboards)   ClickHouse / Druid (for OLAP queries)
+         S3 Data Lake (raw + transformed)
+         dbt + Snowflake (daily batch aggregations for BI)
+         Looker / Tableau (dashboards)</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Content Delivery Network (CDN) — Full Architecture</h3>
+    <div class="tag-row"><span class="badge badge-tag">Performance</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">CDN Hierarchy:
+User (Mumbai) DNS Anycast IP routes to nearest PoP
+      Edge Node (Mumbai PoP, &lt;10ms away)
+           Cache HIT return immediately (sub-10ms)
+           Cache MISS request to Regional Cache (Singapore)
+                   Cache MISS request to Origin (US)
+                   Response cached at Origin CDN
+           Response cached at Regional  Edge  User
+
+CDN PoP (Point of Presence):
+  SSD Cache + Nginx/Varnish + TLS termination + Anycast routing
+
+Pull CDN: Edge pulls from origin on cache miss, caches result (Cloudflare)
+Push CDN: You push content to CDN upfront (Akamai, good for known assets)
+
+Cache-Control Headers:
+  Cache-Control: public, max-age=86400, s-maxage=604800
+  Surrogate-Control: max-age=2592000 (CDN-specific override)
+  Vary: Accept-Encoding (cache separate version per encoding)</div>
+    <div class="concept-box"><h4>What Goes on CDN vs Origin</h4>
+      <table>
+        <tr><th>CDN (cache at edge)</th><th>Origin only (don't cache)</th></tr>
+        <tr><td>Static: JS, CSS, images, videos</td><td>User-specific API responses</td></tr>
+        <tr><td>Public API responses (product listings)</td><td>Cart, checkout, payment</td></tr>
+        <tr><td>ML model weights, binaries</td><td>Session-dependent pages</td></tr>
+        <tr><td>HLS/DASH video segments</td><td>Real-time data (stock prices)</td></tr>
+      </table>
+    </div>
+    <div class="callout callout-orange"><div class="callout-title">Cache Invalidation Strategies</div>Versioned URLs: /bundle.v2.3.0.js (no invalidation needed — new URL = new cache entry). TTL: set short TTL (5min) for semi-static content. Purge API: POST /purge {urls} to Cloudflare/Fastly on deploy. Surrogate keys (cache tags): tag multiple URLs, purge by tag.</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Distributed Consensus — Raft &amp; Paxos</h3>
+    <div class="tag-row"><span class="badge badge-tag">Advanced</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Why Consensus Matters in HLD</h4><ul>
+      <li>Multiple nodes must agree on a single value (leader election, config, who owns a lock)</li>
+      <li>Used by: etcd (Kubernetes config), Zookeeper (Kafka broker election), CockroachDB, Consul</li>
+    </ul></div>
+    <div class="arch-box">Raft Consensus (Leader-based, easier to understand than Paxos):
+
+Roles: Leader | Follower | Candidate
+
+1. Leader Election:
+   All nodes start as Followers with random election timeout (150-300ms)
+   If no heartbeat received, node becomes Candidate
+   RequestVote to all peers; majority wins leader for this term
+
+2. Log Replication:
+   Client writes to Leader
+   Leader appends to own log, sends AppendEntries to all followers
+   When majority (quorum) ack, commit entry, apply to state machine
+   Leader sends commit in next heartbeat to followers
+
+3. Safety: a node only votes for candidate with at least as up-to-date log
+
+Quorum = floor(N/2) + 1
+  3 nodes: quorum = 2 (tolerates 1 failure)
+  5 nodes: quorum = 3 (tolerates 2 failures)</div>
+    <div class="callout callout-blue"><div class="callout-title">In Interviews</div>You rarely need to implement Raft. Know: it's used for leader election and replicated state machine. etcd/Zookeeper use it. Quorum = N/2+1. It tolerates at most (N-1)/2 failures. Split-brain prevention: partitioned minority cannot elect a leader.</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Observability: Metrics, Logs, Traces (The Three Pillars)</h3>
+    <div class="tag-row"><span class="badge badge-tag">Operations</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <table>
+      <tr><th>Pillar</th><th>What it captures</th><th>Tools</th><th>Use for</th></tr>
+      <tr><td><strong>Metrics</strong></td><td>Aggregated numeric data over time (RPS, latency p99, error rate, CPU)</td><td>Prometheus + Grafana, DataDog, CloudWatch</td><td>Alerting, capacity planning, SLA monitoring</td></tr>
+      <tr><td><strong>Logs</strong></td><td>Discrete events with context (request logs, error stack traces)</td><td>ELK Stack, Loki, Splunk, Fluentd</td><td>Debugging, audit trail, root cause analysis</td></tr>
+      <tr><td><strong>Traces</strong></td><td>End-to-end request path across microservices with span timings</td><td>Jaeger, Zipkin, AWS X-Ray, OpenTelemetry</td><td>Find bottleneck services, latency breakdown</td></tr>
+    </table>
+    <div class="concept-box" style="margin-top:10px"><h4>SLI / SLO / SLA</h4><ul>
+      <li><strong>SLI (Service Level Indicator):</strong> Measured metric — e.g., p99 latency = 120ms, error rate = 0.1%</li>
+      <li><strong>SLO (Service Level Objective):</strong> Target — e.g., p99 &lt; 200ms, availability &gt; 99.9% ("three nines")</li>
+      <li><strong>SLA (Service Level Agreement):</strong> Contractual commitment with penalty — "99.9% uptime or credit"</li>
+      <li><strong>Error Budget:</strong> 99.9% SLO = 0.1% error budget = 43.8 min/month of allowed downtime</li>
+    </ul></div>
+    <div class="concept-box"><h4>KEY Alerts Every System Needs</h4><ul>
+      <li>Error rate &gt; 1% for 5 min — page on-call</li>
+      <li>p99 latency &gt; 2× baseline for 5 min — alert</li>
+      <li>Queue depth growing (Kafka consumer lag) — scale up consumers</li>
+      <li>DB connection pool saturation — add read replicas</li>
+      <li>Cache hit rate drops below 90% — investigate cold start or eviction</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Service Mesh &amp; Service Discovery</h3>
+    <div class="tag-row"><span class="badge badge-tag">Microservices</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Service Discovery — How Microservices Find Each Other</h4><ul>
+      <li><strong>Client-side discovery:</strong> Service A queries registry (Consul/Eureka) directly and load-balances itself. More control but coupling to registry library.</li>
+      <li><strong>Server-side discovery:</strong> Client calls LB (ELB, NGINX), LB queries registry. Simpler clients, extra hop.</li>
+      <li><strong>DNS-based (Kubernetes):</strong> Each service gets a stable DNS name (order-service.default.svc.cluster.local). kube-dns resolves to ClusterIP. Most common modern approach.</li>
+    </ul></div>
+    <div class="arch-box">Service Mesh (Istio / Linkerd):
+Each pod gets a sidecar proxy (Envoy)
+All traffic goes: Service A Envoy (sidecar) network Envoy (sidecar) Service B
+
+Control Plane provides:
+  mTLS between all services (zero-trust security)
+  Traffic policies (retries, timeouts, circuit breaker) without code changes
+  Observability (auto-traces, metrics per service pair)
+  Canary deployments (route 5% traffic to v2 via traffic weights)
+
+When to use Service Mesh:
+  Large microservice fleet (&gt;20 services) where cross-cutting concerns
+  (security, observability, traffic management) become unmanageable per-service.</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Geospatial Systems — Geohashing &amp; Quadtrees</h3>
+    <div class="tag-row"><span class="badge badge-tag">Location</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">Geohash:
+  Encodes (lat, lng) to a string: (37.7749, -122.4194) "9q8yy"
+  Nearby locations share common prefix: "9q8yy" neighbors share "9q8y"
+  Precision: 6 chars ≈ 1.2km×0.6km, 8 chars ≈ 38m×19m
+  Stored as indexed VARCHAR in DB range query = prefix LIKE '9q8y%'
+
+  Edge case: points near geohash boundary are geographically close
+  but have different prefixes. Solution: also check 8 neighboring cells.
+
+Quadtree:
+  Divide 2D space into 4 quadrants recursively until each cell has
+  ≤ N points (e.g., 100 drivers per cell)
+  Dynamic: densely populated areas get more subdivisions (NYC vs rural)
+  Used by: Google Maps for rendering, Uber for driver partitioning
+
+S2 (Google):
+  Divides sphere into hierarchical cells at 30 levels
+  Level 12 ≈ city block, Level 30 ≈ 1cm²
+  All cells same shape (low distortion)
+  Used by: Google Maps, Foursquare, Uber</div>
+    <div class="concept-box"><h4>Nearby Search Query Patterns</h4><ul>
+      <li><strong>Redis GEORADIUS:</strong> GEORADIUS drivers 37.77 -122.41 5 km → O(N+log M). Best for real-time moving objects (Uber drivers).</li>
+      <li><strong>PostGIS:</strong> SELECT * FROM restaurants WHERE ST_DWithin(location, ST_MakePoint(-122.41, 37.77), 5000). Best for persistent geo data with complex queries.</li>
+      <li><strong>Elasticsearch geo_distance:</strong> Full-text + location combined query. Good for POI search ("coffee near me").</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Operational Transformation &amp; CRDTs (Collaborative Editing)</h3>
+    <div class="tag-row"><span class="badge badge-tag">Real-time Collab</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>The Problem: Concurrent Edits</h4><ul>
+      <li>User A inserts "X" at position 5. User B simultaneously deletes char at position 3.</li>
+      <li>After A's op reaches B and B's op reaches A — both must converge to same document.</li>
+    </ul></div>
+    <div class="arch-box">Operational Transformation (OT) — Google Docs approach:
+  Each op: {type: insert|delete, position, char, clientId, revision}
+
+  Server acts as central authority (serializes all concurrent ops):
+    Op from User A @ revision 5
+    Op from User B @ revision 5 (concurrent)
+    Server receives both, transforms B's op against A's op:
+      transform(opB, opA) adjust position to account for A's insert
+    Server applies both, sends transformed ops to all clients
+
+  Properties: CONVERGENCE (all clients reach same state) + INTENTION PRESERVATION
+
+CRDTs (Conflict-free Replicated Data Types) — newer approach (Figma, Notion):
+  Data structure designed so concurrent ops always merge deterministically
+  No central server needed for conflict resolution (peer-to-peer possible)
+  Text CRDT (e.g., RGA, YATA): each character has unique ID + tombstone for delete
+  Insert: new char gets ID = (clientId, lamportClock), positioned relative to neighbors
+  Merge: union of character sets sorted by unique IDs = deterministic order
+
+  Pros: works offline, peer-to-peer, simpler server
+  Cons: higher memory (tombstones accumulate), harder to implement
+  Used by: Figma (vector graphics), Automerge, Yjs libraries</div>
+    <div class="callout callout-blue"><div class="callout-title">Interview Answer</div>For Google Docs / collaborative editor: use OT with a central server (industry-proven, Google uses it). Server serializes all ops and transforms them against each other. Clients maintain shadow copy + local revision counter. For truly distributed / offline-first: CRDTs (Figma approach). Trade-off: CRDTs have higher memory overhead.</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Search Architecture — Inverted Index &amp; Elasticsearch Internals</h3>
+    <div class="tag-row"><span class="badge badge-tag">Search</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="arch-box">Inverted Index (core of full-text search):
+  Documents:
+    Doc1: "the quick brown fox"
+    Doc2: "the lazy brown dog"
+    Doc3: "quick brown dog"
+
+  Inverted Index:
+    "brown" → [Doc1(pos:3), Doc2(pos:3), Doc3(pos:2)]
+    "quick" → [Doc1(pos:2), Doc3(pos:1)]
+    "fox"   → [Doc1(pos:4)]
+
+  Query "quick brown": intersect posting lists for "quick" AND "brown"
+  Result: Doc1, Doc3 (sorted by TF-IDF or BM25 relevance score)
+
+Elasticsearch Architecture:
+  Index = collection of shards (distributed across nodes)
+  Primary shard: handles writes, routes to replica shards
+  Replica shard: handles reads, provides failover
+
+  Write path:
+    Client Primary shard (write + WAL to translog)
+    Replica shards (parallel replication)
+    Refresh (default 1s): flush to in-memory segment (searchable!)
+    Flush (30min or size): commit segment to disk, clear translog
+
+  Read path:
+    Query broadcast to all shards (scatter-gather)
+    Each shard returns local top-K hits
+    Coordinating node merges, re-ranks, returns global top-K</div>
+    <div class="concept-box"><h4>Relevance Scoring — BM25</h4><ul>
+      <li><strong>TF (Term Frequency):</strong> how often term appears in document (more = more relevant)</li>
+      <li><strong>IDF (Inverse Document Frequency):</strong> how rare the term is across all docs (rare = more distinctive)</li>
+      <li><strong>BM25:</strong> improved TF-IDF, saturates TF (very high TF doesn't dominate) — Elasticsearch default since v5</li>
+      <li><strong>Vector Search (ANN):</strong> embed text to dense vector (BERT/OpenAI), find nearest neighbors by cosine similarity. Used for semantic search. Tools: FAISS, Elasticsearch knn, Pinecone.</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Idempotency &amp; Exactly-Once Semantics</h3>
+    <div class="tag-row"><span class="badge badge-tag">Reliability</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>Why Idempotency Matters</h4><ul>
+      <li>Networks fail. Client retries. Server may have processed request before failure — duplicate operation risk.</li>
+      <li>Idempotent operation: applying it multiple times = same result as applying once.</li>
+      <li>GET, PUT, DELETE are naturally idempotent. POST (create) is NOT.</li>
+    </ul></div>
+    <div class="arch-box">Idempotency Key Pattern:
+  Client generates unique key: X-Idempotency-Key: uuid-v4
+  Server: SET idempotency:{key} processing EX 86400 (Redis, NX)
+  If NX fails (key exists): request already processed, return cached response
+  On success: store result in Redis with TTL
+  On failure: delete key so client can retry
+
+  Useful for: POST /payments, POST /orders, email sending, SMS
+
+Database-level Idempotency:
+  INSERT INTO orders (idempotency_key, ...) ON CONFLICT (idempotency_key) DO NOTHING
+  -- or return existing row
+
+Kafka Idempotent Producer:
+  enable.idempotence=true Producer gets PID, sequence per partition
+  Broker deduplicates messages within session (exactly-once within producer lifetime)
+  For cross-session: Kafka Transactions (atomic multi-partition writes)</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Capacity Planning &amp; Horizontal Scaling Checklist</h3>
+    <div class="tag-row"><span class="badge badge-tag">HLD Process</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="concept-box"><h4>When to Introduce Each Component</h4>
+      <table>
+        <tr><th>Scale Milestone</th><th>Introduce</th></tr>
+        <tr><td>&lt;1K RPS</td><td>Single server, managed DB (RDS), no cache needed</td></tr>
+        <tr><td>1K–10K RPS</td><td>Read replicas, Redis cache, CDN for static assets</td></tr>
+        <tr><td>10K–100K RPS</td><td>Horizontal stateless app servers, LB, DB connection pooling (PgBouncer)</td></tr>
+        <tr><td>100K–1M RPS</td><td>DB sharding or NoSQL, Kafka for async, microservices for hot paths</td></tr>
+        <tr><td>&gt;1M RPS</td><td>Multi-region, global LB (Anycast), custom distributed storage</td></tr>
+      </table>
+    </div>
+    <div class="concept-box"><h4>Stateless Service Design (Required for Horizontal Scaling)</h4><ul>
+      <li>No session stored in memory → store in Redis</li>
+      <li>No uploaded files stored locally → stream to S3</li>
+      <li>No sticky state in app server → any instance can serve any request</li>
+      <li>Config from environment or config service (not baked into binary)</li>
+      <li>Health check endpoint (/health) for load balancer probing</li>
+      <li>Graceful shutdown: drain in-flight requests before terminating on scale-down</li>
+    </ul></div>
+  </div>
+</div>
+
+</div><!-- end hld-concepts -->
+
 <!-- ===== INTERVIEW QUESTIONS ===== -->
 <div class="subsection" id="interview-qs">
 <div class="subsection-title">System Design Interview Questions</div>
@@ -1215,6 +1672,780 @@ Lineage:
 </div>
 
 </div><!-- end interview-qs -->
+
+<!-- ===== HLD INTERVIEW QUESTIONS ===== -->
+<div class="subsection" id="hld-qs">
+<div class="subsection-title">HLD System Design Interview Questions</div>
+
+<div class="callout callout-orange">
+  <div class="callout-title">Big Infrastructure Questions</div>
+  These are the most common HLD questions at top-tier companies (Google, Meta, Amazon, Uber). Each requires a full 45-min design. Know the key components, trade-offs, and deep-dive areas for each.
+</div>
+
+<div class="interview-q">
+  <div class="interview-q-header" onclick="toggleIQ(this)">
+    <span class="badge badge-tag">HLD-1</span>
+    <h3>Design Google Docs (Collaborative Document Editor)</h3>
+    <span class="toggle-icon" style="margin-left:auto;color:var(--text-muted)"></span>
+  </div>
+  <div class="interview-q-body">
+    <div class="steps">
+      <div class="step"><div><strong>Requirements:</strong> Multiple users edit same document simultaneously in real-time. Changes visible to all within &lt;100ms. Support text, formatting, comments, version history, offline editing, cursor presence.</div></div>
+      <div class="step"><div><strong>Scale:</strong> 1B documents, 100M DAU, up to 100 concurrent editors per doc. 99.99% availability.</div></div>
+      <div class="step"><div><strong>Core Challenge:</strong> Conflict resolution when concurrent edits happen. How do two users editing position 5 simultaneously converge to the same document?</div></div>
+    </div>
+    <div class="arch-box">Architecture:
+Client (Browser / Mobile)
+  Local Document State (shadow copy + pending ops queue)
+  WebSocket connection to Doc Server (sticky session via consistent hash on docId)
+
+Doc Server (one per active document session):
+  Receives op from User A: {type:insert, pos:5, char:'X', rev:42, clientId:'A'}
+  Transforms op against any concurrent ops received (OT algorithm)
+  Appends to document Op Log (ordered)
+  Broadcasts transformed op to all connected clients
+  Persists to Op Storage
+
+Storage:
+  Op Log: Cassandra (append-only, docId + revision as PK, fast writes)
+  Document Snapshots: S3 (full doc state every 1000 ops for fast load)
+  Metadata: MySQL (doc title, owner, ACL, created_at, last_modified)
+  Redis: active session routing (docId → server instance mapping)
+
+Real-time Sync (OT):
+  Server serializes all ops (single authority)
+  Client sends: op + base_revision
+  Server transforms op against all ops since base_revision
+  Committed op broadcast with new revision number to all clients
+
+  Client algorithm:
+    Applied locally immediately (optimistic): instant feedback
+    Receive server ack: adjust revision counter
+    Receive other user's op: transform against local pending ops</div>
+    <div class="concept-box"><h4>Cursor Presence &amp; Awareness</h4><ul>
+      <li>Each user's cursor position = op with {type: cursor, pos, userId, color}</li>
+      <li>Broadcast via same WebSocket channel but not persisted (ephemeral)</li>
+      <li>Throttled: send cursor updates max every 50ms (debounce)</li>
+      <li>Display: other cursors rendered as colored carets with username label</li>
+    </ul></div>
+    <div class="concept-box"><h4>Offline Editing &amp; Sync</h4><ul>
+      <li>Client stores pending ops in IndexedDB while offline</li>
+      <li>On reconnect: send all buffered ops with last-known revision</li>
+      <li>Server replays and transforms against ops committed while offline</li>
+      <li>CRDTs (alternative): Automerge/Yjs — no server-side transformation needed, peer-to-peer merge</li>
+    </ul></div>
+    <div class="tradeoff-grid">
+      <div class="tradeoff-pro">
+        <h5>Key Design Decisions</h5>
+        <ul>
+          <li>OT with central server: battle-tested, Google's actual approach</li>
+          <li>Cassandra for op log: append-only + high write throughput</li>
+          <li>Snapshot every N ops: fast doc load without replaying all ops</li>
+          <li>WebSocket per doc server: low latency, stateful connection</li>
+          <li>Consistent hashing on docId: all clients of same doc → same server</li>
+        </ul>
+      </div>
+      <div class="tradeoff-con">
+        <h5>Deep Dive Questions</h5>
+        <ul>
+          <li>How to handle server crash during active session? (Redis TTL + reconnect)</li>
+          <li>How to load a 500-page doc quickly? (latest snapshot + delta ops)</li>
+          <li>Permission check on every op? (token in WebSocket handshake, server enforces)</li>
+          <li>Comments vs inline edits: separate op types, thread anchored to character range</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="interview-q">
+  <div class="interview-q-header" onclick="toggleIQ(this)">
+    <span class="badge badge-tag">HLD-2</span>
+    <h3>Design Google Maps (Navigation &amp; Geo Service)</h3>
+    <span class="toggle-icon" style="margin-left:auto;color:var(--text-muted)"></span>
+  </div>
+  <div class="interview-q-body">
+    <div class="steps">
+      <div class="step"><div><strong>Requirements:</strong> Search POIs, get directions (car/walk/transit), real-time traffic overlay, ETA, turn-by-turn navigation, map tile rendering, live traffic contribution from users.</div></div>
+      <div class="step"><div><strong>Scale:</strong> 1B+ users, 25M+ updates/day from users. Map data = petabytes. 99.99% uptime for navigation.</div></div>
+    </div>
+    <div class="arch-box">System Components:
+
+1. Map Tile Service:
+   World map pre-rendered into tiles at 21 zoom levels
+   Tile naming: zoom/x/y.png  (quadtree coordinates)
+   Stored on Object Storage (GCS) served via CDN globally
+   Vector tiles (modern): send vector data, render client-side (better scaling, dark mode)
+   Tile generation pipeline: OSM data + satellite imagery Mapnik/custom renderer → tiles
+
+2. Routing Engine:
+   Road network = weighted directed graph
+     Nodes: intersections  Edges: road segments with weights (distance, speed_limit, traffic)
+   Algorithm: Bidirectional Dijkstra (15x faster than one-directional)
+   For Google-scale: Contraction Hierarchies (CH) precompute shortcuts
+     Preprocess offline: add shortcut edges bypassing less important nodes
+     Query: expand upward from src AND downward from dst meeting in middle
+     Result: routes in &lt;1ms even for continent-scale
+
+3. Real-time Traffic:
+   Driver location probes → Kafka (every 3s while driving, anonymized)
+   Traffic aggregation service: compute avg speed per road segment (15s windows)
+   Traffic overlay: Flink stream processor updates segment weights in Redis
+   Routing engine reads current edge weights from Redis for ETA
+
+4. ETA Prediction:
+   Historical + real-time traffic + ML model (time of day, day of week, weather)
+   Continually recalculate during navigation if user deviates or traffic changes
+
+5. Search (POI):
+   "Coffee near me" → Elasticsearch geo_distance query + ranking by ratings/distance
+   Named search "Eiffel Tower" → Knowledge Graph (entity resolution) → coordinates
+   Geocoding (address → lat/lng): Nominatim / in-house model
+   Reverse geocoding (lat/lng → address): R-tree spatial index</div>
+    <div class="tradeoff-grid">
+      <div class="tradeoff-pro">
+        <h5>Key Decisions</h5>
+        <ul>
+          <li>Contraction Hierarchies: routing on 10M+ node graph in &lt;1ms</li>
+          <li>Quadtree tiles + CDN: 99%+ tile requests served from edge cache</li>
+          <li>Kafka for traffic probes: ingests 100M+ updates/day without loss</li>
+          <li>Vector tiles: client rendering, reduced data transfer, theme support</li>
+          <li>Segment-level traffic: granular road speed, not just major highways</li>
+        </ul>
+      </div>
+      <div class="tradeoff-con">
+        <h5>Deep Dive Questions</h5>
+        <ul>
+          <li>Alternative routes: k-shortest paths, re-weight edges with diversity penalty</li>
+          <li>Offline maps: pre-download region tiles + routing graph, sync on WiFi</li>
+          <li>Tunnel/GPS loss: dead reckoning (speed + heading extrapolation) + map snapping</li>
+          <li>Map updates: OSM community + satellite ML detection → daily tile re-renders</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="interview-q">
+  <div class="interview-q-header" onclick="toggleIQ(this)">
+    <span class="badge badge-tag">HLD-3</span>
+    <h3>Design Google Drive / Dropbox (File Sync &amp; Storage)</h3>
+    <span class="toggle-icon" style="margin-left:auto;color:var(--text-muted)"></span>
+  </div>
+  <div class="interview-q-body">
+    <div class="steps">
+      <div class="step"><div><strong>Requirements:</strong> Upload/download files, sync across devices, versioning, sharing (link + ACL), deduplication, conflict resolution when same file edited on two devices offline.</div></div>
+      <div class="step"><div><strong>Scale:</strong> 500M users, 50M DAU, avg 2GB per user = 1 exabyte total. 10M uploads/day.</div></div>
+    </div>
+    <div class="arch-box">Upload Flow:
+1. Client chunks file into 4MB blocks (content-addressed: SHA256 of block)
+2. Client checks: which blocks already exist? POST /api/check_blocks [sha256_list]
+3. Server: SELECT sha256 FROM blocks WHERE sha256 IN (...) return existing
+4. Client uploads ONLY missing blocks (delta sync — huge bandwidth savings)
+   PUT /upload/block/{sha256} direct to S3 via pre-signed URL (bypass app servers)
+5. Client: POST /api/commit_file {filename, block_list: [sha256s], parent_version}
+6. Server: INSERT file record + version in MySQL, notify other devices via SSE/WebSocket
+
+Block Storage (Deduplication):
+  blocks table: {sha256 (PK), s3_path, size, ref_count}
+  files table:  {file_id, user_id, version_id, block_list (JSON array of sha256s)}
+  Two users upload same file? Both reference same blocks (storage saved!)
+  Garbage collection: decrement ref_count on delete; S3 deletion when ref_count=0
+
+File Metadata:
+  MySQL: file hierarchy (parent_folder_id, name, user_id, permissions)
+  Redis: active user sessions, recently accessed file metadata (hot cache)
+  Elasticsearch: full-text filename search across all files
+
+Sync Protocol:
+  Client maintains local delta log (what changed since last sync)
+  Server sends: GET /changes?since=cursor (long-poll or WebSocket)
+  Cursor: opaque token representing sync state (like Dropbox's /list_folder/continue)
+  On change: server publishes event Kafka notifications-{userId} SSE/WebSocket push
+
+Conflict Resolution:
+  Two devices edit file while offline, reconnect with divergent versions
+  Strategy: keep BOTH files: "report.docx" + "report.docx (conflict copy, Device A, 2024-01-15)"
+  User resolves manually (same as Dropbox behavior — don't attempt auto-merge for binary files)</div>
+    <div class="tradeoff-grid">
+      <div class="tradeoff-pro">
+        <h5>Key Decisions</h5>
+        <ul>
+          <li>Content-addressed blocks: dedup + only upload changed chunks (delta)</li>
+          <li>Pre-signed S3 URLs: offload large uploads directly to S3, not app servers</li>
+          <li>MySQL for metadata: ACID needed for file hierarchy + permissions</li>
+          <li>Chunked upload: resume interrupted uploads (only re-upload missing chunks)</li>
+        </ul>
+      </div>
+      <div class="tradeoff-con">
+        <h5>Deep Dive Questions</h5>
+        <ul>
+          <li>Large file upload (10GB): multipart S3 upload, 5min pre-signed URL expiry</li>
+          <li>Version history: store block_list per version, rollback = re-commit old block_list</li>
+          <li>Shared folder sync: all members receive change notifications</li>
+          <li>Client-side encryption: encrypt before upload; server stores ciphertext only</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="interview-q">
+  <div class="interview-q-header" onclick="toggleIQ(this)">
+    <span class="badge badge-tag">HLD-4</span>
+    <h3>Design Netflix / Video Streaming Platform</h3>
+    <span class="toggle-icon" style="margin-left:auto;color:var(--text-muted)"></span>
+  </div>
+  <div class="interview-q-body">
+    <div class="steps">
+      <div class="step"><div><strong>Requirements:</strong> Stream video on-demand (200M+ subscribers), personalized recommendations, search, content upload pipeline for studios, global CDN delivery, adaptive bitrate.</div></div>
+      <div class="step"><div><strong>Scale:</strong> 200M subscribers, 100M+ concurrent streams at peak, 15% of global internet traffic.</div></div>
+    </div>
+    <div class="arch-box">Content Upload Pipeline (Studio → Users):
+Studio uploads raw 4K master → S3 (raw-content bucket)
+S3 event → Kafka "content-uploaded" topic
+Transcoding Fleet (GPU instances — EC2 P4d):
+   Input: raw.mp4
+   FFmpeg transcodes to: 240p/360p/480p/720p/1080p/4K
+   Codec: H.264 (compatibility) + HEVC/H.265 (60% smaller, for 4K)
+   Output: HLS/DASH segments (.ts files, ~6s each) + .m3u8 manifests
+   Upload segments → CDN Origin (S3 bucket closest to edge)
+Metadata: MySQL (title, cast, genre, synopsis, age_rating)
+Elasticsearch: title + genre + cast search
+
+Playback (Client → CDN):
+  Client: GET /api/manifest/{contentId} → returns .m3u8 with CDN URLs
+  Client requests segments: https://cdn-edge.netflix.com/show123/1080p/seg001.ts
+  CDN edge (Open Connect Appliance — Netflix's own CDN hardware in ISP PoPs)
+   Edge cache: 99%+ of popular content served directly from ISP network!
+  Adaptive Bitrate (ABR): client monitors download speed
+   If bandwidth drops: switch from 1080p manifest to 720p, seamless mid-stream
+
+Recommendation Engine:
+  Offline: Spark batch jobs on viewing history → collaborative filtering (ALS matrix factorization)
+  Near-real-time: Kafka stream → Flink updates user affinity scores
+  Serving: pre-computed top-N recommendations per user stored in Cassandra
+  Personalized thumbnails: A/B test different thumbnail images per user profile
+
+Resilience (Netflix Chaos Engineering):
+  Circuit breakers between all microservices (Hystrix/Resilience4j)
+  Chaos Monkey: randomly kills production instances (tests resilience)
+  Multi-region active-active: US-East, US-West, EU, Asia
+  Fallback: if recommendations unavailable → return editorial "top picks"</div>
+    <div class="tradeoff-grid">
+      <div class="tradeoff-pro">
+        <h5>Key Decisions</h5>
+        <ul>
+          <li>Open Connect (own CDN in ISPs): eliminates 95%+ of transit costs</li>
+          <li>HLS/DASH + ABR: smooth experience across all network conditions</li>
+          <li>Cassandra for viewing history: write-heavy time-series, global multi-DC</li>
+          <li>Chaos engineering: force resilience by breaking prod intentionally</li>
+        </ul>
+      </div>
+      <div class="tradeoff-con">
+        <h5>Deep Dive Questions</h5>
+        <ul>
+          <li>Cold start for new content: pre-load segments to edges before release</li>
+          <li>DRM: Widevine (Google) / PlayReady (Microsoft) segment encryption</li>
+          <li>Bandwidth estimation for CDN: 200M users × avg 5 Mbps = 1 Pbps capacity</li>
+          <li>Search: Elasticsearch with ML-reranked results based on user profile</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="interview-q">
+  <div class="interview-q-header" onclick="toggleIQ(this)">
+    <span class="badge badge-tag">HLD-5</span>
+    <h3>Design a Web Crawler (like Google Search Indexer)</h3>
+    <span class="toggle-icon" style="margin-left:auto;color:var(--text-muted)"></span>
+  </div>
+  <div class="interview-q-body">
+    <div class="steps">
+      <div class="step"><div><strong>Requirements:</strong> Crawl 1B+ web pages, extract links, store content, respect robots.txt, avoid duplicate content, refresh stale pages, handle dynamic JS pages.</div></div>
+      <div class="step"><div><strong>Scale:</strong> 1B pages, avg 100KB/page = 100TB content. Re-crawl top pages every 24h, others weekly. 10K pages/sec sustained crawl rate.</div></div>
+    </div>
+    <div class="arch-box">Architecture:
+
+URL Frontier (Priority Queue):
+  Stores URLs to crawl, prioritized by:
+    - PageRank estimate (important pages crawled more often)
+    - Freshness score (last modified headers, update frequency)
+    - Domain politeness (max 1 req/sec per domain)
+  Implementation: Kafka topics per domain + Redis sorted set for priority
+
+Crawl Workers (stateless, horizontally scalable):
+  Dequeue URL from Frontier
+  DNS resolve (local cache + upstream)
+  Fetch page (HTTP GET with User-Agent: Googlebot, respect robots.txt)
+  Dynamic pages: headless Chrome (Puppeteer) for JS rendering
+  Extract: all href links + raw HTML content
+  Publish to Kafka:
+    "pages-crawled" topic: {url, html, timestamp, status_code}
+    "links-found" topic: {source_url, [discovered_urls]}
+
+Content Processing Pipeline:
+  HTML Parser → extract text, metadata, canonical URL
+  Dedup Service: SHA256(normalized_content) → Bloom Filter → URL Set check
+  Duplicate? Skip. New? Store in object storage (S3), index in Elasticsearch
+
+URL Deduplication:
+  Bloom filter (1B URLs, 1% FP rate, ~1.2GB RAM) — fast pre-check
+  URL Set (Redis / DynamoDB) — authoritative dedup store
+  URL normalization: lowercase, remove fragment, canonical redirect resolution
+
+robots.txt Compliance:
+  Fetch and cache robots.txt per domain (TTL 24h)
+  Before crawling any URL: check allow/disallow rules
+  Crawl-delay directive respected
+
+Refresh Strategy:
+  High-priority (news, social): re-crawl every 1h via separate high-frequency queue
+  Normal pages: adaptive based on historical change rate (3 days if rarely changes)
+  404 pages: exponential backoff (1d, 4d, 16d), eventually discard URL</div>
+    <div class="tradeoff-grid">
+      <div class="tradeoff-pro">
+        <h5>Key Decisions</h5>
+        <ul>
+          <li>Kafka per-domain topics: natural domain-rate-limiting</li>
+          <li>Bloom filter: O(1) dedup check for 1B URLs in 1GB RAM</li>
+          <li>Headless Chrome pool: handle JS-heavy SPAs (React, Vue apps)</li>
+          <li>Adaptive refresh: crawl budget allocated by page importance</li>
+        </ul>
+      </div>
+      <div class="tradeoff-con">
+        <h5>Deep Dive Questions</h5>
+        <ul>
+          <li>Spider traps: infinite URLs (date params, session IDs) → URL length limit + depth limit</li>
+          <li>DNS cache poisoning: validate IPs against known-malicious list</li>
+          <li>Politeness: per-domain rate limit, respect crawl-delay, identify as bot</li>
+          <li>Distributed URL frontier: shard by domain hash, ensure politeness per shard</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="interview-q">
+  <div class="interview-q-header" onclick="toggleIQ(this)">
+    <span class="badge badge-tag">HLD-6</span>
+    <h3>Design a Payment System (like Stripe / PayPal)</h3>
+    <span class="toggle-icon" style="margin-left:auto;color:var(--text-muted)"></span>
+  </div>
+  <div class="interview-q-body">
+    <div class="steps">
+      <div class="step"><div><strong>Requirements:</strong> Accept card payments, process transactions, handle refunds, prevent double-charges, financial reconciliation, fraud detection. ACID transactions are non-negotiable.</div></div>
+      <div class="step"><div><strong>Non-Functional:</strong> Exactly-once payment processing (never charge twice). 99.999% availability. PCI-DSS compliance. Sub-3s payment confirmation.</div></div>
+    </div>
+    <div class="arch-box">Payment Flow (Critical Path):
+1. Client: POST /payments {amount, currency, payment_method_token, idempotency_key}
+2. Payment Service: Check idempotency key (Redis NX) — if exists, return cached result
+3. Fraud Detection Service (async check within 200ms):
+   ML model: card velocity, geo anomaly, device fingerprint → risk score
+   &gt;0.8 risk: decline. 0.5-0.8: 3DS challenge. &lt;0.5: proceed
+4. PSP (Payment Service Provider) call: POST to Stripe/Adyen API
+   — Tokenized card (PAN never stored on our servers — PCI-DSS scope reduction)
+   — PSP charges card issuer via card network (Visa/MC rails)
+5. On PSP response:
+   SUCCESS: INSERT INTO ledger (txn_id, amount, status='completed') — ACID
+   FAILURE: INSERT INTO ledger (txn_id, amount, status='failed')
+   TIMEOUT: async reconciliation job checks PSP status endpoint
+6. Return payment result to client
+7. Async: emit PaymentCompleted event → Kafka → Order Service, Email, Analytics
+
+Double-Charge Prevention:
+  Idempotency key (client-generated UUID) stored in Redis with TTL 24h
+  PSP-level idempotency: pass our idempotency key in PSP request header
+  DB: UNIQUE constraint on (idempotency_key)
+
+Ledger (Double-Entry Bookkeeping):
+  Every financial event creates TWO entries (debit + credit):
+    DEBIT: customer wallet  $-50
+    CREDIT: merchant wallet $+50 (or escrow pending settlement)
+  Sum of all ledger entries must always = 0 (invariant checked hourly)
+  Append-only: never UPDATE ledger rows — only INSERT corrections
+
+Reconciliation:
+  Nightly job: compare our ledger against PSP settlement report
+  Mismatches (our-success + PSP-fail): auto-refund and alert
+  Mismatches (our-fail + PSP-success): charge PSP for reverse or log for manual review</div>
+    <div class="tradeoff-grid">
+      <div class="tradeoff-pro">
+        <h5>Key Decisions</h5>
+        <ul>
+          <li>Double-entry ledger: financial correctness, easy auditing</li>
+          <li>Idempotency at every layer: client → service → PSP</li>
+          <li>Tokenization: PAN never stored (PCI-DSS compliance)</li>
+          <li>Async fraud detection: 200ms budget, non-blocking on payment path</li>
+          <li>MySQL/PostgreSQL: ACID for all financial writes</li>
+        </ul>
+      </div>
+      <div class="tradeoff-con">
+        <h5>Deep Dive Questions</h5>
+        <ul>
+          <li>PSP timeout: store as "pending", cron job polls PSP status, update ledger async</li>
+          <li>Currency conversion: lock exchange rate at payment time, store in transaction row</li>
+          <li>Chargebacks: reverse ledger entries, hold merchant funds in escrow during dispute</li>
+          <li>Rate limiting: max 5 payment attempts/hour per card to prevent card testing attacks</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="interview-q">
+  <div class="interview-q-header" onclick="toggleIQ(this)">
+    <span class="badge badge-tag">HLD-7</span>
+    <h3>Design Instagram / Photo Sharing</h3>
+    <span class="toggle-icon" style="margin-left:auto;color:var(--text-muted)"></span>
+  </div>
+  <div class="interview-q-body">
+    <div class="steps">
+      <div class="step"><div><strong>Requirements:</strong> Upload photos/videos, follow users, home feed, explore/search, stories (24h TTL), likes, comments, DMs, notifications. 1B+ users, 100M photos/day.</div></div>
+    </div>
+    <div class="arch-box">Photo Upload:
+  Client → Upload Service (pre-signed S3 URL) → S3 (original)
+  S3 event → Image Processing Worker (Kafka):
+    Resize to: thumbnail (150px), feed (640px), HD (1080px), original
+    Convert to WebP (30% smaller than JPEG)
+    Generate perceptual hash (dHash) for duplicate detection
+    Store all variants in S3, URLs in MySQL
+
+Feed Architecture (Hybrid Fan-out like Twitter):
+  Follower count &lt; 10K (regular users): Fan-out on write
+    Post created → FanoutWorker → ZADD feed:{followerId} timestamp postId
+    Feed stored in Redis Sorted Set per user
+  Celebrity (&gt;10K followers): Fan-out on read
+    At read time: fetch latest N posts from celebrity's timeline directly
+    Merge with user's pre-built feed (client or feed service merges)
+
+  Feed Read:
+    Redis ZRANGE feed:{userId} 0 50 → postIds
+    Batch fetch post metadata from MySQL/Redis
+    Batch fetch user metadata (avatar, username) from User Service cache
+    Return assembled feed
+
+Stories:
+  Upload same as photos, but metadata: TTL = created_at + 86400s
+  Redis Sorted Set: stories:{userId} (score = expiry_time)
+  Background job: ZREMRANGEBYSCORE remove expired stories
+  Viewer set stored in Redis Set (story:{storyId}:viewers) with same TTL
+
+Explore Feed:
+  Content-based: user's interest graph → candidate posts → ML ranking
+  Collaborative filtering: users similar to you liked → show their liked posts
+  Trending hashtags: sliding window count in Redis
+
+Likes Counter:
+  Redis INCR likes:{postId} (in-memory, fast)
+  Async flush to PostgreSQL every 60s (batch update)
+  On read: check Redis first, fallback to DB</div>
+    <div class="tradeoff-grid">
+      <div class="tradeoff-pro">
+        <h5>Key Decisions</h5>
+        <ul>
+          <li>Hybrid fan-out: pre-built Redis feed for regular users, lazy pull for celebrities</li>
+          <li>WebP + multiple resolutions: 30% bandwidth reduction, fast load</li>
+          <li>CDN for all media: images served from edge (global low latency)</li>
+          <li>Cassandra for DMs: write-heavy, time-ordered messages per conversation</li>
+        </ul>
+      </div>
+      <div class="tradeoff-con">
+        <h5>Deep Dive Questions</h5>
+        <ul>
+          <li>Perceptual hash dedup: same photo re-uploaded → point to same S3 object</li>
+          <li>Shadowban: filter posts in feed assembly without notifying user</li>
+          <li>Feed with follow/unfollow: update fan-out set membership atomically</li>
+          <li>Reels (short video): same as YouTube but max 90s, same HLS pipeline</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="interview-q">
+  <div class="interview-q-header" onclick="toggleIQ(this)">
+    <span class="badge badge-tag">HLD-8</span>
+    <h3>Design a Distributed Task Scheduler (like Airflow / Temporal)</h3>
+    <span class="toggle-icon" style="margin-left:auto;color:var(--text-muted)"></span>
+  </div>
+  <div class="interview-q-body">
+    <div class="steps">
+      <div class="step"><div><strong>Requirements:</strong> Schedule tasks (one-time + cron), assign to workers, retry on failure, handle worker crashes, task dependencies (DAGs), exactly-once execution, monitor task status, priority queues.</div></div>
+      <div class="step"><div><strong>Scale:</strong> 100M tasks/day, 10K concurrent workers, tasks must run within 1s of scheduled time.</div></div>
+    </div>
+    <div class="arch-box">Architecture:
+
+Scheduler (Leader-elected via Zookeeper/etcd):
+  Cron expressions → parse next N execution times (pre-compute 5min ahead)
+  INSERT INTO task_queue (task_id, run_at, status='pending', priority) 
+  Leader heartbeat: if leader dies, Raft election for new scheduler leader
+
+Task Queue:
+  Tier 1: Redis Sorted Set (score = run_at timestamp)
+    High-frequency polling by dispatcher (every 100ms)
+    ZRANGEBYSCORE task_queue -inf NOW LIMIT 0 100 → due tasks
+    ZREM + atomically claim via Lua script (prevent double-dispatch)
+  Tier 2: MySQL (durable, for recovery after Redis flush)
+    Redis populated from MySQL on startup; MySQL is source of truth
+
+Dispatcher:
+  Polls Redis every 100ms for due tasks
+  Assigns to available worker via consistent hashing (task_type → worker pool)
+  Worker heartbeats via Redis key (worker:{id} EX 30s)
+  On heartbeat miss: task reassigned (at-least-once delivery)
+
+Workers (stateless pool):
+  Long-poll dispatcher queue or subscribe to Kafka topic per task_type
+  Execute task logic (idempotent!)
+  On completion: UPDATE task_executions SET status='done', result=... WHERE id=...
+  On failure: retry with exponential backoff (max_retries configurable)
+  Poison pills (always-failing): move to DLQ after max_retries
+
+DAG Dependencies:
+  task_dependencies table: {task_id, depends_on_task_id}
+  After task completes: check if any downstream tasks now have all dependencies met
+  If yes: INSERT downstream tasks into task_queue
+
+Exactly-Once Guarantee:
+  Lease-based: worker gets lease (30s), must renew; if missed, task released to another worker
+  Task execution ID: unique per attempt → DB UNIQUE constraint prevents double-insert of result
+  Idempotent task logic: worker code must handle re-execution gracefully</div>
+    <div class="tradeoff-grid">
+      <div class="tradeoff-pro">
+        <h5>Key Decisions</h5>
+        <ul>
+          <li>Redis sorted set: O(log N) scheduling, ~10ms dispatch latency</li>
+          <li>MySQL as durable backup: recover all pending tasks on Redis restart</li>
+          <li>Leader election via etcd: prevents multiple schedulers double-scheduling</li>
+          <li>DLQ: poisonous tasks isolated, don't block healthy tasks</li>
+        </ul>
+      </div>
+      <div class="tradeoff-con">
+        <h5>Deep Dive Questions</h5>
+        <ul>
+          <li>Time zone handling: store all times in UTC, convert at display layer</li>
+          <li>At-most-once (financial jobs): 2PC between scheduler DB and task execution record</li>
+          <li>Worker autoscaling: monitor queue depth, scale workers up/down via K8s HPA</li>
+          <li>Cascading failures: rate limit task retries, circuit break task_type if too many failures</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="interview-q">
+  <div class="interview-q-header" onclick="toggleIQ(this)">
+    <span class="badge badge-tag">HLD-9</span>
+    <h3>Design Amazon E-Commerce (Product, Cart, Orders, Inventory)</h3>
+    <span class="toggle-icon" style="margin-left:auto;color:var(--text-muted)"></span>
+  </div>
+  <div class="interview-q-body">
+    <div class="steps">
+      <div class="step"><div><strong>Requirements:</strong> Product catalog, search, cart, checkout, order management, inventory, pricing, recommendations. 300M active users, 1M orders/day, Black Friday 10× peak.</div></div>
+    </div>
+    <div class="arch-box">Service Decomposition:
+  Product Catalog Service  → MySQL (structured) + Elasticsearch (search) + Redis (hot products)
+  Cart Service             → Redis (session-like, ephemeral, fast writes/reads)
+  Order Service            → MySQL (ACID for order lifecycle)
+  Inventory Service        → MySQL (ACID for stock counts, pessimistic lock for reserve)
+  Pricing Service          → Rules engine + dynamic pricing + Redis cache (TTL 5min)
+  Recommendation Service   → Cassandra (view/purchase history) + ML offline model
+
+Checkout Flow (Distributed Transaction — Saga):
+  1. Cart Service: validate cart items still available
+  2. Inventory Service: RESERVE stock (decrement available_count, optimistic lock on version)
+       If stock conflict: return "out of stock", rollback reservation
+  3. Payment Service: charge card (idempotency key = orderId)
+       If payment fails: compensate → Inventory Service RELEASE reservation
+  4. Order Service: CREATE order record with status='confirmed'
+  5. Inventory Service: COMMIT reservation (move from reserved → sold)
+  6. Kafka: OrderConfirmed → Fulfillment, Email, Analytics
+
+Inventory Concurrency (Flash Sales — 10K req/sec for 1 item):
+  Approach 1: Redis DECR available:{productId}  (optimistic, fast)
+    Check &gt;= 0 before decrement via Lua script (atomic)
+    Flush to DB periodically and on order commit
+  Approach 2: DB Pessimistic lock
+    SELECT stock FOR UPDATE  UPDATE stock SET count -= 1 WHERE id=...
+    Safe but serialized → throughput bottleneck under high concurrency
+
+Product Search:
+  Elasticsearch index: title, description, brand, category, attributes (faceted)
+  Relevance: BM25 score + boost by sales rank + personalization re-rank
+  Facets: filter by price_range, brand, rating, Prime eligibility
+  Spell correction: fuzziness parameter in ES query
+
+Flash Sale Architecture:
+  Pre-sale: pre-allocate tokens in Redis (1 token = 1 item reservation right)
+  User claims token first (lottery / first-come): RPOP flash_tokens:{productId}
+  Got token: proceed to checkout flow with guaranteed inventory
+  Prevents overselling + reduces DB load during spike</div>
+    <div class="tradeoff-grid">
+      <div class="tradeoff-pro">
+        <h5>Key Decisions</h5>
+        <ul>
+          <li>Saga (Choreography): each service publishes/consumes events independently</li>
+          <li>Redis for cart: sub-millisecond reads, no ACID needed for cart</li>
+          <li>Optimistic locking for inventory: high-concurrency without DB blocking</li>
+          <li>Flash sale tokens in Redis: decouple demand spike from DB writes</li>
+        </ul>
+      </div>
+      <div class="tradeoff-con">
+        <h5>Deep Dive Questions</h5>
+        <ul>
+          <li>Cart persistence: sync Redis cart to DB on checkout (prevent loss on expiry)</li>
+          <li>Price consistency: lock price at cart-add or at checkout? (checkout is correct)</li>
+          <li>Returns: saga compensation chain → refund payment + restore inventory</li>
+          <li>Multi-warehouse: nearest warehouse with stock for fastest delivery ETA</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="interview-q">
+  <div class="interview-q-header" onclick="toggleIQ(this)">
+    <span class="badge badge-tag">HLD-10</span>
+    <h3>Design a Global CDN / Content Delivery Network</h3>
+    <span class="toggle-icon" style="margin-left:auto;color:var(--text-muted)"></span>
+  </div>
+  <div class="interview-q-body">
+    <div class="steps">
+      <div class="step"><div><strong>Requirements:</strong> Serve static + dynamic content globally with &lt;50ms latency. Cache 90%+ of requests at edge. Handle 10 Tbps peak traffic. DDoS protection. 99.999% uptime. Support video streaming, file downloads, API acceleration.</div></div>
+    </div>
+    <div class="arch-box">Architecture Layers:
+
+1. DNS + Anycast Routing:
+   Customer's domain CNAME → cdn.example.com
+   Anycast: same IP announced from all PoPs
+   User's DNS query routes to geographically nearest PoP automatically
+   GeoDNS alternative: return different IP based on user's location
+
+2. Edge PoP (Point of Presence):
+   Physical servers in 200+ cities, co-located in major ISPs/IXPs
+   Local SSD cache: hot content stored on 100TB NVMe per PoP
+   Software: Nginx/Varnish as cache layer + Envoy for load balancing
+   TLS termination at edge (reduce round-trip latency dramatically)
+   On cache miss: fetch from Regional Mid-tier cache or Origin Shield
+
+3. Tiered Cache Architecture:
+   Edge (city-level) → Regional Mid-tier (continent) → Origin Shield → Customer Origin
+   Mid-tier collapses cache misses: 1000 edge misses → 1 request to origin
+   Origin Shield: single PoP that faces origin (protects origin from traffic)
+
+4. Cache Key &amp; Invalidation:
+   Default cache key: URL + Vary headers (Accept-Encoding, Accept-Language)
+   Surrogate keys (cache tags): tag content by type (product:{id})
+   Purge by tag: invalidate all product:{12345} URLs atomically across all PoPs
+   CDN propagates purge via gossip protocol to all edge nodes (&lt;1s global)
+
+5. Dynamic Content Acceleration:
+   TLS connection maintained from edge to origin (TCP connection reuse, no handshake per user)
+   HTTP/2 multiplexing + TCP optimization (CUBIC congestion control at edge)
+   Route via private CDN backbone (faster + more reliable than public internet)
+   Argo Smart Routing (Cloudflare): real-time network monitoring picks fastest path
+
+6. DDoS Mitigation:
+   Volumetric (L3/L4): BGP blackhole + traffic scrubbing centers absorb floods
+   Application (L7): rate limiting per IP, WAF rules (block SQLi, bad bots)
+   Anycast absorbs UDP floods: traffic spread across all PoPs, no single point overwhelmed
+   Challenge pages: JS challenge / CAPTCHA for suspicious IPs</div>
+    <div class="tradeoff-grid">
+      <div class="tradeoff-pro">
+        <h5>Key Decisions</h5>
+        <ul>
+          <li>Anycast: automatic failover + DDoS absorption across 200+ PoPs</li>
+          <li>Tiered caching: collapse origin requests by 100-1000×</li>
+          <li>Private backbone: 30-50ms faster than public internet for cross-continent</li>
+          <li>Surrogate keys: surgical cache invalidation without full purge</li>
+        </ul>
+      </div>
+      <div class="tradeoff-con">
+        <h5>Deep Dive Questions</h5>
+        <ul>
+          <li>Video delivery: range request support (byte-range caching per segment)</li>
+          <li>Geo-blocking: edge checks IP geolocation against blocklist before serving</li>
+          <li>Hot object stampede: request coalescing (only 1 request to origin for same uncached URL)</li>
+          <li>HTTPS everywhere: HSTS preloading, OCSP stapling at edge for fast TLS</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="interview-q">
+  <div class="interview-q-header" onclick="toggleIQ(this)">
+    <span class="badge badge-tag">HLD-11</span>
+    <h3>Design a Metrics &amp; Monitoring System (like Prometheus + Grafana)</h3>
+    <span class="toggle-icon" style="margin-left:auto;color:var(--text-muted)"></span>
+  </div>
+  <div class="interview-q-body">
+    <div class="steps">
+      <div class="step"><div><strong>Requirements:</strong> Collect metrics from thousands of services, store time-series data, query for dashboards, trigger alerts, scale to 1M+ metrics, 1-second granularity, 90-day retention.</div></div>
+    </div>
+    <div class="arch-box">Architecture:
+
+Collection (Push vs Pull):
+  Pull model (Prometheus): scrape /metrics endpoint of each service every 15s
+    Pros: service doesn't need to know about monitoring infra
+    Cons: requires service discovery, misses very short-lived processes
+  Push model (StatsD, CloudWatch Agent):
+    Service pushes metrics to aggregation agent
+    Better for serverless/ephemeral functions
+
+Ingestion Pipeline (1M metrics/sec):
+  Services → Kafka (metrics-raw topic, partitioned by service_name)
+  Stream processor (Flink): aggregate raw points → 1-min rollups → 5-min rollups
+  Write to TSDB (Time-Series DB)
+
+Storage — Time-Series Database:
+  Data shape: (metric_name, labels, timestamp, value)
+  E.g.: {name: "http_requests_total", labels: {service:"api", status:"200"}, ts: 1715000000, val: 1234.5}
+
+  Options:
+    Prometheus TSDB: local disk, chunks stored as compressed delta encoding
+    InfluxDB: purpose-built, tag-based indexing, Flux query language
+    Thanos / Cortex (Prometheus at scale): add S3 for long-term storage, global query
+
+  Compression trick: store delta-of-deltas for timestamps + XOR compression for values
+    Gorilla encoding (Facebook): 1.37 bytes/data point (vs 16 bytes raw)
+
+Query Layer:
+  PromQL: rate(http_requests_total{status="500"}[5m]) → 5-min error rate
+  Pre-computed rollups: 1s → 1min → 5min → 1hr aggregates for fast dashboard queries
+  Cache query results in Redis (30s TTL) for popular dashboard queries
+
+Alerting:
+  Alertmanager: evaluate alert rules every 15s against recent metrics
+  Alert: http_error_rate > 0.01 for 5m → fire PagerDuty/Slack
+  Deduplication: group related alerts, suppress flapping (pending state buffer)
+  On-call routing: team owns service → route to that team's PagerDuty schedule</div>
+    <div class="tradeoff-grid">
+      <div class="tradeoff-pro">
+        <h5>Key Decisions</h5>
+        <ul>
+          <li>Kafka buffer: handles ingest spikes without dropping metrics</li>
+          <li>Pre-aggregated rollups: fast dashboard queries without scanning raw data</li>
+          <li>Gorilla compression: 12× storage reduction for time-series</li>
+          <li>S3 long-term: cheap historical data, query via Thanos/Athena</li>
+        </ul>
+      </div>
+      <div class="tradeoff-con">
+        <h5>Deep Dive Questions</h5>
+        <ul>
+          <li>High cardinality labels (userId as label): cardinality explosion, avoid in metrics (use logs instead)</li>
+          <li>Cross-DC aggregation: Thanos sidecar merges metrics across regions globally</li>
+          <li>Anomaly detection: seasonal decomposition + z-score alerting (ML-based)</li>
+          <li>Retention tiers: 15s granularity 7 days, 1min granularity 30 days, 1hr 1 year</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end hld-qs -->
 
 </div><!-- content-area -->
 </main>
