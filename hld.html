@@ -60,6 +60,46 @@
   <p>Big-infrastructure concepts, estimation, scalability patterns, and full system design walkthroughs for top-tier interviews.</p>
 </div>
 
+<div class="sys-diagram">
+  <div class="sys-diagram-title">Typical High-Level System Design</div>
+  <div class="sys-row">
+    <div class="sys-box b-client">Users<small>Web / Mobile</small></div>
+  </div>
+  <div class="sys-down">↓</div>
+  <div class="sys-row">
+    <div class="sys-box b-cdn">CDN<small>Cloudflare / Fastly</small></div>
+    <div class="sys-box b-lb">Global LB<small>Anycast DNS</small></div>
+  </div>
+  <div class="sys-down">↓</div>
+  <div class="sys-row">
+    <div class="sys-box b-gw">API Gateway<small>Auth · Rate Limit · Route</small></div>
+  </div>
+  <div class="sys-down">↓</div>
+  <div class="sys-row">
+    <div class="sys-box b-svc">Service A<small>Read Replicas</small></div>
+    <div class="sys-box b-svc">Service B<small>Sharded</small></div>
+    <div class="sys-box b-svc">Service C<small>Stateless</small></div>
+    <div class="sys-box b-svc">Service D<small>ML Inference</small></div>
+  </div>
+  <div class="sys-down">↓</div>
+  <div class="sys-row">
+    <div class="sys-box b-queue">Kafka<small>Event Streaming</small></div>
+    <div class="sys-box b-cache">Redis Cluster<small>L2 Cache</small></div>
+  </div>
+  <div class="sys-down">↓</div>
+  <div class="sys-row">
+    <div class="sys-box b-db">Primary DB<small>Write Leader</small></div>
+    <div class="sys-box b-db">Replicas ×3<small>Read Scale-out</small></div>
+    <div class="sys-box b-search">Elasticsearch<small>Search</small></div>
+    <div class="sys-box b-store">Object Store<small>S3 / GCS</small></div>
+  </div>
+  <div class="sys-down">↓ async</div>
+  <div class="sys-row">
+    <div class="sys-box b-worker">Stream Processing<small>Flink / Spark</small></div>
+    <div class="sys-box b-ml">Data Warehouse<small>Snowflake · BigQuery</small></div>
+  </div>
+</div>
+
 <div class="topic-jump">
   <a href="#hld-framework">Framework</a>
   <a href="#estimation">Estimation</a>
@@ -208,6 +248,33 @@ Serverless (image resizing, scheduled jobs, webhooks)</div>
     <div class="tag-row"><span class="badge badge-tag">Critical</span></div><span class="toggle-icon"></span>
   </div>
   <div class="problem-card-body">
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Kafka Architecture — Producer → Topics → Consumer Groups</div>
+      <div class="sys-row">
+        <div class="sys-col">
+          <div class="sys-box b-svc">Producer A<small>Order Service</small></div>
+          <div class="sys-box b-svc">Producer B<small>Payment Service</small></div>
+          <div class="sys-box b-svc">Producer C<small>User Service</small></div>
+        </div>
+        <div class="sys-arrow">→ write →</div>
+        <div class="sys-col">
+          <div class="sys-box b-queue">Topic: orders<small>3 partitions</small></div>
+          <div class="sys-box b-queue">Topic: payments<small>3 partitions</small></div>
+          <div class="sys-box b-queue">Topic: events<small>6 partitions</small></div>
+        </div>
+        <div class="sys-arrow">→ read →</div>
+        <div class="sys-col">
+          <div class="sys-box b-worker">Consumer Group A<small>Email Workers</small></div>
+          <div class="sys-box b-worker">Consumer Group B<small>Analytics Workers</small></div>
+          <div class="sys-box b-worker">Consumer Group C<small>Fulfillment Workers</small></div>
+        </div>
+      </div>
+      <div class="sys-row" style="margin-top:8px">
+        <div style="flex:1;font-size:11px;color:var(--text-muted);text-align:center">Each producer appends to partition (hash key)</div>
+        <div style="flex:1;font-size:11px;color:var(--text-muted);text-align:center">Retained on disk (days/weeks)</div>
+        <div style="flex:1;font-size:11px;color:var(--text-muted);text-align:center">Each group reads independently (own offset)</div>
+      </div>
+    </div>
     <table>
       <tr><th></th><th>Kafka</th><th>RabbitMQ</th><th>AWS SQS</th><th>AWS SNS</th></tr>
       <tr><td>Model</td><td>Pub/Sub + Log (pull)</td><td>AMQP queue (push)</td><td>Queue (pull)</td><td>Topic fan-out (push)</td></tr>
@@ -276,6 +343,38 @@ Raw events Kafka (stream)
     <div class="tag-row"><span class="badge badge-tag">Performance</span></div><span class="toggle-icon"></span>
   </div>
   <div class="problem-card-body">
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">CDN — Tiered Cache Hierarchy</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">User (Mumbai)</div>
+        <div class="sys-arrow">→ DNS Anycast →</div>
+        <div class="sys-box b-cdn">Edge PoP<small>Mumbai &lt;10ms</small></div>
+      </div>
+      <div class="sys-row" style="margin-top:6px;padding-left:240px">
+        <span style="font-size:11px;color:var(--text-muted)">MISS ↓</span>
+      </div>
+      <div class="sys-row" style="padding-left:200px">
+        <div class="sys-box b-cdn">Regional Cache<small>Singapore</small></div>
+      </div>
+      <div class="sys-row" style="margin-top:4px;padding-left:340px">
+        <span style="font-size:11px;color:var(--text-muted)">MISS ↓</span>
+      </div>
+      <div class="sys-row" style="padding-left:300px">
+        <div class="sys-box b-cdn">Origin Shield<small>single ingress to origin</small></div>
+      </div>
+      <div class="sys-row" style="margin-top:4px;padding-left:440px">
+        <span style="font-size:11px;color:var(--text-muted)">MISS ↓</span>
+      </div>
+      <div class="sys-row" style="padding-left:400px">
+        <div class="sys-box b-svc">Customer Origin<small>App Server / S3</small></div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-row">
+        <div class="sys-box b-store">Cache HIT at Edge<small>sub-10ms</small></div>
+        <div class="sys-box b-store">Cache HIT at Region<small>~30ms</small></div>
+        <div class="sys-box b-db">Origin Request<small>~200ms</small></div>
+      </div>
+    </div>
     <div class="arch-box">CDN Hierarchy:
 User (Mumbai) DNS Anycast IP routes to nearest PoP
       Edge Node (Mumbai PoP, &lt;10ms away)
@@ -631,6 +730,34 @@ Kafka Idempotent Producer:
       <div class="step"><div><strong>Scale:</strong> 1B documents, 100M DAU, up to 100 concurrent editors per doc. 99.99% availability.</div></div>
       <div class="step"><div><strong>Core Challenge:</strong> Conflict resolution when concurrent edits happen. How do two users editing position 5 simultaneously converge to the same document?</div></div>
     </div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Google Docs — Real-time Collaborative Architecture</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">User A<small>Browser (OT)</small></div>
+        <div class="sys-box b-client">User B<small>Browser (OT)</small></div>
+        <div class="sys-box b-client">User C<small>Browser (OT)</small></div>
+      </div>
+      <div class="sys-down">↓ WebSocket (persistent connection)</div>
+      <div class="sys-row">
+        <div class="sys-box b-lb">Load Balancer<small>consistent hash on docId</small></div>
+      </div>
+      <div class="sys-down">↓ sticky session per document</div>
+      <div class="sys-row">
+        <div class="sys-box b-svc">Doc Server A<small>owns Doc #1234</small></div>
+        <div class="sys-box b-svc">Doc Server B<small>owns Doc #5678</small></div>
+      </div>
+      <div class="sys-down">↓</div>
+      <div class="sys-row">
+        <div class="sys-box b-cache">Redis<small>docId → server routing</small></div>
+        <div class="sys-box b-queue">Kafka<small>op-log topic</small></div>
+      </div>
+      <div class="sys-down">↓</div>
+      <div class="sys-row">
+        <div class="sys-box b-db">Cassandra<small>Op Log (append-only)</small></div>
+        <div class="sys-box b-store">S3<small>Snapshots every 1000 ops</small></div>
+        <div class="sys-box b-db">MySQL<small>Metadata + ACL</small></div>
+      </div>
+    </div>
     <div class="arch-box">Architecture:
 Client (Browser / Mobile)
   Local Document State (shadow copy + pending ops queue)
@@ -706,6 +833,40 @@ Real-time Sync (OT):
       <div class="step"><div><strong>Requirements:</strong> Search POIs, get directions (car/walk/transit), real-time traffic overlay, ETA, turn-by-turn navigation, map tile rendering, live traffic contribution from users.</div></div>
       <div class="step"><div><strong>Scale:</strong> 1B+ users, 25M+ updates/day from users. Map data = petabytes. 99.99% uptime for navigation.</div></div>
     </div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Google Maps — System Architecture</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">User App</div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-lb">API Gateway</div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-col">
+          <div class="sys-box b-svc">Routing Engine<small>Contraction Hierarchies</small></div>
+          <div class="sys-box b-svc">Tile Service<small>Quadtree zoom/x/y.png</small></div>
+          <div class="sys-box b-search">POI Search<small>Elasticsearch geo</small></div>
+        </div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-label" style="color:var(--accent-blue);font-weight:600;font-size:11px;margin-bottom:6px">MAP TILES</div>
+      <div class="sys-row">
+        <div class="sys-box b-store">GCS Tiles<small>zoom/x/y.png</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-cdn">CDN<small>99%+ tile HIT rate</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-client">Client renders</div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-label" style="color:var(--accent-orange);font-weight:600;font-size:11px;margin-bottom:6px">REAL-TIME TRAFFIC</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">Driver probes<small>GPS every 3s</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-queue">Kafka<small>location topic</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-worker">Flink<small>avg speed per segment</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-cache">Redis<small>edge weights for routing</small></div>
+      </div>
+    </div>
     <div class="arch-box">System Components:
 
 1. Map Tile Service:
@@ -774,6 +935,34 @@ Real-time Sync (OT):
       <div class="step"><div><strong>Requirements:</strong> Upload/download files, sync across devices, versioning, sharing (link + ACL), deduplication, conflict resolution when same file edited on two devices offline.</div></div>
       <div class="step"><div><strong>Scale:</strong> 500M users, 50M DAU, avg 2GB per user = 1 exabyte total. 10M uploads/day.</div></div>
     </div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Google Drive — File Sync Architecture</div>
+      <div class="sys-label" style="color:var(--accent-green);font-weight:600;font-size:11px;margin-bottom:6px">UPLOAD (Delta Sync)</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">Client<small>chunk file into 4MB blocks</small></div>
+        <div class="sys-arrow">→ check missing blocks →</div>
+        <div class="sys-box b-svc">Block Service</div>
+        <div class="sys-arrow">→ upload missing only →</div>
+        <div class="sys-box b-store">S3<small>content-addressed by SHA256</small></div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-label" style="color:var(--accent-blue);font-weight:600;font-size:11px;margin-bottom:6px">SYNC (Cross-device)</div>
+      <div class="sys-row">
+        <div class="sys-box b-svc">Metadata Service</div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-db">MySQL<small>file hierarchy + ACL</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-queue">Kafka<small>change notifications</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-client">All Devices<small>SSE / WebSocket push</small></div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-row">
+        <div class="sys-box b-db">blocks table<small>sha256, s3_path, ref_count</small></div>
+        <div class="sys-box b-db">files table<small>file_id, block_list (sha256s)</small></div>
+        <div class="sys-box b-cache">Redis<small>hot metadata cache</small></div>
+      </div>
+    </div>
     <div class="arch-box">Upload Flow:
 1. Client chunks file into 4MB blocks (content-addressed: SHA256 of block)
 2. Client checks: which blocks already exist? POST /api/check_blocks [sha256_list]
@@ -831,6 +1020,43 @@ Conflict Resolution:
     <div class="steps">
       <div class="step"><div><strong>Requirements:</strong> Stream video on-demand (200M+ subscribers), personalized recommendations, search, content upload pipeline for studios, global CDN delivery, adaptive bitrate.</div></div>
       <div class="step"><div><strong>Scale:</strong> 200M subscribers, 100M+ concurrent streams at peak, 15% of global internet traffic.</div></div>
+    </div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Netflix — Content Pipeline &amp; Playback Architecture</div>
+      <div class="sys-label" style="color:var(--accent-green);font-weight:600;font-size:11px;margin-bottom:6px">CONTENT UPLOAD PIPELINE</div>
+      <div class="sys-row">
+        <div class="sys-box b-store">Studio Upload<small>Raw 4K master</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-store">S3<small>raw-content</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-queue">Kafka<small>content-uploaded</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-worker">GPU Transcoder<small>FFmpeg fleet</small></div>
+      </div>
+      <div class="sys-down">↓ outputs: 240p / 720p / 1080p / 4K HLS segments (.ts + .m3u8)</div>
+      <div class="sys-row">
+        <div class="sys-box b-cdn">CDN Origin<small>S3 bucket</small></div>
+        <div class="sys-arrow">→ pre-cache →</div>
+        <div class="sys-box b-cdn">Edge PoPs<small>Open Connect in ISPs</small></div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-label" style="color:var(--accent-blue);font-weight:600;font-size:11px;margin-bottom:6px">PLAYBACK FLOW</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">User App</div>
+        <div class="sys-arrow">GET manifest →</div>
+        <div class="sys-box b-svc">Manifest API<small>returns .m3u8 URL</small></div>
+        <div class="sys-arrow">→ fetch segments →</div>
+        <div class="sys-box b-cdn">CDN Edge<small>ISP PoP &lt;10ms</small></div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-label" style="color:var(--accent-orange);font-weight:600;font-size:11px;margin-bottom:6px">RECOMMENDATIONS</div>
+      <div class="sys-row">
+        <div class="sys-box b-worker">Spark Batch<small>ALS model</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-db">Cassandra<small>top-N per user</small></div>
+        <div class="sys-arrow">+</div>
+        <div class="sys-box b-queue">Kafka / Flink<small>real-time affinity</small></div>
+      </div>
     </div>
     <div class="arch-box">Content Upload Pipeline (Studio → Users):
 Studio uploads raw 4K master → S3 (raw-content bucket)
@@ -891,6 +1117,33 @@ Resilience (Netflix Chaos Engineering):
     <div class="steps">
       <div class="step"><div><strong>Requirements:</strong> Crawl 1B+ web pages, extract links, store content, respect robots.txt, avoid duplicate content, refresh stale pages, handle dynamic JS pages.</div></div>
       <div class="step"><div><strong>Scale:</strong> 1B pages, avg 100KB/page = 100TB content. Re-crawl top pages every 24h, others weekly. 10K pages/sec sustained.</div></div>
+    </div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Web Crawler — Pipeline Architecture</div>
+      <div class="sys-row">
+        <div class="sys-box b-cache">URL Frontier<small>Redis ZSet (priority)</small></div>
+        <div class="sys-arrow">→ dequeue →</div>
+        <div class="sys-box b-worker">Crawl Workers<small>stateless, N=100</small></div>
+        <div class="sys-arrow">→ fetch page →</div>
+        <div class="sys-box b-svc">HTTP Fetch<small>respect robots.txt</small></div>
+      </div>
+      <div class="sys-down">↓</div>
+      <div class="sys-row">
+        <div class="sys-box b-queue">Kafka<small>pages-crawled topic</small></div>
+        <div class="sys-box b-queue">Kafka<small>links-found topic</small></div>
+      </div>
+      <div class="sys-down">↓</div>
+      <div class="sys-row">
+        <div class="sys-box b-worker">HTML Parser<small>extract text + links</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-cache">Bloom Filter<small>1B URLs, 1GB RAM</small></div>
+        <div class="sys-arrow">→ not seen →</div>
+        <div class="sys-box b-cache">URL Frontier<small>add to priority queue</small></div>
+      </div>
+      <div class="sys-row" style="margin-top:6px">
+        <div class="sys-box b-store">S3<small>raw HTML content</small></div>
+        <div class="sys-box b-search">Elasticsearch<small>indexed text</small></div>
+      </div>
     </div>
     <div class="arch-box">URL Frontier (Priority Queue):
   Stores URLs to crawl, prioritized by:
@@ -954,6 +1207,35 @@ Refresh Strategy:
       <div class="step"><div><strong>Requirements:</strong> Accept card payments, process transactions, handle refunds, prevent double-charges, financial reconciliation, fraud detection. ACID non-negotiable.</div></div>
       <div class="step"><div><strong>Non-Functional:</strong> Exactly-once payment processing. 99.999% availability. PCI-DSS compliance. Sub-3s payment confirmation.</div></div>
     </div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Payment System — Critical Transaction Path</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">Client</div>
+        <div class="sys-arrow">POST /payments →</div>
+        <div class="sys-box b-gw">API Gateway<small>TLS + Auth</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-svc">Payment Service<small>idempotency key check</small></div>
+      </div>
+      <div class="sys-down">↓</div>
+      <div class="sys-row">
+        <div class="sys-box b-cache">Redis<small>idempotency cache (NX)</small></div>
+        <div class="sys-box b-ml">Fraud Detection<small>ML risk score &lt;200ms</small></div>
+      </div>
+      <div class="sys-down">↓ approved</div>
+      <div class="sys-row">
+        <div class="sys-box b-svc">PSP<small>Stripe / Adyen</small></div>
+        <div class="sys-arrow">→ ACID →</div>
+        <div class="sys-box b-db">Ledger (MySQL)<small>double-entry bookkeeping</small></div>
+      </div>
+      <div class="sys-down">↓ async</div>
+      <div class="sys-row">
+        <div class="sys-box b-queue">Kafka<small>PaymentCompleted</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-svc">Order Service</div>
+        <div class="sys-box b-svc">Email Service</div>
+        <div class="sys-box b-worker">Analytics</div>
+      </div>
+    </div>
     <div class="arch-box">Payment Flow (Critical Path):
 1. Client: POST /payments {amount, currency, payment_method_token, idempotency_key}
 2. Payment Service: Check idempotency key (Redis NX) — if exists, return cached result
@@ -1010,6 +1292,45 @@ Reconciliation:
   <div class="interview-q-body">
     <div class="steps">
       <div class="step"><div><strong>Requirements:</strong> Upload photos/videos, follow users, home feed, explore/search, stories (24h TTL), likes, comments, DMs, notifications. 1B+ users, 100M photos/day.</div></div>
+    </div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Instagram — Hybrid Fan-out Feed Architecture</div>
+      <div class="sys-label" style="color:var(--accent-green);font-weight:600;font-size:11px;margin-bottom:6px">PHOTO UPLOAD</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">User</div>
+        <div class="sys-arrow">→ pre-signed URL →</div>
+        <div class="sys-box b-store">S3<small>original</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-queue">Kafka<small>photo-uploaded</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-worker">Image Processor<small>WebP + resize</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-cdn">CDN<small>3 resolutions</small></div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-label" style="color:var(--accent-blue);font-weight:600;font-size:11px;margin-bottom:6px">FAN-OUT ON WRITE (regular users &lt;10K followers)</div>
+      <div class="sys-row">
+        <div class="sys-box b-worker">Fan-out Worker</div>
+        <div class="sys-arrow">ZADD feed:{followerId} →</div>
+        <div class="sys-box b-cache">Redis ZSet<small>per-user pre-built feed</small></div>
+      </div>
+      <div class="sys-label" style="color:var(--accent-orange);font-weight:600;font-size:11px;margin:6px 0 4px">FAN-OUT ON READ (celebrities &gt;10K followers)</div>
+      <div class="sys-row">
+        <div class="sys-box b-svc">Feed Service</div>
+        <div class="sys-arrow">→ merge at query time →</div>
+        <div class="sys-box b-db">Celebrity Timeline<small>fetch top N directly</small></div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-label" style="color:var(--text-muted);font-weight:600;font-size:11px;margin-bottom:6px">FEED READ</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">User</div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-svc">Feed Service</div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-cache">Redis ZSet<small>regular posts</small></div>
+        <div class="sys-arrow">+</div>
+        <div class="sys-box b-db">Celebrity pull<small>merge + sort</small></div>
+      </div>
     </div>
     <div class="arch-box">Photo Upload:
   Client → Upload Service (pre-signed S3 URL) → S3 (original)
@@ -1068,6 +1389,31 @@ Likes Counter:
       <div class="step"><div><strong>Requirements:</strong> Schedule tasks (one-time + cron), assign to workers, retry on failure, handle worker crashes, task dependencies (DAGs), exactly-once execution, monitor task status, priority queues.</div></div>
       <div class="step"><div><strong>Scale:</strong> 100M tasks/day, 10K concurrent workers, tasks must run within 1s of scheduled time.</div></div>
     </div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Distributed Task Scheduler — Architecture</div>
+      <div class="sys-row">
+        <div class="sys-box b-svc">Scheduler<small>Leader (etcd election)</small></div>
+        <div class="sys-arrow">→ INSERT due tasks →</div>
+        <div class="sys-box b-db">MySQL<small>task_queue (durable)</small></div>
+        <div class="sys-arrow">→ populate →</div>
+        <div class="sys-box b-cache">Redis ZSet<small>score = run_at timestamp</small></div>
+      </div>
+      <div class="sys-down">↓ poll every 100ms</div>
+      <div class="sys-row">
+        <div class="sys-box b-worker">Dispatcher</div>
+        <div class="sys-arrow">→ ZRANGEBYSCORE + Lua claim →</div>
+        <div class="sys-box b-svc">Worker Pool<small>10K workers</small></div>
+        <div class="sys-arrow">→ heartbeat →</div>
+        <div class="sys-box b-cache">Redis<small>worker:{id} TTL 30s</small></div>
+      </div>
+      <div class="sys-down">↓ on completion</div>
+      <div class="sys-row">
+        <div class="sys-box b-db">MySQL<small>UPDATE status = done</small></div>
+        <div class="sys-arrow">→ check DAG deps →</div>
+        <div class="sys-box b-queue">Downstream Tasks<small>re-enqueue if ready</small></div>
+        <div class="sys-box b-worker">DLQ<small>failed after N retries</small></div>
+      </div>
+    </div>
     <div class="arch-box">Scheduler (Leader-elected via Zookeeper/etcd):
   Cron expressions → parse next N execution times (pre-compute 5min ahead)
   INSERT INTO task_queue (task_id, run_at, status='pending', priority)
@@ -1125,6 +1471,33 @@ DAG Dependencies:
   <div class="interview-q-body">
     <div class="steps">
       <div class="step"><div><strong>Requirements:</strong> Product catalog, search, cart, checkout, order management, inventory, pricing, recommendations. 300M active users, 1M orders/day, Black Friday 10× peak.</div></div>
+    </div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">E-Commerce — Service Decomposition &amp; Checkout Saga</div>
+      <div class="sys-label" style="color:var(--text-muted);font-weight:600;font-size:11px;margin-bottom:6px">SERVICE LAYER</div>
+      <div class="sys-row">
+        <div class="sys-box b-search">Catalog Service<small>MySQL + ES + Redis</small></div>
+        <div class="sys-box b-cache">Cart Service<small>Redis only</small></div>
+        <div class="sys-box b-db">Order Service<small>MySQL ACID</small></div>
+        <div class="sys-box b-db">Inventory Service<small>MySQL + opt lock</small></div>
+        <div class="sys-box b-svc">Pricing Service<small>Rules + Redis TTL</small></div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-label" style="color:var(--accent-orange);font-weight:600;font-size:11px;margin-bottom:6px">CHECKOUT SAGA (distributed transaction)</div>
+      <div class="sys-row">
+        <div class="sys-box b-svc">1. Validate<small>Cart items</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-db">2. Reserve<small>Inventory</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-svc">3. Charge<small>Payment</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-db">4. Confirm<small>Order</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-queue">5. Kafka<small>OrderConfirmed</small></div>
+      </div>
+      <div class="sys-row" style="margin-top:6px">
+        <div style="font-size:11px;color:var(--accent-db,#f05252);font-style:italic;text-align:center;flex:1">On failure at any step → compensating transactions run in reverse</div>
+      </div>
     </div>
     <div class="arch-box">Service Decomposition:
   Product Catalog  → MySQL + Elasticsearch (search) + Redis (hot products)
@@ -1235,6 +1608,39 @@ Flash Sale Architecture (10K req/sec for 1 item):
   <div class="interview-q-body">
     <div class="steps">
       <div class="step"><div><strong>Requirements:</strong> Collect metrics from thousands of services, store time-series data, query for dashboards, trigger alerts. Scale to 1M+ metrics, 1-second granularity, 90-day retention.</div></div>
+    </div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Metrics &amp; Monitoring System — Architecture</div>
+      <div class="sys-label" style="color:var(--text-muted);font-weight:600;font-size:11px;margin-bottom:6px">COLLECTION</div>
+      <div class="sys-row">
+        <div class="sys-box b-svc">Services<small>/metrics endpoint</small></div>
+        <div class="sys-arrow">→ scrape (pull) →</div>
+        <div class="sys-box b-worker">Prometheus<small>pull every 15s</small></div>
+        <div class="sys-arrow">+</div>
+        <div class="sys-box b-svc">Lambda / FaaS<small>/metrics push</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-worker">StatsD Agent<small>push model</small></div>
+      </div>
+      <div class="sys-down">↓</div>
+      <div class="sys-row">
+        <div class="sys-box b-queue">Kafka<small>metrics-raw topic</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-worker">Flink<small>rollups: 1s→1min→5min</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-db">TSDB<small>Prometheus / InfluxDB</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-store">S3 / Thanos<small>long-term 90 days</small></div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-row">
+        <div class="sys-box b-search">PromQL Query<small>rate(), histogram_quantile()</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-cache">Redis Cache<small>30s TTL</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-svc">Grafana<small>dashboards</small></div>
+        <div class="sys-arrow">+</div>
+        <div class="sys-box b-ml">Alertmanager<small>PagerDuty / Slack</small></div>
+      </div>
     </div>
     <div class="arch-box">Collection:
   Pull model (Prometheus): scrape /metrics endpoint of each service every 15s

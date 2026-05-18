@@ -60,6 +60,52 @@
   <p>Core concepts, architecture patterns, resilience, caching, databases, and component-level interview questions. For big-infra HLD questions, see <a href="hld.html" style="color:var(--accent-blue)">High-Level Design →</a></p>
 </div>
 
+<div class="sys-diagram">
+  <div class="sys-diagram-title">Typical Scalable Web Architecture</div>
+  <div class="sys-row">
+    <div class="sys-box b-client">Mobile App</div>
+    <div class="sys-box b-client">Web Browser</div>
+    <div class="sys-box b-client">3rd Party API</div>
+  </div>
+  <div class="sys-down">↓</div>
+  <div class="sys-row">
+    <div class="sys-box b-cdn">CDN<small>Static Assets</small></div>
+    <div class="sys-box b-lb">DNS / Anycast<small>Global Routing</small></div>
+  </div>
+  <div class="sys-down">↓</div>
+  <div class="sys-row">
+    <div class="sys-box b-lb">Load Balancer<small>L7 — NGINX / ALB</small></div>
+  </div>
+  <div class="sys-down">↓</div>
+  <div class="sys-row">
+    <div class="sys-box b-gw">API Gateway<small>Auth · Rate Limit · Route · Log</small></div>
+  </div>
+  <div class="sys-down">↓</div>
+  <div class="sys-row">
+    <div class="sys-box b-svc">User Service</div>
+    <div class="sys-box b-svc">Order Service</div>
+    <div class="sys-box b-svc">Product Service</div>
+    <div class="sys-box b-svc">Notif Service</div>
+  </div>
+  <div class="sys-down">↓</div>
+  <div class="sys-row">
+    <div class="sys-box b-queue">Kafka<small>Async Messaging</small></div>
+    <div class="sys-box b-cache">Redis Cluster<small>Cache · Sessions</small></div>
+  </div>
+  <div class="sys-down">↓</div>
+  <div class="sys-row">
+    <div class="sys-box b-db">MySQL / Postgres<small>ACID Transactions</small></div>
+    <div class="sys-box b-db">Cassandra<small>Write-Heavy</small></div>
+    <div class="sys-box b-search">Elasticsearch<small>Full-Text Search</small></div>
+    <div class="sys-box b-store">S3<small>Blob Storage</small></div>
+  </div>
+  <div class="sys-down">↓ async</div>
+  <div class="sys-row">
+    <div class="sys-box b-worker">Background Workers<small>Jobs · ETL · Emails</small></div>
+    <div class="sys-box b-ml">Analytics<small>Snowflake · BigQuery</small></div>
+  </div>
+</div>
+
 <div class="topic-jump">
   <a href="#fundamentals">Fundamentals</a>
   <a href="#db">Databases</a>
@@ -242,6 +288,27 @@
     <h3>Database Replication Strategies</h3><span class="toggle-icon"></span>
   </div>
   <div class="problem-card-body">
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Database Replication — Single Leader (Primary-Replica)</div>
+      <div class="sys-row">
+        <div class="sys-box b-svc">App Server 1</div>
+        <div class="sys-box b-svc">App Server 2</div>
+        <div class="sys-box b-svc">App Server 3</div>
+      </div>
+      <div class="sys-row" style="margin-top:4px">
+        <div style="flex:1;text-align:center;font-size:11px;color:var(--accent-green);font-weight:600">↓ WRITES only</div>
+        <div style="flex:1;text-align:center;font-size:11px;color:var(--accent-blue);font-weight:600">↓ READS (scale-out)</div>
+      </div>
+      <div class="sys-row">
+        <div class="sys-box b-db">Primary<small>All writes go here</small></div>
+        <div class="sys-arrow">→ sync / async →</div>
+        <div class="sys-col">
+          <div class="sys-box b-db">Replica 1<small>reads</small></div>
+          <div class="sys-box b-db">Replica 2<small>reads</small></div>
+          <div class="sys-box b-db">Replica 3<small>reads</small></div>
+        </div>
+      </div>
+    </div>
     <div class="arch-box">Single Leader (Primary-Replica):
 Leader (writes) async/sync replication Replica 1, 2, 3
 Reads can go to any replica (scale reads 3x)
@@ -398,6 +465,25 @@ Client reads from R nodes; R + W &gt; N = consistency</div>
     <h3>API Gateway Pattern</h3><span class="toggle-icon"></span>
   </div>
   <div class="problem-card-body">
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">API Gateway Pattern</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">Mobile App</div>
+        <div class="sys-box b-client">Web App</div>
+        <div class="sys-box b-client">Partner API</div>
+      </div>
+      <div class="sys-down">↓</div>
+      <div class="sys-row">
+        <div class="sys-box b-gw">API Gateway<small>Auth · Rate Limit · SSL · Route · Trace · Transform</small></div>
+      </div>
+      <div class="sys-down">↓ routes to microservices</div>
+      <div class="sys-row">
+        <div class="sys-box b-svc">User Service<small>:8001</small></div>
+        <div class="sys-box b-svc">Order Service<small>:8002</small></div>
+        <div class="sys-box b-svc">Catalog Service<small>:8003</small></div>
+        <div class="sys-box b-svc">Search Service<small>:8004</small></div>
+      </div>
+    </div>
     <div class="arch-box">Client (Mobile / Web / Third-party)
           API Gateway                  - Auth (JWT validation, one place)      - Rate Limiting (per client / IP)       - SSL Termination                       - Request Routing / Load Balancing      - Request / Response Transformation     - Logging, Distributed Tracing          - Circuit Breaking                      User Service     Order Service    Catalog Service</div>
     <div class="callout callout-blue"><div class="callout-title">Tools</div>Kong, AWS API Gateway, NGINX, Traefik, Envoy, Spring Cloud Gateway</div>
@@ -512,6 +598,21 @@ DB Transaction (atomic):         1. INSERT INTO orders ...         2. INSERT INT
   </div>
   <div class="problem-card-body">
     <div class="callout callout-orange"><div class="callout-title">Problem</div>If Service B is slow, calls from A to B pile up, threads exhaust, A also fails cascading failure across the system.</div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Circuit Breaker State Machine</div>
+      <div class="sys-row">
+        <div class="sys-box b-svc">CLOSED<small>All requests pass through</small></div>
+        <div class="sys-arrow">→ failures &gt; 50% →</div>
+        <div class="sys-box b-db">OPEN<small>Fail fast — no calls sent</small></div>
+        <div class="sys-arrow">→ 30s timeout →</div>
+        <div class="sys-box b-gw">HALF-OPEN<small>1–2 probe requests allowed</small></div>
+      </div>
+      <div class="sys-row" style="margin-top:6px">
+        <div style="flex:1;font-size:11px;color:var(--text-muted);text-align:center">Normal operation</div>
+        <div style="flex:1;font-size:11px;color:var(--text-muted);text-align:center">Returns cached fallback</div>
+        <div style="flex:1;font-size:11px;color:var(--text-muted);text-align:center">Success→CLOSED | Fail→OPEN</div>
+      </div>
+    </div>
     <div class="arch-box">CLOSED (normal)      OPEN (failing)         HALF-OPEN (testing)
 All requests flow fail fast (no requests) allow 1-2 test requests
     failure rate          timeout expires          fail OPEN   succeed CLOSED
@@ -815,6 +916,45 @@ Session (Stateful):
       <div class="step"><div><strong>Estimates:</strong> 1B reads/day = 12K RPS. 100M writes/day = 1.2K RPS. Storage: 100 bytes * 100M * 365 days * 5 years = ~18TB.</div></div>
       <div class="step"><div><strong>Short Code:</strong> Base62 (a-z, A-Z, 0-9). 7 chars = 62^7 = 3.5 trillion unique codes. Use DB auto-increment ID convert to Base62.</div></div>
     </div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">URL Shortener Architecture</div>
+      <div class="sys-label" style="color:var(--accent-green);font-weight:600;font-size:11px;margin-bottom:6px">WRITE PATH — 1.2K RPS</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">Client</div>
+        <div class="sys-arrow">POST /shorten →</div>
+        <div class="sys-box b-lb">Load Balancer</div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-svc">Shortener Service</div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-db">MySQL<small>id → short_code</small></div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-label" style="color:var(--accent-blue);font-weight:600;font-size:11px;margin-bottom:6px">READ / REDIRECT PATH — 12K RPS</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">Client</div>
+        <div class="sys-arrow">GET /abc123 →</div>
+        <div class="sys-box b-svc">Redirect Service</div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-cache">Redis Cache<small>HIT: 302 redirect</small></div>
+      </div>
+      <div class="sys-row" style="margin-top:4px;padding-left:340px">
+        <span style="font-size:11px;color:var(--text-muted)">MISS ↓</span>
+      </div>
+      <div class="sys-row" style="padding-left:280px">
+        <div class="sys-box b-db">MySQL<small>lookup + cache fill</small></div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-label" style="color:var(--accent-orange);font-weight:600;font-size:11px;margin-bottom:6px">ANALYTICS — ASYNC</div>
+      <div class="sys-row">
+        <div class="sys-box b-svc">Redirect Service</div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-queue">Kafka<small>click events</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-worker">Analytics Consumer</div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-db">ClickHouse<small>aggregates</small></div>
+      </div>
+    </div>
     <div class="arch-box">Write: POST /shorten {long_url, expiry}
   ShortenerService INSERT into MySQL (id, short_code, long_url, expiry)
   Return https://short.ly/abc1234
@@ -861,6 +1001,32 @@ Analytics (async):
       <div class="step"><div><strong>Requirements:</strong> 1:1 and group chat, online presence, message history, delivery/read receipts, media sharing.</div></div>
       <div class="step"><div><strong>Real-time Transport:</strong> WebSocket (full-duplex, bidirectional). Long Polling as fallback for restrictive networks.</div></div>
       <div class="step"><div><strong>Message Storage:</strong> Cassandra. RowKey = channel_id, clustering by timestamp. Write-heavy, append-only, time-ordered = perfect fit.</div></div>
+    </div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Chat System — Real-time Message Flow</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">Alice<small>WebSocket</small></div>
+        <div class="sys-arrow">→ msg →</div>
+        <div class="sys-box b-svc">Chat Server A<small>Alice's connection</small></div>
+        <div class="sys-arrow">PUBLISH →</div>
+        <div class="sys-box b-cache">Redis Pub/Sub<small>channel: user:bob</small></div>
+        <div class="sys-arrow">→ DELIVER</div>
+        <div class="sys-box b-svc">Chat Server B<small>Bob's connection</small></div>
+        <div class="sys-arrow">→ push →</div>
+        <div class="sys-box b-client">Bob<small>WebSocket</small></div>
+      </div>
+      <div class="sys-down">↓ async persist</div>
+      <div class="sys-row">
+        <div class="sys-box b-queue">Kafka<small>messages topic</small></div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-db">Cassandra<small>msg history by channel</small></div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-row">
+        <div class="sys-box b-svc">Presence Service</div>
+        <div class="sys-arrow">heartbeat →</div>
+        <div class="sys-box b-cache">Redis<small>user:online:{id} TTL 60s</small></div>
+      </div>
     </div>
     <div class="arch-box">Message Flow (Alice Bob):
 1. Alice sends msg via WebSocket Chat Server A
@@ -914,6 +1080,35 @@ Presence Service:
       <li><strong>Pull (Fan-out on Read)</strong>: Merge tweets from followed users at read time. Slow reads. DB expensive.</li>
       <li><strong>Hybrid (Twitter's approach)</strong>: Push for regular users, Pull for celebrities at read time. Best of both.</li>
     </ul></div>
+    <div class="sys-diagram">
+      <div class="sys-diagram-title">Twitter — Hybrid Fan-out Architecture</div>
+      <div class="sys-label" style="color:var(--accent-green);font-weight:600;font-size:11px;margin-bottom:6px">WRITE: User posts tweet</div>
+      <div class="sys-row">
+        <div class="sys-box b-client">User (1K followers)</div>
+        <div class="sys-arrow">POST /tweet →</div>
+        <div class="sys-box b-svc">Tweet Service</div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-db">Cassandra<small>tweets by userId</small></div>
+      </div>
+      <div class="sys-row" style="margin-top:6px">
+        <div class="sys-box b-queue">Kafka<small>tweet-created</small></div>
+        <div class="sys-arrow">→ for &lt;10K followers →</div>
+        <div class="sys-box b-worker">Fan-out Worker</div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-cache">Redis ZSet<small>feed:{followerId}</small></div>
+      </div>
+      <div class="sys-sep"></div>
+      <div class="sys-label" style="color:var(--accent-blue);font-weight:600;font-size:11px;margin-bottom:6px">READ: User loads home feed</div>
+      <div class="sys-row">
+        <div class="sys-box b-svc">Feed Service</div>
+        <div class="sys-arrow">→</div>
+        <div class="sys-box b-cache">Redis ZSet<small>regular tweets (pre-built)</small></div>
+        <div class="sys-arrow">+</div>
+        <div class="sys-box b-db">Celebrity pull<small>fetch top 20 directly</small></div>
+        <div class="sys-arrow">→ merge →</div>
+        <div class="sys-box b-client">Feed</div>
+      </div>
+    </div>
     <div class="arch-box">Tweet Write:
   POST /tweet TweetService Cassandra (tweets by userId + timestamp)
                 Kafka: "tweet-created" event
