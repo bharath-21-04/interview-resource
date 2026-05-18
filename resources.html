@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Resources | Interview Prep</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:12px}
+.res-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;transition:border-color .15s}
+.res-card:hover{border-color:var(--accent-blue)}
+.res-card a{color:var(--text-primary);text-decoration:none;font-weight:600;font-size:14px}
+.res-card a:hover{color:var(--accent-blue)}
+.res-card p{color:var(--text-muted);font-size:12px;line-height:1.6;margin:0}
+.res-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.res-type{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.type-book{background:#1e3a5f;color:#5aacff}
+.type-course{background:#1a3a2a;color:#3ecb7a}
+.type-site{background:#3a2a1a;color:#f5a523}
+.type-video{background:#3a1a1a;color:#fb7185}
+.type-tool{background:#2a1a3a;color:#e879f9}
+.diff-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600}
+.diff-beginner{background:#1a3a2a;color:#3ecb7a}
+.diff-intermediate{background:#3a2a1a;color:#f5a523}
+.diff-advanced{background:#3a1a1a;color:#fb7185}
+.diff-all{background:#1e3050;color:#5aacff}
+.topic-jump{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
+.topic-jump a{background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);text-decoration:none;font-size:12px;padding:5px 12px;border-radius:6px;transition:all .15s}
+.topic-jump a:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">IP</div>
+    <div><h2>Interview Prep</h2><p>Full Stack Reference</p></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Pages</div>
+    <a href="index.html" class="nav-link">Dashboard</a>
+    <a href="dsa.html" class="nav-link">DSA — Python</a>
+    <a href="algorithms.html" class="nav-link">Algorithms — TypeScript</a>
+    <a href="typescript.html" class="nav-link">TypeScript Cheatsheet</a>
+    <a href="oop-lld.html" class="nav-link">OOP &amp; LLD — Java</a>
+    <a href="system-design.html" class="nav-link">System Design (LLD)</a>
+    <a href="hld.html" class="nav-link">High-Level Design (HLD)</a>
+    <a href="kafka.html" class="nav-link">Kafka &amp; Messaging</a>
+    <a href="os-concurrency.html" class="nav-link">OS &amp; Concurrency</a>
+    <a href="docker-aws.html" class="nav-link">Docker &amp; AWS</a>
+    <a href="networking-security.html" class="nav-link">Networking &amp; Security</a>
+    <a href="databases.html" class="nav-link">Databases — SQL &amp; NoSQL</a>
+    <a href="alation.html" class="nav-link">Alation Focus <span class="nav-badge">HOT</span></a>
+    <a href="resources.html" class="nav-link active">📚 Resources</a>
+  </div>
+  <div class="sidebar-footer"><kbd>Cmd K</kbd> to search</div>
+</nav>
+
+<main class="main">
+<div class="topbar"><h1>📚 Learning Resources</h1>
+  <button class="topbar-search-btn" onclick="window._spotlightOpen && window._spotlightOpen()">Search topics... <kbd>Cmd K</kbd></button></div>
+<div class="content-area">
+<div class="section-header">
+  <h1>Curated Study Resources</h1>
+  <p>Best books, courses, websites, and tools for every topic in this interview prep guide. Handpicked for depth and interview relevance.</p>
+</div>
+
+<div class="topic-jump">
+  <a href="#dsa">DSA</a>
+  <a href="#system-design">System Design</a>
+  <a href="#typescript">TypeScript</a>
+  <a href="#java-oop">Java &amp; OOP</a>
+  <a href="#kafka">Kafka</a>
+  <a href="#databases">Databases</a>
+  <a href="#os">OS &amp; Concurrency</a>
+  <a href="#docker-aws">Docker &amp; AWS</a>
+  <a href="#networking">Networking</a>
+  <a href="#practice">Practice Platforms</a>
+</div>
+
+<!-- DSA -->
+<div class="subsection" id="dsa">
+<div class="subsection-title">Data Structures &amp; Algorithms</div>
+<div class="res-grid">
+
+<div class="res-card">
+  <a href="https://neetcode.io" target="_blank">NeetCode.io ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Website</span><span class="diff-badge diff-all">All Levels</span></div>
+  <p>The best structured roadmap for LeetCode prep. 150 + 250 problems organized by pattern with video explanations. Start here.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://leetcode.com" target="_blank">LeetCode ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Platform</span><span class="diff-badge diff-all">All Levels</span></div>
+  <p>Industry-standard interview prep platform. Focus on Medium problems. Use filters for company tags when targeting specific companies.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://visualgo.net" target="_blank">VisuAlgo ↗</a>
+  <div class="res-meta"><span class="res-type type-tool">Tool</span><span class="diff-badge diff-beginner">Beginner</span></div>
+  <p>Animated visualizations of data structures and algorithms. Essential for understanding how sorting, trees, and graphs actually work step-by-step.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://www.algorithmist.com" target="_blank">Introduction to Algorithms (CLRS) ↗</a>
+  <div class="res-meta"><span class="res-type type-book">Book</span><span class="diff-badge diff-advanced">Advanced</span></div>
+  <p>The definitive textbook. Rigorous proofs and analysis. Use as reference for complex algorithms — not as a primary study guide.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://cp-algorithms.com" target="_blank">CP-Algorithms ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Website</span><span class="diff-badge diff-advanced">Advanced</span></div>
+  <p>Comprehensive algorithm reference with implementations. Excellent for graph algorithms, number theory, and competitive programming topics.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://www.techinterviewhandbook.org" target="_blank">Tech Interview Handbook ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Website</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>Free, curated guide to the tech interview process — resume, behavioral, coding, system design. Maintained by ex-Meta engineer.</p>
+</div>
+
+</div>
+</div>
+
+<!-- System Design -->
+<div class="subsection" id="system-design">
+<div class="subsection-title">System Design (HLD &amp; LLD)</div>
+<div class="res-grid">
+
+<div class="res-card">
+  <a href="https://github.com/donnemartin/system-design-primer" target="_blank">System Design Primer (GitHub) ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Website</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>The most-starred system design resource on GitHub. Covers scalability, CAP theorem, databases, caching, and full design walkthroughs. Free.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://dataintensive.net" target="_blank">Designing Data-Intensive Applications ↗</a>
+  <div class="res-meta"><span class="res-type type-book">Book</span><span class="diff-badge diff-advanced">Advanced</span></div>
+  <p>The best book for distributed systems and databases. Covers replication, partitioning, consistency, consensus. Required reading for senior roles.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://bytebytego.com" target="_blank">ByteByteGo ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Website / Newsletter</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>By the author of "System Design Interview" books. Beautiful visual diagrams of real systems. Newsletter and YouTube channel are free.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://highscalability.com" target="_blank">High Scalability ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Blog</span><span class="diff-badge diff-advanced">Advanced</span></div>
+  <p>Real architecture case studies from companies like Twitter, YouTube, WhatsApp. Learn how production systems actually scale.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://refactoring.guru/design-patterns" target="_blank">Refactoring Guru — Design Patterns ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Website</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>Beautifully illustrated guide to all 23 Gang of Four patterns plus refactoring techniques. Best visual reference for LLD and OOP design.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://github.com/ashishps1/awesome-system-design-resources" target="_blank">Awesome System Design Resources ↗</a>
+  <div class="res-meta"><span class="res-type type-site">GitHub</span><span class="diff-badge diff-all">All Levels</span></div>
+  <p>Curated list of system design resources including papers, articles, and courses. Great starting point for structured HLD prep.</p>
+</div>
+
+</div>
+</div>
+
+<!-- TypeScript -->
+<div class="subsection" id="typescript">
+<div class="subsection-title">TypeScript</div>
+<div class="res-grid">
+
+<div class="res-card">
+  <a href="https://www.typescriptlang.org/docs/" target="_blank">TypeScript Official Handbook ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Docs</span><span class="diff-badge diff-beginner">Beginner</span></div>
+  <p>The authoritative source. Handbook covers everyday types, narrowing, functions, and more. Reference section covers all compiler options.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://www.totaltypescript.com" target="_blank">Total TypeScript (Matt Pocock) ↗</a>
+  <div class="res-meta"><span class="res-type type-course">Course</span><span class="diff-badge diff-advanced">Advanced</span></div>
+  <p>Deep dive into TypeScript by one of the best educators. Free workshops on generics, type transformations, and advanced patterns. Highly recommended.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://type-challenges.github.io" target="_blank">Type Challenges ↗</a>
+  <div class="res-meta"><span class="res-type type-tool">Practice</span><span class="diff-badge diff-advanced">Advanced</span></div>
+  <p>LeetCode-style challenges for TypeScript types. Work through Easy → Hard to master mapped types, conditional types, and infer. Great for interviews.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://www.executeprogram.com/courses/typescript" target="_blank">Execute Program — TypeScript ↗</a>
+  <div class="res-meta"><span class="res-type type-course">Course</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>Spaced repetition learning for TypeScript. Short interactive lessons that test your knowledge over time. Excellent retention method.</p>
+</div>
+
+</div>
+</div>
+
+<!-- Java & OOP -->
+<div class="subsection" id="java-oop">
+<div class="subsection-title">Java &amp; Object-Oriented Programming</div>
+<div class="res-grid">
+
+<div class="res-card">
+  <a href="https://www.oreilly.com/library/view/effective-java-3rd/9780134686097/" target="_blank">Effective Java — Joshua Bloch ↗</a>
+  <div class="res-meta"><span class="res-type type-book">Book</span><span class="diff-badge diff-advanced">Advanced</span></div>
+  <p>The definitive Java programming guide. 90 items covering best practices for generics, lambdas, concurrency, and serialization. Must-read for Java interviews.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://refactoring.guru/design-patterns/java" target="_blank">Design Patterns in Java ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Website</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>All GoF patterns with Java code examples. Strategy, Observer, Factory, Singleton, Builder — with UML and real-world use cases.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://docs.oracle.com/javase/tutorial/" target="_blank">Oracle Java Tutorials ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Docs</span><span class="diff-badge diff-beginner">Beginner</span></div>
+  <p>Official Oracle tutorials covering all Java fundamentals. Excellent for generics, collections, concurrency utilities, and I/O streams.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://www.baeldung.com" target="_blank">Baeldung ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Blog</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>Practical Java and Spring tutorials. Deep dives into Java concurrency, streams, optional, and Spring Boot. Great for quick topic lookups.</p>
+</div>
+
+</div>
+</div>
+
+<!-- Kafka -->
+<div class="subsection" id="kafka">
+<div class="subsection-title">Kafka &amp; Messaging Systems</div>
+<div class="res-grid">
+
+<div class="res-card">
+  <a href="https://developer.confluent.io" target="_blank">Confluent Developer ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Website</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>Free Kafka courses by Confluent (Kafka's creators). Covers producers, consumers, Kafka Streams, Schema Registry, and ksqlDB. Best structured learning path.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://www.oreilly.com/library/view/kafka-the-definitive/9781492043072/" target="_blank">Kafka: The Definitive Guide ↗</a>
+  <div class="res-meta"><span class="res-type type-book">Book</span><span class="diff-badge diff-advanced">Advanced</span></div>
+  <p>Official deep-dive by Confluent engineers. Covers internals, replication, exactly-once semantics, and operations at scale. Free PDF on Confluent website.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://kafka.apache.org/documentation/" target="_blank">Apache Kafka Documentation ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Docs</span><span class="diff-badge diff-advanced">Advanced</span></div>
+  <p>Official reference. Use for configuration options, consumer group mechanics, log compaction, and MirrorMaker 2 for multi-region setups.</p>
+</div>
+
+</div>
+</div>
+
+<!-- Databases -->
+<div class="subsection" id="databases">
+<div class="subsection-title">Databases — SQL, NoSQL &amp; Internals</div>
+<div class="res-grid">
+
+<div class="res-card">
+  <a href="https://15445.courses.cs.cmu.edu" target="_blank">CMU 15-445 Database Systems ↗</a>
+  <div class="res-meta"><span class="res-type type-course">Course</span><span class="diff-badge diff-advanced">Advanced</span></div>
+  <p>Free CMU database course with full lecture videos. Covers storage engines, B-Trees, query execution, concurrency control (MVCC, 2PL), and recovery (ARIES).</p>
+</div>
+
+<div class="res-card">
+  <a href="https://use-the-index-luke.com" target="_blank">Use The Index, Luke ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Website</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>Free guide to SQL query performance and database indexing. Explains B-Tree indexes, composite indexes, index-only scans, and common pitfalls.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://www.mongodb.com/docs/manual/" target="_blank">MongoDB Manual ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Docs</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>Official MongoDB reference. Essential for understanding document model, aggregation pipeline, indexes, transactions, and sharding.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://redis.io/docs/latest/" target="_blank">Redis Documentation ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Docs</span><span class="diff-badge diff-beginner">Beginner</span></div>
+  <p>Redis data types (Strings, Hashes, Lists, Sets, Sorted Sets, Streams), persistence modes, eviction policies, and Pub/Sub patterns.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://planetscale.com/blog/how-does-database-sharding-work" target="_blank">PlanetScale Blog — Sharding ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Blog</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>Clear explanations of database sharding strategies, consistent hashing, and distributed SQL. PlanetScale blog has excellent deep-dives.</p>
+</div>
+
+</div>
+</div>
+
+<!-- OS & Concurrency -->
+<div class="subsection" id="os">
+<div class="subsection-title">Operating Systems &amp; Concurrency</div>
+<div class="res-grid">
+
+<div class="res-card">
+  <a href="https://pages.cs.wisc.edu/~remzi/OSTEP/" target="_blank">OS: Three Easy Pieces (OSTEP) ↗</a>
+  <div class="res-meta"><span class="res-type type-book">Free Book</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>The best free OS textbook. Covers virtualization (processes/memory), concurrency (locks, semaphores, condition variables), and persistence (file systems).</p>
+</div>
+
+<div class="res-card">
+  <a href="https://jcip.net" target="_blank">Java Concurrency in Practice ↗</a>
+  <div class="res-meta"><span class="res-type type-book">Book</span><span class="diff-badge diff-advanced">Advanced</span></div>
+  <p>The definitive guide to Java concurrency by Brian Goetz. Thread safety, Executor framework, atomic variables, locks, and testing concurrent programs.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://en.wikipedia.org/wiki/Producer%E2%80%93consumer_problem" target="_blank">Classic Concurrency Problems ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Reference</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>Study the classic synchronization problems: Producer-Consumer, Dining Philosophers, Readers-Writers. These appear directly in interviews.</p>
+</div>
+
+</div>
+</div>
+
+<!-- Docker & AWS -->
+<div class="subsection" id="docker-aws">
+<div class="subsection-title">Docker &amp; AWS / Cloud</div>
+<div class="res-grid">
+
+<div class="res-card">
+  <a href="https://docs.docker.com/get-started/" target="_blank">Docker Get Started ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Docs</span><span class="diff-badge diff-beginner">Beginner</span></div>
+  <p>Official Docker tutorial. Covers containerization concepts, Dockerfile best practices, multi-stage builds, Docker Compose, and networking.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://aws.amazon.com/architecture/well-architected/" target="_blank">AWS Well-Architected Framework ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Docs</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>AWS's five pillars: Operational Excellence, Security, Reliability, Performance, Cost Optimization. Essential for architecture design questions.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://kubernetes.io/docs/tutorials/" target="_blank">Kubernetes Tutorials ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Docs</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>Official Kubernetes tutorials. Learn Pods, Deployments, Services, ConfigMaps, Secrets, Ingress, and Horizontal Pod Autoscaling.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://www.awsgeek.com" target="_blank">AWS Geek — Cheatsheets ↗</a>
+  <div class="res-meta"><span class="res-type type-tool">Visual Reference</span><span class="diff-badge diff-all">All Levels</span></div>
+  <p>One-page visual cheatsheets for every major AWS service. Perfect for quick review before interviews. Clean, printable diagrams.</p>
+</div>
+
+</div>
+</div>
+
+<!-- Networking -->
+<div class="subsection" id="networking">
+<div class="subsection-title">Networking &amp; Security</div>
+<div class="res-grid">
+
+<div class="res-card">
+  <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP" target="_blank">MDN — HTTP ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Docs</span><span class="diff-badge diff-beginner">Beginner</span></div>
+  <p>Comprehensive HTTP reference. HTTP/1.1, HTTP/2, HTTP/3, caching headers, CORS, cookies, status codes, and connection management.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://owasp.org/www-project-top-ten/" target="_blank">OWASP Top 10 ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Reference</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>The standard for web application security. SQL injection, XSS, CSRF, broken authentication — know all 10 with mitigations for security-focused interviews.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://beej.us/guide/bgnet/" target="_blank">Beej's Guide to Network Programming ↗</a>
+  <div class="res-meta"><span class="res-type type-book">Free Book</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>Classic free guide to TCP/IP socket programming in C. Deep understanding of how TCP connections, UDP, and network I/O actually work.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://cloudflare.com/learning" target="_blank">Cloudflare Learning Center ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Website</span><span class="diff-badge diff-beginner">Beginner</span></div>
+  <p>Excellent articles on DNS, CDN, DDoS protection, TLS/SSL, HTTP/3, and QUIC. Free, well-written, and consistently updated.</p>
+</div>
+
+</div>
+</div>
+
+<!-- Practice Platforms -->
+<div class="subsection" id="practice">
+<div class="subsection-title">Practice Platforms &amp; Mock Interviews</div>
+<div class="res-grid">
+
+<div class="res-card">
+  <a href="https://www.pramp.com" target="_blank">Pramp ↗</a>
+  <div class="res-meta"><span class="res-type type-tool">Platform</span><span class="diff-badge diff-all">All Levels</span></div>
+  <p>Free peer-to-peer mock interviews for coding, system design, and behavioral. Practice being both interviewer and interviewee. Highly recommended.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://interviewing.io" target="_blank">interviewing.io ↗</a>
+  <div class="res-meta"><span class="res-type type-tool">Platform</span><span class="diff-badge diff-advanced">Advanced</span></div>
+  <p>Anonymous mock interviews with real engineers from top companies. Paid, but free practice interviews available. Great for final prep.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://excalidraw.com" target="_blank">Excalidraw ↗</a>
+  <div class="res-meta"><span class="res-type type-tool">Tool</span><span class="diff-badge diff-all">All Levels</span></div>
+  <p>Free collaborative whiteboard for system design interviews. Practice drawing architectures. Many companies use this or similar tools during virtual interviews.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://www.hackerrank.com" target="_blank">HackerRank ↗</a>
+  <div class="res-meta"><span class="res-type type-platform">Platform</span><span class="diff-badge diff-beginner">Beginner</span></div>
+  <p>Common platform for company assessments. Practice SQL challenges, regex, and role-specific tracks. Many companies send HackerRank OAs.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://codinginterviewpatterns.com" target="_blank">Coding Patterns ↗</a>
+  <div class="res-meta"><span class="res-type type-site">Website</span><span class="diff-badge diff-intermediate">Intermediate</span></div>
+  <p>Identifies the 16 core patterns behind coding interview problems: sliding window, two pointers, fast/slow pointer, merge intervals, and more.</p>
+</div>
+
+<div class="res-card">
+  <a href="https://github.com/yangshun/tech-interview-handbook" target="_blank">Tech Interview Handbook ↗</a>
+  <div class="res-meta"><span class="res-type type-site">GitHub</span><span class="diff-badge diff-all">All Levels</span></div>
+  <p>Comprehensive end-to-end guide: resume, behavioral questions, coding, system design, and salary negotiation. Free and open source.</p>
+</div>
+
+</div>
+</div>
+
+</div><!-- content-area -->
+</main>
+<script src="main.js"></script>
+<script src="search-data.js"></script>
+<script src="search.js"></script>
+</body>
+</html>

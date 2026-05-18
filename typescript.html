@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeScript Cheatsheet | Interview Prep</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.ts-code{background:var(--bg-code);border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-secondary);line-height:1.85;margin:10px 0;overflow-x:auto;white-space:pre}
+.kw{color:#e879f9} .ty{color:#5aacff} .st{color:#3ecb7a} .cm{color:#4a6484;font-style:italic} .nm{color:#f5a523} .op{color:#fb7185} .nu{color:#f5a523}
+.ts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0}
+@media(max-width:860px){.ts-grid{grid-template-columns:1fr}}
+.ts-badge{display:inline-block;background:rgba(90,172,255,.12);border:1px solid rgba(90,172,255,.25);color:#5aacff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.4px;text-transform:uppercase;margin-right:6px}
+.topic-jump{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
+.topic-jump a{background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);text-decoration:none;font-size:12px;padding:5px 12px;border-radius:6px;transition:all .15s}
+.topic-jump a:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">IP</div>
+    <div><h2>Interview Prep</h2><p>Full Stack Reference</p></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Pages</div>
+    <a href="index.html" class="nav-link">Dashboard</a>
+    <a href="dsa.html" class="nav-link">DSA — Python</a>
+    <a href="algorithms.html" class="nav-link">Algorithms — TypeScript</a>
+    <a href="typescript.html" class="nav-link active">TypeScript Cheatsheet</a>
+    <a href="oop-lld.html" class="nav-link">OOP &amp; LLD — Java</a>
+    <a href="system-design.html" class="nav-link">System Design (LLD)</a>
+    <a href="hld.html" class="nav-link">High-Level Design (HLD)</a>
+    <a href="kafka.html" class="nav-link">Kafka &amp; Messaging</a>
+    <a href="os-concurrency.html" class="nav-link">OS &amp; Concurrency</a>
+    <a href="docker-aws.html" class="nav-link">Docker &amp; AWS</a>
+    <a href="networking-security.html" class="nav-link">Networking &amp; Security</a>
+    <a href="databases.html" class="nav-link">Databases — SQL &amp; NoSQL</a>
+    <a href="alation.html" class="nav-link">Alation Focus <span class="nav-badge">HOT</span></a>
+    <a href="resources.html" class="nav-link">📚 Resources</a>
+  </div>
+  <div class="sidebar-footer"><kbd>Cmd K</kbd> to search</div>
+</nav>
+
+<main class="main">
+<div class="topbar"><h1>TypeScript Cheatsheet</h1>
+  <button class="topbar-search-btn" onclick="window._spotlightOpen && window._spotlightOpen()">Search topics... <kbd>Cmd K</kbd></button></div>
+<div class="content-area">
+<div class="section-header">
+  <h1>TypeScript Cheatsheet</h1>
+  <p>Complete reference — types, generics, utility types, patterns, async, decorators, and interview-ready snippets.</p>
+</div>
+
+<div class="topic-jump">
+  <a href="#primitives">Primitives</a>
+  <a href="#objects">Objects &amp; Interfaces</a>
+  <a href="#unions">Unions &amp; Narrowing</a>
+  <a href="#generics">Generics</a>
+  <a href="#utility">Utility Types</a>
+  <a href="#functions">Functions</a>
+  <a href="#classes">Classes</a>
+  <a href="#async">Async &amp; Promises</a>
+  <a href="#advanced">Advanced Types</a>
+  <a href="#patterns">Common Patterns</a>
+  <a href="#gotchas">Gotchas</a>
+</div>
+
+<!-- PRIMITIVES -->
+<div class="subsection" id="primitives">
+<div class="subsection-title">Primitive &amp; Built-in Types</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>All Primitive Types + Type Assertions + Literals</h3>
+    <div class="tag-row"><span class="badge badge-tag">Basics</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">// ─── Primitive Types ───────────────────────────────────────</span>
+<span class="kw">let</span> <span class="nm">name</span>: <span class="ty">string</span> = <span class="st">"Alice"</span>;
+<span class="kw">let</span> <span class="nm">age</span>: <span class="ty">number</span> = <span class="nu">30</span>;          <span class="cm">// integer AND float — no separate int type</span>
+<span class="kw">let</span> <span class="nm">active</span>: <span class="ty">boolean</span> = <span class="kw">true</span>;
+<span class="kw">let</span> <span class="nm">id</span>: <span class="ty">bigint</span> = <span class="nu">9007199254740991n</span>;
+<span class="kw">let</span> <span class="nm">sym</span>: <span class="ty">symbol</span> = <span class="kw">Symbol</span>(<span class="st">"key"</span>);
+<span class="kw">let</span> <span class="nm">nothing</span>: <span class="ty">null</span> = <span class="kw">null</span>;
+<span class="kw">let</span> <span class="nm">undef</span>: <span class="ty">undefined</span> = <span class="kw">undefined</span>;
+
+<span class="cm">// ─── Special Types ─────────────────────────────────────────</span>
+<span class="kw">let</span> <span class="nm">anything</span>: <span class="ty">any</span>;          <span class="cm">// ⚠ disables type checking — avoid</span>
+<span class="kw">let</span> <span class="nm">safe</span>: <span class="ty">unknown</span>;           <span class="cm">// must narrow before use — prefer over any</span>
+<span class="kw">function</span> <span class="nm">fail</span>(): <span class="ty">never</span> {     <span class="cm">// function that never returns</span>
+  <span class="kw">throw new</span> Error(<span class="st">"boom"</span>);
+}
+<span class="kw">function</span> <span class="nm">log</span>(): <span class="ty">void</span> {}      <span class="cm">// returns nothing</span>
+
+<span class="cm">// ─── Literal Types ─────────────────────────────────────────</span>
+<span class="kw">type</span> <span class="ty">Direction</span> = <span class="st">"north"</span> | <span class="st">"south"</span> | <span class="st">"east"</span> | <span class="st">"west"</span>;
+<span class="kw">type</span> <span class="ty">Status</span> = <span class="nu">200</span> | <span class="nu">400</span> | <span class="nu">404</span> | <span class="nu">500</span>;
+<span class="kw">type</span> <span class="ty">Enabled</span> = <span class="kw">true</span>;          <span class="cm">// literal boolean</span>
+
+<span class="cm">// ─── Type Assertions ───────────────────────────────────────</span>
+<span class="kw">const</span> <span class="nm">el</span> = document.getElementById(<span class="st">"btn"</span>) <span class="kw">as</span> <span class="ty">HTMLButtonElement</span>;
+<span class="kw">const</span> <span class="nm">len</span> = (<span class="nm">anything</span> <span class="kw">as</span> <span class="ty">string</span>).length;
+<span class="kw">const</span> <span class="nm">num</span> = &lt;<span class="ty">number</span>&gt;<span class="nm">anything</span>;   <span class="cm">// JSX-incompatible syntax, prefer `as`</span>
+<span class="kw">const</span> <span class="nm">sure</span> = <span class="nm">anything</span>!;         <span class="cm">// non-null assertion — asserts not null/undefined</span>
+
+<span class="cm">// ─── const assertion ───────────────────────────────────────</span>
+<span class="kw">const</span> <span class="nm">config</span> = { host: <span class="st">"localhost"</span>, port: <span class="nu">3000</span> } <span class="kw">as const</span>;
+<span class="cm">// config.host is "localhost" (literal), not string — fully readonly</span>
+
+<span class="cm">// ─── Arrays & Tuples ───────────────────────────────────────</span>
+<span class="kw">const</span> <span class="nm">nums</span>: <span class="ty">number</span>[] = [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>];
+<span class="kw">const</span> <span class="nm">strs</span>: <span class="ty">Array</span>&lt;<span class="ty">string</span>&gt; = [<span class="st">"a"</span>, <span class="st">"b"</span>];
+<span class="kw">const</span> <span class="nm">pair</span>: [<span class="ty">string</span>, <span class="ty">number</span>] = [<span class="st">"age"</span>, <span class="nu">30</span>]; <span class="cm">// tuple — exact length+types</span>
+<span class="kw">const</span> <span class="nm">triple</span>: [<span class="ty">string</span>, <span class="ty">number</span>, <span class="ty">boolean</span>?] = [<span class="st">"x"</span>, <span class="nu">1</span>]; <span class="cm">// optional 3rd</span>
+</div>
+  </div>
+</div>
+</div>
+
+<!-- OBJECTS & INTERFACES -->
+<div class="subsection" id="objects">
+<div class="subsection-title">Objects, Interfaces &amp; Type Aliases</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>interface vs type — Differences + Extending + Index Signatures</h3>
+    <div class="tag-row"><span class="badge badge-tag">Core</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">// ─── interface (preferred for object shapes & public API) ──</span>
+<span class="kw">interface</span> <span class="ty">User</span> {
+  <span class="kw">readonly</span> <span class="nm">id</span>: <span class="ty">number</span>;         <span class="cm">// readonly — cannot reassign after init</span>
+  <span class="nm">name</span>: <span class="ty">string</span>;
+  <span class="nm">email</span>?: <span class="ty">string</span>;               <span class="cm">// optional property</span>
+  <span class="nm">greet</span>(): <span class="ty">string</span>;              <span class="cm">// method signature</span>
+}
+
+<span class="cm">// Extending interfaces (open for extension — key difference from type)</span>
+<span class="kw">interface</span> <span class="ty">Admin</span> <span class="kw">extends</span> <span class="ty">User</span> {
+  <span class="nm">role</span>: <span class="st">"super"</span> | <span class="st">"moderator"</span>;
+}
+
+<span class="cm">// Interface merging (declaration merging — unique to interface)</span>
+<span class="kw">interface</span> <span class="ty">Window</span> { <span class="nm">myLib</span>: <span class="ty">string</span> }  <span class="cm">// extends existing Window global</span>
+
+<span class="cm">// ─── type alias (preferred for unions, primitives, mapped types) ──</span>
+<span class="kw">type</span> <span class="ty">ID</span> = <span class="ty">string</span> | <span class="ty">number</span>;
+<span class="kw">type</span> <span class="ty">Point</span> = { <span class="nm">x</span>: <span class="ty">number</span>; <span class="nm">y</span>: <span class="ty">number</span> };
+<span class="kw">type</span> <span class="ty">AdminUser</span> = <span class="ty">User</span> &amp; { <span class="nm">role</span>: <span class="ty">string</span> };  <span class="cm">// intersection</span>
+
+<span class="cm">// ─── Index Signatures ──────────────────────────────────────</span>
+<span class="kw">interface</span> <span class="ty">StringMap</span> {
+  [<span class="nm">key</span>: <span class="ty">string</span>]: <span class="ty">string</span>;       <span class="cm">// any string key → string value</span>
+}
+<span class="kw">type</span> <span class="ty">Record2</span>&lt;<span class="ty">K</span> <span class="kw">extends</span> <span class="ty">string</span>, <span class="ty">V</span>&gt; = { [<span class="ty">P</span> <span class="kw">in</span> <span class="ty">K</span>]: <span class="ty">V</span> };
+
+<span class="cm">// ─── Nested + Optional chaining ───────────────────────────</span>
+<span class="kw">interface</span> <span class="ty">Config</span> {
+  db?: { host: <span class="ty">string</span>; port?: <span class="ty">number</span> };
+}
+<span class="kw">const</span> <span class="nm">port</span> = <span class="nm">config</span>.<span class="nm">db</span>?.<span class="nm">port</span> ?? <span class="nu">5432</span>;  <span class="cm">// optional chain + nullish coalescing</span>
+
+<span class="cm">// ─── Satisfies operator (TS 4.9+) ─────────────────────────</span>
+<span class="kw">const</span> <span class="nm">palette</span> = {
+  red: [<span class="nu">255</span>, <span class="nu">0</span>, <span class="nu">0</span>],
+  green: <span class="st">"#00ff00"</span>,
+} <span class="kw">satisfies</span> <span class="ty">Record</span>&lt;<span class="ty">string</span>, <span class="ty">string</span> | <span class="ty">number</span>[]&gt;;
+<span class="cm">// palette.red is still number[] (not string | number[]) — narrowed!</span>
+</div>
+  </div>
+</div>
+</div>
+
+<!-- UNIONS & NARROWING -->
+<div class="subsection" id="unions">
+<div class="subsection-title">Unions, Intersections &amp; Type Narrowing</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Discriminated Unions + All Narrowing Techniques</h3>
+    <div class="tag-row"><span class="badge badge-tag">Critical</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">// ─── typeof narrowing ──────────────────────────────────────</span>
+<span class="kw">function</span> <span class="nm">format</span>(<span class="nm">val</span>: <span class="ty">string</span> | <span class="ty">number</span>) {
+  <span class="kw">if</span> (<span class="kw">typeof</span> <span class="nm">val</span> === <span class="st">"string"</span>) <span class="kw">return</span> <span class="nm">val</span>.toUpperCase();  <span class="cm">// val: string here</span>
+  <span class="kw">return</span> <span class="nm">val</span>.toFixed(<span class="nu">2</span>);                                 <span class="cm">// val: number here</span>
+}
+
+<span class="cm">// ─── instanceof narrowing ──────────────────────────────────</span>
+<span class="kw">function</span> <span class="nm">handleError</span>(<span class="nm">e</span>: <span class="ty">unknown</span>) {
+  <span class="kw">if</span> (<span class="nm">e</span> <span class="kw">instanceof</span> <span class="ty">Error</span>) <span class="kw">return</span> <span class="nm">e</span>.message;  <span class="cm">// e: Error</span>
+  <span class="kw">return</span> <span class="ty">String</span>(<span class="nm">e</span>);
+}
+
+<span class="cm">// ─── in narrowing ──────────────────────────────────────────</span>
+<span class="kw">type</span> <span class="ty">Fish</span> = { <span class="nm">swim</span>(): <span class="ty">void</span> };
+<span class="kw">type</span> <span class="ty">Bird</span> = { <span class="nm">fly</span>(): <span class="ty">void</span> };
+<span class="kw">function</span> <span class="nm">move</span>(<span class="nm">animal</span>: <span class="ty">Fish</span> | <span class="ty">Bird</span>) {
+  <span class="kw">if</span> (<span class="st">"swim"</span> <span class="kw">in</span> <span class="nm">animal</span>) <span class="nm">animal</span>.swim();  <span class="cm">// animal: Fish</span>
+  <span class="kw">else</span> <span class="nm">animal</span>.fly();                      <span class="cm">// animal: Bird</span>
+}
+
+<span class="cm">// ─── Discriminated Union (most powerful pattern) ───────────</span>
+<span class="kw">type</span> <span class="ty">Shape</span> =
+  | { <span class="nm">kind</span>: <span class="st">"circle"</span>;    <span class="nm">radius</span>: <span class="ty">number</span> }
+  | { <span class="nm">kind</span>: <span class="st">"rectangle"</span>; <span class="nm">width</span>: <span class="ty">number</span>; <span class="nm">height</span>: <span class="ty">number</span> }
+  | { <span class="nm">kind</span>: <span class="st">"triangle"</span>;  <span class="nm">base</span>: <span class="ty">number</span>;  <span class="nm">height</span>: <span class="ty">number</span> };
+
+<span class="kw">function</span> <span class="nm">area</span>(<span class="nm">s</span>: <span class="ty">Shape</span>): <span class="ty">number</span> {
+  <span class="kw">switch</span> (<span class="nm">s</span>.kind) {
+    <span class="kw">case</span> <span class="st">"circle"</span>:    <span class="kw">return</span> Math.PI * <span class="nm">s</span>.radius ** <span class="nu">2</span>;
+    <span class="kw">case</span> <span class="st">"rectangle"</span>: <span class="kw">return</span> <span class="nm">s</span>.width * <span class="nm">s</span>.height;
+    <span class="kw">case</span> <span class="st">"triangle"</span>:  <span class="kw">return</span> <span class="nu">0.5</span> * <span class="nm">s</span>.base * <span class="nm">s</span>.height;
+    <span class="kw">default</span>:
+      <span class="kw">const</span> <span class="nm">_exhaustive</span>: <span class="ty">never</span> = <span class="nm">s</span>;  <span class="cm">// compile error if case missing!</span>
+      <span class="kw">return</span> <span class="nm">_exhaustive</span>;
+  }
+}
+
+<span class="cm">// ─── Type Guard (user-defined) ─────────────────────────────</span>
+<span class="kw">function</span> <span class="nm">isFish</span>(<span class="nm">a</span>: <span class="ty">Fish</span> | <span class="ty">Bird</span>): <span class="nm">a</span> <span class="kw">is</span> <span class="ty">Fish</span> {
+  <span class="kw">return</span> (<span class="nm">a</span> <span class="kw">as</span> <span class="ty">Fish</span>).swim !== <span class="kw">undefined</span>;
+}
+
+<span class="cm">// ─── Assertion Functions (TS 3.7+) ─────────────────────────</span>
+<span class="kw">function</span> <span class="nm">assert</span>(<span class="nm">cond</span>: <span class="ty">unknown</span>, <span class="nm">msg</span>: <span class="ty">string</span>): <span class="kw">asserts</span> <span class="nm">cond</span> {
+  <span class="kw">if</span> (!<span class="nm">cond</span>) <span class="kw">throw new</span> Error(<span class="nm">msg</span>);
+}
+<span class="kw">function</span> <span class="nm">assertString</span>(<span class="nm">v</span>: <span class="ty">unknown</span>): <span class="kw">asserts</span> <span class="nm">v</span> <span class="kw">is</span> <span class="ty">string</span> {
+  <span class="kw">if</span> (<span class="kw">typeof</span> <span class="nm">v</span> !== <span class="st">"string"</span>) <span class="kw">throw new</span> TypeError();
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- GENERICS -->
+<div class="subsection" id="generics">
+<div class="subsection-title">Generics</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Generics — Functions, Interfaces, Constraints, Defaults, Conditional</h3>
+    <div class="tag-row"><span class="badge badge-tag">Critical</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">// ─── Generic function ──────────────────────────────────────</span>
+<span class="kw">function</span> <span class="nm">identity</span>&lt;<span class="ty">T</span>&gt;(<span class="nm">arg</span>: <span class="ty">T</span>): <span class="ty">T</span> { <span class="kw">return</span> <span class="nm">arg</span>; }
+<span class="nm">identity</span>&lt;<span class="ty">string</span>&gt;(<span class="st">"hello"</span>);     <span class="cm">// explicit</span>
+<span class="nm">identity</span>(<span class="nu">42</span>);                   <span class="cm">// inferred T=number</span>
+
+<span class="cm">// ─── Generic interface ─────────────────────────────────────</span>
+<span class="kw">interface</span> <span class="ty">ApiResponse</span>&lt;<span class="ty">T</span>&gt; {
+  data: <span class="ty">T</span>;
+  status: <span class="ty">number</span>;
+  error?: <span class="ty">string</span>;
+}
+<span class="kw">type</span> <span class="ty">UserResponse</span> = <span class="ty">ApiResponse</span>&lt;<span class="ty">User</span>&gt;;
+
+<span class="cm">// ─── Constraints (extends) ─────────────────────────────────</span>
+<span class="kw">function</span> <span class="nm">getLength</span>&lt;<span class="ty">T</span> <span class="kw">extends</span> { length: <span class="ty">number</span> }&gt;(<span class="nm">arg</span>: <span class="ty">T</span>): <span class="ty">number</span> {
+  <span class="kw">return</span> <span class="nm">arg</span>.length;
+}
+<span class="nm">getLength</span>(<span class="st">"hello"</span>);   <span class="cm">// ✓ string has length</span>
+<span class="nm">getLength</span>([<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>]); <span class="cm">// ✓ array has length</span>
+
+<span class="cm">// ─── keyof constraint ──────────────────────────────────────</span>
+<span class="kw">function</span> <span class="nm">getProperty</span>&lt;<span class="ty">T</span>, <span class="ty">K</span> <span class="kw">extends keyof</span> <span class="ty">T</span>&gt;(<span class="nm">obj</span>: <span class="ty">T</span>, <span class="nm">key</span>: <span class="ty">K</span>): <span class="ty">T</span>[<span class="ty">K</span>] {
+  <span class="kw">return</span> <span class="nm">obj</span>[<span class="nm">key</span>];
+}
+<span class="nm">getProperty</span>({ <span class="nm">a</span>: <span class="nu">1</span>, <span class="nm">b</span>: <span class="st">"two"</span> }, <span class="st">"a"</span>); <span class="cm">// returns number</span>
+
+<span class="cm">// ─── Default type params (TS 2.3+) ─────────────────────────</span>
+<span class="kw">interface</span> <span class="ty">Container</span>&lt;<span class="ty">T</span> = <span class="ty">string</span>&gt; { value: <span class="ty">T</span> }
+<span class="kw">const</span> <span class="nm">c</span>: <span class="ty">Container</span> = { value: <span class="st">"hello"</span> }; <span class="cm">// T defaults to string</span>
+
+<span class="cm">// ─── Conditional Types ─────────────────────────────────────</span>
+<span class="kw">type</span> <span class="ty">IsArray</span>&lt;<span class="ty">T</span>&gt; = <span class="ty">T</span> <span class="kw">extends</span> <span class="ty">any</span>[] ? <span class="st">"yes"</span> : <span class="st">"no"</span>;
+<span class="kw">type</span> <span class="ty">A</span> = <span class="ty">IsArray</span>&lt;<span class="ty">number</span>[]&gt;;  <span class="cm">// "yes"</span>
+<span class="kw">type</span> <span class="ty">B</span> = <span class="ty">IsArray</span>&lt;<span class="ty">string</span>&gt;;    <span class="cm">// "no"</span>
+
+<span class="cm">// Infer within conditional</span>
+<span class="kw">type</span> <span class="ty">UnwrapArray</span>&lt;<span class="ty">T</span>&gt; = <span class="ty">T</span> <span class="kw">extends</span> (<span class="kw">infer</span> <span class="ty">U</span>)[] ? <span class="ty">U</span> : <span class="ty">T</span>;
+<span class="kw">type</span> <span class="ty">Num</span> = <span class="ty">UnwrapArray</span>&lt;<span class="ty">number</span>[]&gt;;  <span class="cm">// number</span>
+<span class="kw">type</span> <span class="ty">Str</span> = <span class="ty">UnwrapArray</span>&lt;<span class="ty">string</span>&gt;;    <span class="cm">// string (not array, so T returned)</span>
+
+<span class="cm">// ReturnType built with infer</span>
+<span class="kw">type</span> <span class="ty">MyReturnType</span>&lt;<span class="ty">T</span> <span class="kw">extends</span> (...<span class="nm">args</span>: <span class="ty">any</span>) =&gt; <span class="ty">any</span>&gt; =
+  <span class="ty">T</span> <span class="kw">extends</span> (...<span class="nm">args</span>: <span class="ty">any</span>) =&gt; <span class="kw">infer</span> <span class="ty">R</span> ? <span class="ty">R</span> : <span class="ty">never</span>;
+</div>
+  </div>
+</div>
+</div>
+
+<!-- UTILITY TYPES -->
+<div class="subsection" id="utility">
+<div class="subsection-title">Utility Types</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>All Built-in Utility Types with Examples</h3>
+    <div class="tag-row"><span class="badge badge-tag">Must Know</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="kw">interface</span> <span class="ty">User</span> { <span class="nm">id</span>: <span class="ty">number</span>; <span class="nm">name</span>: <span class="ty">string</span>; <span class="nm">email</span>: <span class="ty">string</span>; <span class="nm">age</span>?: <span class="ty">number</span> }
+
+<span class="cm">// ─── Object Transformation ────────────────────────────────</span>
+<span class="kw">type</span> <span class="ty">PartialUser</span>   = <span class="ty">Partial</span>&lt;<span class="ty">User</span>&gt;;      <span class="cm">// all props optional</span>
+<span class="kw">type</span> <span class="ty">RequiredUser</span>  = <span class="ty">Required</span>&lt;<span class="ty">User</span>&gt;;     <span class="cm">// all props required (removes ?)</span>
+<span class="kw">type</span> <span class="ty">ReadonlyUser</span>  = <span class="ty">Readonly</span>&lt;<span class="ty">User</span>&gt;;     <span class="cm">// all props readonly</span>
+<span class="kw">type</span> <span class="ty">UserRecord</span>    = <span class="ty">Record</span>&lt;<span class="ty">string</span>, <span class="ty">User</span>&gt;; <span class="cm">// dictionary</span>
+
+<span class="cm">// Pick & Omit — most used in practice</span>
+<span class="kw">type</span> <span class="ty">UserPreview</span>   = <span class="ty">Pick</span>&lt;<span class="ty">User</span>, <span class="st">"id"</span> | <span class="st">"name"</span>&gt;;     <span class="cm">// only id & name</span>
+<span class="kw">type</span> <span class="ty">CreateUser</span>    = <span class="ty">Omit</span>&lt;<span class="ty">User</span>, <span class="st">"id"</span>&gt;;               <span class="cm">// everything except id</span>
+<span class="kw">type</span> <span class="ty">UpdateUser</span>    = <span class="ty">Partial</span>&lt;<span class="ty">Omit</span>&lt;<span class="ty">User</span>, <span class="st">"id"</span>&gt;&gt;;       <span class="cm">// common patch body</span>
+
+<span class="cm">// ─── Set operations on Union types ────────────────────────</span>
+<span class="kw">type</span> <span class="ty">AB</span> = <span class="st">"a"</span> | <span class="st">"b"</span> | <span class="st">"c"</span>;
+<span class="kw">type</span> <span class="ty">Exl</span> = <span class="ty">Exclude</span>&lt;<span class="ty">AB</span>, <span class="st">"a"</span>&gt;;          <span class="cm">// "b" | "c" — removes from union</span>
+<span class="kw">type</span> <span class="ty">Ext</span> = <span class="ty">Extract</span>&lt;<span class="ty">AB</span>, <span class="st">"a"</span> | <span class="st">"d"</span>&gt;;   <span class="cm">// "a" — keeps intersection</span>
+<span class="kw">type</span> <span class="ty">NN</span>  = <span class="ty">NonNullable</span>&lt;<span class="ty">string</span> | <span class="ty">null</span> | <span class="ty">undefined</span>&gt;; <span class="cm">// string</span>
+
+<span class="cm">// ─── Function types ───────────────────────────────────────</span>
+<span class="kw">type</span> <span class="ty">Fn</span> = (<span class="nm">x</span>: <span class="ty">number</span>) =&gt; <span class="ty">string</span>;
+<span class="kw">type</span> <span class="ty">RT</span> = <span class="ty">ReturnType</span>&lt;<span class="ty">Fn</span>&gt;;          <span class="cm">// string</span>
+<span class="kw">type</span> <span class="ty">PT</span> = <span class="ty">Parameters</span>&lt;<span class="ty">Fn</span>&gt;;         <span class="cm">// [x: number]</span>
+<span class="kw">type</span> <span class="ty">CT</span> = <span class="ty">ConstructorParameters</span>&lt;<span class="kw">typeof</span> Date&gt;;  <span class="cm">// Date constructor args</span>
+<span class="kw">type</span> <span class="ty">IT</span> = <span class="ty">InstanceType</span>&lt;<span class="kw">typeof</span> Date&gt;;          <span class="cm">// Date instance type</span>
+
+<span class="cm">// ─── Awaited (TS 4.5+) ────────────────────────────────────</span>
+<span class="kw">type</span> <span class="ty">Resolved</span> = <span class="ty">Awaited</span>&lt;Promise&lt;Promise&lt;<span class="ty">string</span>&gt;&gt;&gt;; <span class="cm">// string (deeply unwraps)</span>
+
+<span class="cm">// ─── Template Literal Types (TS 4.1+) ────────────────────</span>
+<span class="kw">type</span> <span class="ty">EventName</span>&lt;<span class="ty">T</span> <span class="kw">extends</span> <span class="ty">string</span>&gt; = <span class="op">`on${Capitalize&lt;T&gt;}`</span>;
+<span class="kw">type</span> <span class="ty">ClickEvent</span> = <span class="ty">EventName</span>&lt;<span class="st">"click"</span>&gt;;  <span class="cm">// "onClick"</span>
+
+<span class="kw">type</span> <span class="ty">CRUD</span> = <span class="st">"create"</span> | <span class="st">"read"</span> | <span class="st">"update"</span> | <span class="st">"delete"</span>;
+<span class="kw">type</span> <span class="ty">APIRoute</span> = <span class="op">`/api/${CRUD}`</span>;  <span class="cm">// "/api/create" | "/api/read" | ...</span>
+</div>
+  </div>
+</div>
+</div>
+
+<!-- FUNCTIONS -->
+<div class="subsection" id="functions">
+<div class="subsection-title">Functions</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Function Overloads, Rest, Callbacks, Higher-Order, this parameter</h3>
+    <div class="tag-row"><span class="badge badge-tag">Functions</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">// ─── Basic signatures ──────────────────────────────────────</span>
+<span class="kw">function</span> <span class="nm">add</span>(<span class="nm">a</span>: <span class="ty">number</span>, <span class="nm">b</span>: <span class="ty">number</span>): <span class="ty">number</span> { <span class="kw">return</span> <span class="nm">a</span> + <span class="nm">b</span>; }
+<span class="kw">const</span> <span class="nm">mul</span> = (<span class="nm">a</span>: <span class="ty">number</span>, <span class="nm">b</span>: <span class="ty">number</span>): <span class="ty">number</span> =&gt; <span class="nm">a</span> * <span class="nm">b</span>;
+
+<span class="cm">// Optional + default + rest</span>
+<span class="kw">function</span> <span class="nm">greet</span>(<span class="nm">name</span>: <span class="ty">string</span>, <span class="nm">greeting</span> = <span class="st">"Hello"</span>, ...<span class="nm">titles</span>: <span class="ty">string</span>[]): <span class="ty">string</span> {
+  <span class="kw">return</span> <span class="op">`${greeting} ${titles.join(" ")} ${name}`</span>;
+}
+
+<span class="cm">// ─── Function Overloads ────────────────────────────────────</span>
+<span class="kw">function</span> <span class="nm">parse</span>(<span class="nm">input</span>: <span class="ty">string</span>): <span class="ty">number</span>;
+<span class="kw">function</span> <span class="nm">parse</span>(<span class="nm">input</span>: <span class="ty">number</span>): <span class="ty">string</span>;
+<span class="kw">function</span> <span class="nm">parse</span>(<span class="nm">input</span>: <span class="ty">string</span> | <span class="ty">number</span>): <span class="ty">string</span> | <span class="ty">number</span> {  <span class="cm">// implementation</span>
+  <span class="kw">return</span> <span class="kw">typeof</span> <span class="nm">input</span> === <span class="st">"string"</span> ? <span class="ty">Number</span>(<span class="nm">input</span>) : <span class="ty">String</span>(<span class="nm">input</span>);
+}
+
+<span class="cm">// ─── Callback types ───────────────────────────────────────</span>
+<span class="kw">type</span> <span class="ty">Predicate</span>&lt;<span class="ty">T</span>&gt; = (<span class="nm">item</span>: <span class="ty">T</span>) =&gt; <span class="ty">boolean</span>;
+<span class="kw">type</span> <span class="ty">Mapper</span>&lt;<span class="ty">T</span>, <span class="ty">U</span>&gt; = (<span class="nm">item</span>: <span class="ty">T</span>, <span class="nm">index</span>: <span class="ty">number</span>) =&gt; <span class="ty">U</span>;
+
+<span class="kw">function</span> <span class="nm">filter</span>&lt;<span class="ty">T</span>&gt;(<span class="nm">arr</span>: <span class="ty">T</span>[], <span class="nm">pred</span>: <span class="ty">Predicate</span>&lt;<span class="ty">T</span>&gt;): <span class="ty">T</span>[] {
+  <span class="kw">return</span> <span class="nm">arr</span>.filter(<span class="nm">pred</span>);
+}
+
+<span class="cm">// ─── this parameter (fake param for type of `this`) ────────</span>
+<span class="kw">interface</span> <span class="ty">Counter</span> { count: <span class="ty">number</span>; increment(<span class="kw">this</span>: <span class="ty">Counter</span>): <span class="ty">void</span> }
+<span class="kw">const</span> <span class="nm">counter</span>: <span class="ty">Counter</span> = {
+  count: <span class="nu">0</span>,
+  increment() { <span class="kw">this</span>.count++; }  <span class="cm">// `this` is typed as Counter</span>
+};
+
+<span class="cm">// ─── Higher-order / Compose ────────────────────────────────</span>
+<span class="kw">const</span> <span class="nm">compose</span> = &lt;<span class="ty">A</span>, <span class="ty">B</span>, <span class="ty">C</span>&gt;(f: (<span class="nm">b</span>: <span class="ty">B</span>) =&gt; <span class="ty">C</span>, g: (<span class="nm">a</span>: <span class="ty">A</span>) =&gt; <span class="ty">B</span>) =&gt; (<span class="nm">a</span>: <span class="ty">A</span>) =&gt; f(g(<span class="nm">a</span>));
+<span class="kw">const</span> <span class="nm">doubleStr</span> = <span class="nm">compose</span>((<span class="nm">n</span>: <span class="ty">number</span>) =&gt; <span class="nm">n</span>.toString(), (<span class="nm">n</span>: <span class="ty">number</span>) =&gt; <span class="nm">n</span> * <span class="nu">2</span>);
+</div>
+  </div>
+</div>
+</div>
+
+<!-- CLASSES -->
+<div class="subsection" id="classes">
+<div class="subsection-title">Classes</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Classes — Access Modifiers, Abstract, Mixins, Decorators</h3>
+    <div class="tag-row"><span class="badge badge-tag">OOP</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="kw">abstract class</span> <span class="ty">Animal</span> {
+  <span class="cm">// Access modifiers: public (default) | private | protected | readonly</span>
+  <span class="kw">constructor</span>(
+    <span class="kw">public readonly</span> <span class="nm">name</span>: <span class="ty">string</span>,        <span class="cm">// shorthand property declaration</span>
+    <span class="kw">protected</span> <span class="nm">age</span>: <span class="ty">number</span>,
+    <span class="kw">private</span> <span class="nm">_secret</span>: <span class="ty">string</span> = <span class="st">"hidden"</span>
+  ) {}
+
+  <span class="kw">abstract</span> <span class="nm">speak</span>(): <span class="ty">string</span>;              <span class="cm">// must implement in subclass</span>
+
+  <span class="nm">describe</span>(): <span class="ty">string</span> {
+    <span class="kw">return</span> <span class="op">`${this.name} is ${this.age}`</span>;
+  }
+
+  <span class="kw">static</span> <span class="nm">create</span>(<span class="nm">name</span>: <span class="ty">string</span>): <span class="kw">this</span> {   <span class="cm">// polymorphic this in factory</span>
+    <span class="kw">return new</span> (<span class="kw">this</span> <span class="kw">as any</span>)(name, <span class="nu">0</span>);
+  }
+}
+
+<span class="kw">class</span> <span class="ty">Dog</span> <span class="kw">extends</span> <span class="ty">Animal</span> {
+  speak(): <span class="ty">string</span> { <span class="kw">return</span> <span class="op">`${this.name} says Woof`</span>; }
+  <span class="cm">// Override: can access this.age (protected) but not this._secret (private)</span>
+}
+
+<span class="cm">// ─── Implements interface ──────────────────────────────────</span>
+<span class="kw">interface</span> <span class="ty">Serializable</span> { serialize(): <span class="ty">string</span> }
+<span class="kw">class</span> <span class="ty">Cat</span> <span class="kw">extends</span> <span class="ty">Animal</span> <span class="kw">implements</span> <span class="ty">Serializable</span> {
+  speak() { <span class="kw">return</span> <span class="st">"Meow"</span>; }
+  serialize() { <span class="kw">return</span> JSON.stringify({ name: <span class="kw">this</span>.name }); }
+}
+
+<span class="cm">// ─── Private fields (runtime private — ES2022) ─────────────</span>
+<span class="kw">class</span> <span class="ty">BankAccount</span> {
+  <span class="op">#</span><span class="nm">balance</span> = <span class="nu">0</span>;                           <span class="cm">// truly private — not on prototype</span>
+  deposit(<span class="nm">n</span>: <span class="ty">number</span>) { <span class="kw">this</span>.<span class="op">#</span><span class="nm">balance</span> += <span class="nm">n</span>; }
+  <span class="kw">get</span> balance() { <span class="kw">return</span> <span class="kw">this</span>.<span class="op">#</span><span class="nm">balance</span>; }
+}
+
+<span class="cm">// ─── Mixin pattern ─────────────────────────────────────────</span>
+<span class="kw">type</span> <span class="ty">Constructor</span>&lt;<span class="ty">T</span> = {}&gt; = <span class="kw">new</span> (...<span class="nm">args</span>: <span class="ty">any</span>[]) =&gt; <span class="ty">T</span>;
+<span class="kw">function</span> <span class="nm">Timestamped</span>&lt;<span class="ty">TBase</span> <span class="kw">extends</span> <span class="ty">Constructor</span>&gt;(<span class="ty">Base</span>: <span class="ty">TBase</span>) {
+  <span class="kw">return class extends</span> <span class="ty">Base</span> {
+    createdAt = <span class="kw">new</span> Date();
+  };
+}
+<span class="kw">class</span> <span class="ty">TimestampedUser</span> <span class="kw">extends</span> <span class="nm">Timestamped</span>(<span class="ty">Animal</span>) {
+  speak() { <span class="kw">return</span> <span class="st">"..."</span>; }
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ASYNC -->
+<div class="subsection" id="async">
+<div class="subsection-title">Async / Promises / Error Handling</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Async/Await, Promise combinators, Error handling patterns</h3>
+    <div class="tag-row"><span class="badge badge-tag">Critical</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">// ─── Basic async/await ─────────────────────────────────────</span>
+<span class="kw">async function</span> <span class="nm">fetchUser</span>(<span class="nm">id</span>: <span class="ty">number</span>): Promise&lt;<span class="ty">User</span>&gt; {
+  <span class="kw">const</span> <span class="nm">res</span> = <span class="kw">await</span> fetch(<span class="op">`/api/users/${id}`</span>);
+  <span class="kw">if</span> (!<span class="nm">res</span>.ok) <span class="kw">throw new</span> Error(<span class="op">`HTTP ${res.status}`</span>);
+  <span class="kw">return</span> <span class="nm">res</span>.json() <span class="kw">as</span> Promise&lt;<span class="ty">User</span>&gt;;
+}
+
+<span class="cm">// ─── Promise combinators ───────────────────────────────────</span>
+<span class="cm">// all — all succeed or reject fast on first failure</span>
+<span class="kw">const</span> [<span class="nm">u1</span>, <span class="nm">u2</span>] = <span class="kw">await</span> Promise.all([fetchUser(<span class="nu">1</span>), fetchUser(<span class="nu">2</span>)]);
+
+<span class="cm">// allSettled — wait for all, get status for each (never rejects)</span>
+<span class="kw">const</span> <span class="nm">results</span> = <span class="kw">await</span> Promise.allSettled([fetchUser(<span class="nu">1</span>), fetchUser(<span class="nu">99</span>)]);
+<span class="nm">results</span>.forEach(r =&gt; {
+  <span class="kw">if</span> (r.status === <span class="st">"fulfilled"</span>) console.log(r.value);
+  <span class="kw">else</span> console.error(r.reason);
+});
+
+<span class="cm">// race — first settled wins</span>
+<span class="kw">const</span> <span class="nm">fastest</span> = <span class="kw">await</span> Promise.race([fetchUser(<span class="nu">1</span>), fetchUser(<span class="nu">2</span>)]);
+
+<span class="cm">// any — first FULFILLED wins (ignores rejections; rejects only if ALL fail)</span>
+<span class="kw">const</span> <span class="nm">first</span> = <span class="kw">await</span> Promise.any([fetchUser(<span class="nu">1</span>), fetchUser(<span class="nu">2</span>)]);
+
+<span class="cm">// ─── Result type pattern (safer than try/catch everywhere) ─</span>
+<span class="kw">type</span> <span class="ty">Result</span>&lt;<span class="ty">T</span>, <span class="ty">E</span> = Error&gt; =
+  | { ok: <span class="kw">true</span>;  value: <span class="ty">T</span> }
+  | { ok: <span class="kw">false</span>; error: <span class="ty">E</span> };
+
+<span class="kw">async function</span> <span class="nm">safeGet</span>&lt;<span class="ty">T</span>&gt;(<span class="nm">fn</span>: () =&gt; Promise&lt;<span class="ty">T</span>&gt;): Promise&lt;<span class="ty">Result</span>&lt;<span class="ty">T</span>&gt;&gt; {
+  <span class="kw">try</span> { <span class="kw">return</span> { ok: <span class="kw">true</span>,  value: <span class="kw">await</span> <span class="nm">fn</span>() }; }
+  <span class="kw">catch</span> (<span class="nm">e</span>) { <span class="kw">return</span> { ok: <span class="kw">false</span>, error: <span class="nm">e</span> <span class="kw">instanceof</span> Error ? <span class="nm">e</span> : <span class="kw">new</span> Error(<span class="ty">String</span>(<span class="nm">e</span>)) }; }
+}
+
+<span class="cm">// ─── Async iterator / generator ────────────────────────────</span>
+<span class="kw">async function</span>* <span class="nm">paginate</span>(<span class="nm">url</span>: <span class="ty">string</span>) {
+  <span class="kw">let</span> <span class="nm">page</span> = <span class="nu">1</span>;
+  <span class="kw">while</span> (<span class="kw">true</span>) {
+    <span class="kw">const</span> <span class="nm">data</span> = <span class="kw">await</span> fetch(<span class="op">`${url}?page=${page++}`</span>).then(r =&gt; r.json());
+    <span class="kw">if</span> (!<span class="nm">data</span>.length) <span class="kw">break</span>;
+    <span class="kw">yield</span> <span class="nm">data</span>;
+  }
+}
+<span class="kw">for await</span> (<span class="kw">const</span> <span class="nm">page</span> <span class="kw">of</span> <span class="nm">paginate</span>(<span class="st">"/api/items"</span>)) { console.log(<span class="nm">page</span>); }
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ADVANCED TYPES -->
+<div class="subsection" id="advanced">
+<div class="subsection-title">Advanced Types</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Mapped Types, Template Literals, Decorators, Module Augmentation</h3>
+    <div class="tag-row"><span class="badge badge-tag">Advanced</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">// ─── Mapped Types ──────────────────────────────────────────</span>
+<span class="kw">type</span> <span class="ty">Nullable</span>&lt;<span class="ty">T</span>&gt; = { [<span class="ty">P</span> <span class="kw">in keyof</span> <span class="ty">T</span>]: <span class="ty">T</span>[<span class="ty">P</span>] | <span class="kw">null</span> };
+<span class="kw">type</span> <span class="ty">Getters</span>&lt;<span class="ty">T</span>&gt; = {
+  [<span class="ty">P</span> <span class="kw">in keyof</span> <span class="ty">T</span> <span class="kw">as</span> <span class="op">`get${Capitalize&lt;string &amp; P&gt;}`</span>]: () =&gt; <span class="ty">T</span>[<span class="ty">P</span>]
+};
+<span class="cm">// Getters&lt;{name:string}&gt; → { getName: () => string }</span>
+
+<span class="cm">// ─── Recursive types ───────────────────────────────────────</span>
+<span class="kw">type</span> <span class="ty">DeepReadonly</span>&lt;<span class="ty">T</span>&gt; = {
+  <span class="kw">readonly</span> [<span class="ty">P</span> <span class="kw">in keyof</span> <span class="ty">T</span>]: <span class="ty">T</span>[<span class="ty">P</span>] <span class="kw">extends</span> <span class="ty">object</span> ? <span class="ty">DeepReadonly</span>&lt;<span class="ty">T</span>[<span class="ty">P</span>]&gt; : <span class="ty">T</span>[<span class="ty">P</span>];
+};
+
+<span class="kw">type</span> <span class="ty">DeepPartial</span>&lt;<span class="ty">T</span>&gt; = {
+  [<span class="ty">P</span> <span class="kw">in keyof</span> <span class="ty">T</span>]?: <span class="ty">T</span>[<span class="ty">P</span>] <span class="kw">extends</span> <span class="ty">object</span> ? <span class="ty">DeepPartial</span>&lt;<span class="ty">T</span>[<span class="ty">P</span>]&gt; : <span class="ty">T</span>[<span class="ty">P</span>];
+};
+
+<span class="cm">// ─── Decorators (TS + experimentalDecorators) ──────────────</span>
+<span class="kw">function</span> <span class="nm">log</span>(<span class="nm">target</span>: <span class="ty">any</span>, <span class="nm">key</span>: <span class="ty">string</span>, <span class="nm">desc</span>: <span class="ty">PropertyDescriptor</span>) {
+  <span class="kw">const</span> <span class="nm">original</span> = <span class="nm">desc</span>.value;
+  <span class="nm">desc</span>.value = <span class="kw">function</span>(...<span class="nm">args</span>: <span class="ty">any</span>[]) {
+    console.log(<span class="op">`Calling ${key} with`</span>, <span class="nm">args</span>);
+    <span class="kw">return</span> <span class="nm">original</span>.apply(<span class="kw">this</span>, <span class="nm">args</span>);
+  };
+}
+
+<span class="kw">class</span> <span class="ty">Service</span> {
+  <span class="op">@</span><span class="nm">log</span>
+  <span class="nm">fetchData</span>(<span class="nm">id</span>: <span class="ty">number</span>) { <span class="cm">/* ... */</span> }
+}
+
+<span class="cm">// ─── Branded / Opaque types ────────────────────────────────</span>
+<span class="kw">type</span> <span class="ty">UserId</span>  = <span class="ty">string</span> &amp; { <span class="kw">readonly</span> _brand: <span class="st">"UserId"</span> };
+<span class="kw">type</span> <span class="ty">OrderId</span> = <span class="ty">string</span> &amp; { <span class="kw">readonly</span> _brand: <span class="st">"OrderId"</span> };
+
+<span class="kw">const</span> <span class="nm">makeUserId</span> = (<span class="nm">id</span>: <span class="ty">string</span>): <span class="ty">UserId</span> =&gt; <span class="nm">id</span> <span class="kw">as</span> <span class="ty">UserId</span>;
+<span class="cm">// Prevents accidentally passing UserId where OrderId expected</span>
+</div>
+  </div>
+</div>
+
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Enums — const enum, union alternative, reverse mapping</h3>
+    <div class="tag-row"><span class="badge badge-tag">Enums</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">// Numeric enum (default — auto-increments)</span>
+<span class="kw">enum</span> <span class="ty">Direction</span> { Up, Down, Left, Right }  <span class="cm">// 0,1,2,3</span>
+<span class="ty">Direction</span>.Up      <span class="cm">// 0</span>
+<span class="ty">Direction</span>[<span class="nu">0</span>]      <span class="cm">// "Up" — reverse mapping (numeric only!)</span>
+
+<span class="cm">// String enum (most common — no reverse mapping, clear values)</span>
+<span class="kw">enum</span> <span class="ty">Status</span> { Active = <span class="st">"ACTIVE"</span>, Inactive = <span class="st">"INACTIVE"</span> }
+
+<span class="cm">// const enum — inlined at compile time (zero runtime overhead)</span>
+<span class="kw">const enum</span> <span class="ty">Color</span> { Red, Green, Blue }
+<span class="kw">let</span> <span class="nm">c</span> = <span class="ty">Color</span>.Red;  <span class="cm">// compiled to: let c = 0;</span>
+
+<span class="cm">// ⚠ Modern preference: union of string literals (simpler, no runtime object)</span>
+<span class="kw">type</span> <span class="ty">StatusLiteral</span> = <span class="st">"ACTIVE"</span> | <span class="st">"INACTIVE"</span>;
+<span class="cm">// Avoids enum pitfalls (numeric assignability, bloated JS output)</span>
+</div>
+  </div>
+</div>
+</div>
+
+<!-- PATTERNS -->
+<div class="subsection" id="patterns">
+<div class="subsection-title">Common TypeScript Patterns</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Builder, Repository, Event Emitter, Dependency Injection in TypeScript</h3>
+    <div class="tag-row"><span class="badge badge-tag">Patterns</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">// ─── Builder Pattern ───────────────────────────────────────</span>
+<span class="kw">class</span> <span class="ty">QueryBuilder</span> {
+  <span class="kw">private</span> <span class="nm">parts</span>: <span class="ty">string</span>[] = [];
+
+  select(...<span class="nm">cols</span>: <span class="ty">string</span>[]): <span class="kw">this</span> {
+    <span class="kw">this</span>.parts.push(<span class="op">`SELECT ${cols.join(", ")}`</span>); <span class="kw">return this</span>;
+  }
+  from(<span class="nm">table</span>: <span class="ty">string</span>): <span class="kw">this</span> {
+    <span class="kw">this</span>.parts.push(<span class="op">`FROM ${table}`</span>); <span class="kw">return this</span>;
+  }
+  where(<span class="nm">cond</span>: <span class="ty">string</span>): <span class="kw">this</span> {
+    <span class="kw">this</span>.parts.push(<span class="op">`WHERE ${cond}`</span>); <span class="kw">return this</span>;
+  }
+  build(): <span class="ty">string</span> { <span class="kw">return this</span>.parts.join(<span class="st">" "</span>); }
+}
+<span class="kw">const</span> <span class="nm">q</span> = <span class="kw">new</span> <span class="ty">QueryBuilder</span>().select(<span class="st">"id"</span>,<span class="st">"name"</span>).from(<span class="st">"users"</span>).where(<span class="st">"active=1"</span>).build();
+
+<span class="cm">// ─── Generic Repository ────────────────────────────────────</span>
+<span class="kw">interface</span> <span class="ty">Repository</span>&lt;<span class="ty">T</span>, <span class="ty">ID</span>&gt; {
+  findById(<span class="nm">id</span>: <span class="ty">ID</span>): Promise&lt;<span class="ty">T</span> | <span class="kw">null</span>&gt;;
+  findAll(): Promise&lt;<span class="ty">T</span>[]&gt;;
+  save(<span class="nm">entity</span>: <span class="ty">T</span>): Promise&lt;<span class="ty">T</span>&gt;;
+  delete(<span class="nm">id</span>: <span class="ty">ID</span>): Promise&lt;<span class="ty">void</span>&gt;;
+}
+<span class="kw">class</span> <span class="ty">UserRepository</span> <span class="kw">implements</span> <span class="ty">Repository</span>&lt;<span class="ty">User</span>, <span class="ty">number</span>&gt; { <span class="cm">/* ... */</span> }
+
+<span class="cm">// ─── Typed Event Emitter ───────────────────────────────────</span>
+<span class="kw">type</span> <span class="ty">Events</span> = {
+  login:  [userId: <span class="ty">string</span>];
+  logout: [userId: <span class="ty">string</span>, reason: <span class="ty">string</span>];
+  error:  [err: Error];
+};
+<span class="kw">class</span> <span class="ty">TypedEmitter</span>&lt;<span class="ty">E</span> <span class="kw">extends</span> <span class="ty">Record</span>&lt;<span class="ty">string</span>, <span class="ty">any</span>[]&gt;&gt; {
+  <span class="kw">private</span> <span class="nm">listeners</span> = <span class="kw">new</span> Map&lt;<span class="ty">string</span>, <span class="ty">Function</span>[]&gt;();
+  on&lt;<span class="ty">K</span> <span class="kw">extends keyof</span> <span class="ty">E</span>&gt;(<span class="nm">event</span>: <span class="ty">K</span>, cb: (...<span class="nm">args</span>: <span class="ty">E</span>[<span class="ty">K</span>]) =&gt; <span class="ty">void</span>) {
+    (<span class="kw">this</span>.listeners.get(<span class="nm">event</span> <span class="kw">as</span> <span class="ty">string</span>) ?? <span class="kw">this</span>.listeners.set(<span class="nm">event</span> <span class="kw">as</span> <span class="ty">string</span>, []).get(<span class="nm">event</span> <span class="kw">as</span> <span class="ty">string</span>)!).push(<span class="nm">cb</span>);
+  }
+  emit&lt;<span class="ty">K</span> <span class="kw">extends keyof</span> <span class="ty">E</span>&gt;(<span class="nm">event</span>: <span class="ty">K</span>, ...<span class="nm">args</span>: <span class="ty">E</span>[<span class="ty">K</span>]) {
+    <span class="kw">this</span>.listeners.get(<span class="nm">event</span> <span class="kw">as</span> <span class="ty">string</span>)?.forEach(cb =&gt; cb(...<span class="nm">args</span>));
+  }
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- GOTCHAS -->
+<div class="subsection" id="gotchas">
+<div class="subsection-title">Common Gotchas &amp; Interview Tips</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Top TypeScript Gotchas Every Developer Must Know</h3>
+    <div class="tag-row"><span class="badge badge-tag">Interview</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <div class="grid-2">
+      <div class="concept-box">
+        <h4>Structural vs Nominal Typing</h4>
+        <div class="ts-code"><span class="kw">interface</span> <span class="ty">Cat</span> { name: <span class="ty">string</span> }
+<span class="kw">interface</span> <span class="ty">Dog</span> { name: <span class="ty">string</span> }
+<span class="kw">const</span> <span class="nm">dog</span>: <span class="ty">Dog</span> = { name: <span class="st">"Rex"</span> };
+<span class="kw">const</span> <span class="nm">cat</span>: <span class="ty">Cat</span> = <span class="nm">dog</span>; <span class="cm">// ✓ structural — shapes match</span></div>
+      </div>
+      <div class="concept-box">
+        <h4>Excess Property Checks</h4>
+        <div class="ts-code"><span class="kw">const</span> <span class="nm">u</span>: <span class="ty">User</span> = { id:<span class="nu">1</span>, name:<span class="st">"A"</span>, extra:<span class="st">"x"</span> }; <span class="cm">// ✗ Error</span>
+<span class="kw">const</span> <span class="nm">obj</span> = { id:<span class="nu">1</span>, name:<span class="st">"A"</span>, extra:<span class="st">"x"</span> };
+<span class="kw">const</span> <span class="nm">u2</span>: <span class="ty">User</span> = <span class="nm">obj</span>; <span class="cm">// ✓ via variable (no excess check)</span></div>
+      </div>
+      <div class="concept-box">
+        <h4>Type vs typeof</h4>
+        <div class="ts-code"><span class="kw">const</span> <span class="nm">str</span> = <span class="st">"hello"</span>;
+<span class="kw">type</span> <span class="ty">T1</span> = <span class="kw">typeof</span> <span class="nm">str</span>;    <span class="cm">// "hello" (literal)</span>
+<span class="kw">type</span> <span class="ty">T2</span> = <span class="ty">ReturnType</span>&lt;<span class="kw">typeof</span> fetch&gt;; <span class="cm">// runtime value → type</span></div>
+      </div>
+      <div class="concept-box">
+        <h4>Widening / Narrowing</h4>
+        <div class="ts-code"><span class="kw">let</span> <span class="nm">x</span> = <span class="st">"hello"</span>; <span class="cm">// widened to string</span>
+<span class="kw">const</span> <span class="nm">y</span> = <span class="st">"hello"</span>; <span class="cm">// narrowed to "hello" literal</span>
+<span class="kw">let</span> <span class="nm">z</span> = <span class="kw">null</span>;      <span class="cm">// widened to null (not never)</span></div>
+      </div>
+    </div>
+    <div class="callout callout-orange" style="margin-top:12px">
+      <div class="callout-title">Top Interview Points</div>
+      <ul style="margin:6px 0 0 18px;line-height:2;font-size:13px">
+        <li><strong>interface vs type:</strong> Use <code>interface</code> for object shapes (extensible via declaration merging). Use <code>type</code> for unions, intersections, primitives, mapped types.</li>
+        <li><strong>any vs unknown:</strong> <code>unknown</code> requires narrowing before use — much safer. Never use <code>any</code> in production code.</li>
+        <li><strong>Discriminated union + exhaustive check with <code>never</code></strong> is the best pattern for state machines.</li>
+        <li><strong>const enum</strong> inlines values (no runtime overhead) but breaks with isolatedModules — avoid in libraries.</li>
+        <li><strong>Type assertions (<code>as</code>)</strong> bypass type checking — use sparingly. Prefer type guards or generic constraints.</li>
+        <li><strong>strictNullChecks:</strong> Always on in production — forces explicit handling of null/undefined.</li>
+        <li><strong>Branded types</strong> prevent semantic errors (passing userId where productId expected).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</div>
+
+</div><!-- content-area -->
+</main>
+<script src="main.js"></script>
+<script src="search-data.js"></script>
+<script src="search.js"></script>
+</body>
+</html>

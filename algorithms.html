@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithms — TypeScript | Interview Prep</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.ts-code{background:var(--bg-code);border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-secondary);line-height:1.85;margin:10px 0;overflow-x:auto;white-space:pre}
+.kw{color:#e879f9} .ty{color:#5aacff} .st{color:#3ecb7a} .cm{color:#4a6484;font-style:italic} .nm{color:#f5a523} .op{color:#fb7185} .nu{color:#f5a523}
+.topic-jump{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
+.topic-jump a{background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);text-decoration:none;font-size:12px;padding:5px 12px;border-radius:6px;transition:all .15s}
+.topic-jump a:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.complexity-table th{background:var(--bg-overlay)}
+.complexity-table td:first-child{font-family:'JetBrains Mono',monospace;font-size:12px}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">IP</div>
+    <div><h2>Interview Prep</h2><p>Full Stack Reference</p></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Pages</div>
+    <a href="index.html" class="nav-link">Dashboard</a>
+    <a href="dsa.html" class="nav-link">DSA — Python</a>
+    <a href="algorithms.html" class="nav-link active">Algorithms — TypeScript</a>
+    <a href="typescript.html" class="nav-link">TypeScript Cheatsheet</a>
+    <a href="oop-lld.html" class="nav-link">OOP &amp; LLD — Java</a>
+    <a href="system-design.html" class="nav-link">System Design (LLD)</a>
+    <a href="hld.html" class="nav-link">High-Level Design (HLD)</a>
+    <a href="kafka.html" class="nav-link">Kafka &amp; Messaging</a>
+    <a href="os-concurrency.html" class="nav-link">OS &amp; Concurrency</a>
+    <a href="docker-aws.html" class="nav-link">Docker &amp; AWS</a>
+    <a href="networking-security.html" class="nav-link">Networking &amp; Security</a>
+    <a href="databases.html" class="nav-link">Databases — SQL &amp; NoSQL</a>
+    <a href="alation.html" class="nav-link">Alation Focus <span class="nav-badge">HOT</span></a>
+    <a href="resources.html" class="nav-link">📚 Resources</a>
+  </div>
+  <div class="sidebar-footer"><kbd>Cmd K</kbd> to search</div>
+</nav>
+
+<main class="main">
+<div class="topbar"><h1>Algorithms — TypeScript Implementations</h1>
+  <button class="topbar-search-btn" onclick="window._spotlightOpen && window._spotlightOpen()">Search topics... <kbd>Cmd K</kbd></button></div>
+<div class="content-area">
+<div class="section-header">
+  <h1>Data Structures &amp; Algorithms in TypeScript</h1>
+  <p>Full documented implementations of every core data structure and algorithm — ready for interviews. Every method includes Big-O complexity and step-by-step explanation.</p>
+</div>
+
+<div class="topic-jump">
+  <a href="#linked-list">Linked List</a>
+  <a href="#stack-queue">Stack &amp; Queue</a>
+  <a href="#binary-tree">Binary Tree</a>
+  <a href="#bst">BST</a>
+  <a href="#heap">Heap</a>
+  <a href="#trie">Trie</a>
+  <a href="#graph">Graph</a>
+  <a href="#sorting">Sorting</a>
+  <a href="#searching">Searching</a>
+  <a href="#dp">Dynamic Programming</a>
+  <a href="#sliding-window">Sliding Window</a>
+  <a href="#two-pointers">Two Pointers</a>
+  <a href="#union-find">Union Find</a>
+  <a href="#complexity">Big-O Reference</a>
+</div>
+
+<!-- ===== LINKED LIST ===== -->
+<div class="subsection" id="linked-list">
+<div class="subsection-title">Linked List</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Singly &amp; Doubly Linked List — Full Implementation</h3>
+    <div class="tag-row"><span class="badge badge-tag">Fundamental</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">/**
+ * Singly Linked List Node
+ * Each node holds a value and a pointer to the next node.
+ * Memory: O(n) — n nodes, each O(1) space
+ */</span>
+<span class="kw">class</span> <span class="ty">ListNode</span>&lt;<span class="ty">T</span>&gt; {
+  constructor(
+    <span class="kw">public</span> val: <span class="ty">T</span>,
+    <span class="kw">public</span> next: <span class="ty">ListNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span> = <span class="kw">null</span>
+  ) {}
+}
+
+<span class="cm">/**
+ * Singly Linked List
+ * - prepend  O(1) — add to head
+ * - append   O(n) — add to tail (O(1) with tail pointer)
+ * - delete   O(n) — must find predecessor
+ * - search   O(n) — sequential scan
+ */</span>
+<span class="kw">class</span> <span class="ty">LinkedList</span>&lt;<span class="ty">T</span>&gt; {
+  <span class="kw">private</span> head: <span class="ty">ListNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span> = <span class="kw">null</span>;
+  <span class="kw">private</span> tail: <span class="ty">ListNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span> = <span class="kw">null</span>;
+  <span class="kw">private</span> _size = <span class="nu">0</span>;
+  <span class="kw">get</span> size() { <span class="kw">return this</span>._size; }
+
+  <span class="cm">/** Add to tail — O(1) with tail pointer */</span>
+  append(val: <span class="ty">T</span>): <span class="kw">void</span> {
+    <span class="kw">const</span> node = <span class="kw">new</span> <span class="ty">ListNode</span>(val);
+    <span class="kw">if</span> (!<span class="kw">this</span>.tail) { <span class="kw">this</span>.head = <span class="kw">this</span>.tail = node; }
+    <span class="kw">else</span> { <span class="kw">this</span>.tail.next = node; <span class="kw">this</span>.tail = node; }
+    <span class="kw">this</span>._size++;
+  }
+
+  <span class="cm">/** Add to head — O(1) */</span>
+  prepend(val: <span class="ty">T</span>): <span class="kw">void</span> {
+    <span class="kw">const</span> node = <span class="kw">new</span> <span class="ty">ListNode</span>(val, <span class="kw">this</span>.head);
+    <span class="kw">this</span>.head = node;
+    <span class="kw">if</span> (!<span class="kw">this</span>.tail) <span class="kw">this</span>.tail = node;
+    <span class="kw">this</span>._size++;
+  }
+
+  <span class="cm">/** Remove first occurrence of value — O(n) */</span>
+  delete(val: <span class="ty">T</span>): <span class="ty">boolean</span> {
+    <span class="kw">if</span> (!<span class="kw">this</span>.head) <span class="kw">return false</span>;
+    <span class="cm">// Special case: removing head</span>
+    <span class="kw">if</span> (<span class="kw">this</span>.head.val === val) {
+      <span class="kw">this</span>.head = <span class="kw">this</span>.head.next;
+      <span class="kw">if</span> (!<span class="kw">this</span>.head) <span class="kw">this</span>.tail = <span class="kw">null</span>;
+      <span class="kw">this</span>._size--;
+      <span class="kw">return true</span>;
+    }
+    <span class="cm">// Find predecessor of target node</span>
+    <span class="kw">let</span> curr = <span class="kw">this</span>.head;
+    <span class="kw">while</span> (curr.next) {
+      <span class="kw">if</span> (curr.next.val === val) {
+        <span class="kw">if</span> (curr.next === <span class="kw">this</span>.tail) <span class="kw">this</span>.tail = curr;
+        curr.next = curr.next.next;
+        <span class="kw">this</span>._size--;
+        <span class="kw">return true</span>;
+      }
+      curr = curr.next;
+    }
+    <span class="kw">return false</span>;
+  }
+
+  <span class="cm">/** Reverse the list in-place — O(n) time, O(1) space */</span>
+  reverse(): <span class="kw">void</span> {
+    <span class="kw">let</span> prev: <span class="ty">ListNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span> = <span class="kw">null</span>;
+    <span class="kw">let</span> curr = <span class="kw">this</span>.head;
+    <span class="kw">this</span>.tail = <span class="kw">this</span>.head;          <span class="cm">// old head becomes new tail</span>
+    <span class="kw">while</span> (curr) {
+      <span class="kw">const</span> next = curr.next;
+      curr.next = prev;             <span class="cm">// flip pointer</span>
+      prev = curr;
+      curr = next;
+    }
+    <span class="kw">this</span>.head = prev;              <span class="cm">// prev is now the last seen node = new head</span>
+  }
+
+  <span class="cm">/** Detect cycle using Floyd's two-pointer — O(n) time, O(1) space */</span>
+  hasCycle(): <span class="ty">boolean</span> {
+    <span class="kw">let</span> slow = <span class="kw">this</span>.head, fast = <span class="kw">this</span>.head;
+    <span class="kw">while</span> (fast?.next) {
+      slow = slow!.next;            <span class="cm">// moves 1 step</span>
+      fast = fast.next.next;        <span class="cm">// moves 2 steps</span>
+      <span class="kw">if</span> (slow === fast) <span class="kw">return true</span>;  <span class="cm">// they meet → cycle</span>
+    }
+    <span class="kw">return false</span>;
+  }
+
+  <span class="cm">/** Get middle node (slow/fast pointer) — O(n) */</span>
+  middle(): <span class="ty">ListNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span> {
+    <span class="kw">let</span> slow = <span class="kw">this</span>.head, fast = <span class="kw">this</span>.head;
+    <span class="kw">while</span> (fast?.next) {
+      slow = slow!.next;
+      fast = fast.next.next;
+    }
+    <span class="kw">return</span> slow;  <span class="cm">// when fast reaches end, slow is at middle</span>
+  }
+
+  toArray(): <span class="ty">T</span>[] {
+    <span class="kw">const</span> res: <span class="ty">T</span>[] = [];
+    <span class="kw">let</span> curr = <span class="kw">this</span>.head;
+    <span class="kw">while</span> (curr) { res.push(curr.val); curr = curr.next; }
+    <span class="kw">return</span> res;
+  }
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ===== STACK & QUEUE ===== -->
+<div class="subsection" id="stack-queue">
+<div class="subsection-title">Stack &amp; Queue</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Stack (LIFO) + Queue (FIFO) + Deque — Full Implementation</h3>
+    <div class="tag-row"><span class="badge badge-tag">Fundamental</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">/**
+ * Stack — Last In First Out
+ * Uses an array internally. All operations O(1) amortized.
+ * Use cases: undo/redo, DFS, expression parsing, call stack
+ */</span>
+<span class="kw">class</span> <span class="ty">Stack</span>&lt;<span class="ty">T</span>&gt; {
+  <span class="kw">private</span> data: <span class="ty">T</span>[] = [];
+
+  push(val: <span class="ty">T</span>): <span class="kw">void</span> { <span class="kw">this</span>.data.push(val); }
+  pop(): <span class="ty">T</span> | <span class="kw">undefined</span> { <span class="kw">return this</span>.data.pop(); }
+  peek(): <span class="ty">T</span> | <span class="kw">undefined</span> { <span class="kw">return this</span>.data[<span class="kw">this</span>.data.length - <span class="nu">1</span>]; }
+  isEmpty(): <span class="ty">boolean</span> { <span class="kw">return this</span>.data.length === <span class="nu">0</span>; }
+  get size(): <span class="ty">number</span> { <span class="kw">return this</span>.data.length; }
+}
+
+<span class="cm">/**
+ * Queue — First In First Out (using two stacks — O(1) amortized)
+ * Naive array approach: enqueue O(1), dequeue O(n) [shift is O(n)]
+ * Two-stack approach: both operations O(1) amortized
+ */</span>
+<span class="kw">class</span> <span class="ty">Queue</span>&lt;<span class="ty">T</span>&gt; {
+  <span class="kw">private</span> inbox:  <span class="ty">T</span>[] = [];   <span class="cm">// push into this</span>
+  <span class="kw">private</span> outbox: <span class="ty">T</span>[] = [];   <span class="cm">// pop from this</span>
+
+  enqueue(val: <span class="ty">T</span>): <span class="kw">void</span> { <span class="kw">this</span>.inbox.push(val); }
+
+  dequeue(): <span class="ty">T</span> | <span class="kw">undefined</span> {
+    <span class="kw">if</span> (<span class="kw">this</span>.outbox.length === <span class="nu">0</span>) {
+      <span class="cm">// Transfer all from inbox to outbox — reverses order (FIFO preserved)</span>
+      <span class="kw">while</span> (<span class="kw">this</span>.inbox.length) <span class="kw">this</span>.outbox.push(<span class="kw">this</span>.inbox.pop()!);
+    }
+    <span class="kw">return this</span>.outbox.pop();
+  }
+
+  peek(): <span class="ty">T</span> | <span class="kw">undefined</span> {
+    <span class="kw">if</span> (!<span class="kw">this</span>.outbox.length) <span class="kw">while</span> (<span class="kw">this</span>.inbox.length) <span class="kw">this</span>.outbox.push(<span class="kw">this</span>.inbox.pop()!);
+    <span class="kw">return this</span>.outbox[<span class="kw">this</span>.outbox.length - <span class="nu">1</span>];
+  }
+
+  get size(): <span class="ty">number</span> { <span class="kw">return this</span>.inbox.length + <span class="kw">this</span>.outbox.length; }
+  isEmpty(): <span class="ty">boolean</span> { <span class="kw">return this</span>.size === <span class="nu">0</span>; }
+}
+
+<span class="cm">/**
+ * Monotonic Stack — maintains increasing or decreasing order
+ * Use case: Next Greater Element, Largest Rectangle in Histogram
+ */</span>
+<span class="kw">function</span> nextGreaterElement(nums: <span class="ty">number</span>[]): <span class="ty">number</span>[] {
+  <span class="kw">const</span> result = <span class="kw">new</span> Array(nums.length).fill(-<span class="nu">1</span>);
+  <span class="kw">const</span> stack: <span class="ty">number</span>[] = [];  <span class="cm">// stores INDICES of elements waiting for answer</span>
+
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="nu">0</span>; i &lt; nums.length; i++) {
+    <span class="cm">// Pop all elements smaller than current — current is their "next greater"</span>
+    <span class="kw">while</span> (stack.length &amp;&amp; nums[stack[stack.length - <span class="nu">1</span>]] &lt; nums[i]) {
+      result[stack.pop()!] = nums[i];
+    }
+    stack.push(i);  <span class="cm">// push index of current element</span>
+  }
+  <span class="kw">return</span> result;  <span class="cm">// remaining in stack have no greater element → stay -1</span>
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ===== BINARY TREE ===== -->
+<div class="subsection" id="binary-tree">
+<div class="subsection-title">Binary Tree — Traversals &amp; Operations</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Binary Tree — DFS (Pre/In/Post), BFS, Height, Diameter, LCA</h3>
+    <div class="tag-row"><span class="badge badge-tag">Critical</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="kw">class</span> <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt; {
+  constructor(
+    <span class="kw">public</span> val: <span class="ty">T</span>,
+    <span class="kw">public</span> left:  <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span> = <span class="kw">null</span>,
+    <span class="kw">public</span> right: <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span> = <span class="kw">null</span>
+  ) {}
+}
+
+<span class="cm">// ─── DFS Traversals ───────────────────────────────────────</span>
+<span class="cm">// Pre-order: Root → Left → Right  (serialize tree, copy tree)</span>
+<span class="kw">function</span> preOrder&lt;<span class="ty">T</span>&gt;(root: <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span>): <span class="ty">T</span>[] {
+  <span class="kw">if</span> (!root) <span class="kw">return</span> [];
+  <span class="kw">return</span> [root.val, ...preOrder(root.left), ...preOrder(root.right)];
+}
+
+<span class="cm">// In-order: Left → Root → Right  (BST sorted order!)</span>
+<span class="kw">function</span> inOrder&lt;<span class="ty">T</span>&gt;(root: <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span>): <span class="ty">T</span>[] {
+  <span class="kw">if</span> (!root) <span class="kw">return</span> [];
+  <span class="kw">return</span> [...inOrder(root.left), root.val, ...inOrder(root.right)];
+}
+
+<span class="cm">// Post-order: Left → Right → Root  (delete tree, evaluate expression)</span>
+<span class="kw">function</span> postOrder&lt;<span class="ty">T</span>&gt;(root: <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span>): <span class="ty">T</span>[] {
+  <span class="kw">if</span> (!root) <span class="kw">return</span> [];
+  <span class="kw">return</span> [...postOrder(root.left), ...postOrder(root.right), root.val];
+}
+
+<span class="cm">// Iterative in-order (avoids stack overflow for deep trees)</span>
+<span class="kw">function</span> inOrderIterative&lt;<span class="ty">T</span>&gt;(root: <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span>): <span class="ty">T</span>[] {
+  <span class="kw">const</span> result: <span class="ty">T</span>[] = [], stack: <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt;[] = [];
+  <span class="kw">let</span> curr = root;
+  <span class="kw">while</span> (curr || stack.length) {
+    <span class="kw">while</span> (curr) { stack.push(curr); curr = curr.left; }  <span class="cm">// go left</span>
+    curr = stack.pop()!;
+    result.push(curr.val);          <span class="cm">// visit</span>
+    curr = curr.right;              <span class="cm">// go right</span>
+  }
+  <span class="kw">return</span> result;
+}
+
+<span class="cm">// ─── BFS / Level-order ─────────────────────────────────────</span>
+<span class="kw">function</span> levelOrder&lt;<span class="ty">T</span>&gt;(root: <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span>): <span class="ty">T</span>[][] {
+  <span class="kw">if</span> (!root) <span class="kw">return</span> [];
+  <span class="kw">const</span> result: <span class="ty">T</span>[][] = [], queue: <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt;[] = [root];
+  <span class="kw">while</span> (queue.length) {
+    <span class="kw">const</span> level: <span class="ty">T</span>[] = [];
+    <span class="kw">const</span> size = queue.length;        <span class="cm">// snapshot size — process ONE level</span>
+    <span class="kw">for</span> (<span class="kw">let</span> i = <span class="nu">0</span>; i &lt; size; i++) {
+      <span class="kw">const</span> node = queue.shift()!;
+      level.push(node.val);
+      <span class="kw">if</span> (node.left)  queue.push(node.left);
+      <span class="kw">if</span> (node.right) queue.push(node.right);
+    }
+    result.push(level);
+  }
+  <span class="kw">return</span> result;
+}
+
+<span class="cm">// ─── Height of tree — O(n) ────────────────────────────────</span>
+<span class="kw">function</span> height&lt;<span class="ty">T</span>&gt;(root: <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span>): <span class="ty">number</span> {
+  <span class="kw">if</span> (!root) <span class="kw">return</span> <span class="nu">0</span>;
+  <span class="kw">return</span> <span class="nu">1</span> + Math.max(height(root.left), height(root.right));
+}
+
+<span class="cm">// ─── Diameter (longest path between any two nodes) ─────────</span>
+<span class="kw">function</span> diameter&lt;<span class="ty">T</span>&gt;(root: <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span>): <span class="ty">number</span> {
+  <span class="kw">let</span> maxDia = <span class="nu">0</span>;
+  <span class="kw">function</span> dfs(node: <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span>): <span class="ty">number</span> {
+    <span class="kw">if</span> (!node) <span class="kw">return</span> <span class="nu">0</span>;
+    <span class="kw">const</span> L = dfs(node.left), R = dfs(node.right);
+    maxDia = Math.max(maxDia, L + R);  <span class="cm">// path through this node</span>
+    <span class="kw">return</span> <span class="nu">1</span> + Math.max(L, R);        <span class="cm">// height contribution upward</span>
+  }
+  dfs(root);
+  <span class="kw">return</span> maxDia;
+}
+
+<span class="cm">// ─── Lowest Common Ancestor — O(n) ────────────────────────</span>
+<span class="kw">function</span> lca&lt;<span class="ty">T</span>&gt;(
+  root: <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span>,
+  p: <span class="ty">T</span>, q: <span class="ty">T</span>
+): <span class="ty">TreeNode</span>&lt;<span class="ty">T</span>&gt; | <span class="kw">null</span> {
+  <span class="kw">if</span> (!root || root.val === p || root.val === q) <span class="kw">return</span> root;
+  <span class="kw">const</span> left  = lca(root.left,  p, q);
+  <span class="kw">const</span> right = lca(root.right, p, q);
+  <span class="cm">// If both sides return non-null → root is LCA</span>
+  <span class="kw">if</span> (left &amp;&amp; right) <span class="kw">return</span> root;
+  <span class="kw">return</span> left ?? right;  <span class="cm">// one side found both nodes</span>
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ===== BST ===== -->
+<div class="subsection" id="bst">
+<div class="subsection-title">Binary Search Tree</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>BST — Insert, Search, Delete, Validate, kth Smallest</h3>
+    <div class="tag-row"><span class="badge badge-tag">Critical</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">/**
+ * BST Property: left.val < node.val < right.val for ALL nodes
+ * Average case: O(log n) for insert/search/delete
+ * Worst case: O(n) when tree is skewed (like a linked list)
+ * Use self-balancing (AVL, Red-Black) to guarantee O(log n)
+ */</span>
+<span class="kw">class</span> <span class="ty">BST</span> {
+  root: <span class="ty">TreeNode</span>&lt;<span class="ty">number</span>&gt; | <span class="kw">null</span> = <span class="kw">null</span>;
+
+  <span class="cm">/** Insert — avg O(log n), worst O(n) */</span>
+  insert(val: <span class="ty">number</span>): <span class="kw">void</span> {
+    <span class="kw">const</span> insertNode = (node: <span class="ty">TreeNode</span>&lt;<span class="ty">number</span>&gt; | <span class="kw">null</span>): <span class="ty">TreeNode</span>&lt;<span class="ty">number</span>&gt; =&gt; {
+      <span class="kw">if</span> (!node) <span class="kw">return new</span> <span class="ty">TreeNode</span>(val);
+      <span class="kw">if</span> (val &lt; node.val) node.left  = insertNode(node.left);
+      <span class="kw">else if</span> (val &gt; node.val) node.right = insertNode(node.right);
+      <span class="cm">// Equal: duplicates ignored (or add count field)</span>
+      <span class="kw">return</span> node;
+    };
+    <span class="kw">this</span>.root = insertNode(<span class="kw">this</span>.root);
+  }
+
+  <span class="cm">/** Search — avg O(log n) */</span>
+  search(val: <span class="ty">number</span>): <span class="ty">boolean</span> {
+    <span class="kw">let</span> curr = <span class="kw">this</span>.root;
+    <span class="kw">while</span> (curr) {
+      <span class="kw">if</span> (val === curr.val) <span class="kw">return true</span>;
+      curr = val &lt; curr.val ? curr.left : curr.right;
+    }
+    <span class="kw">return false</span>;
+  }
+
+  <span class="cm">/** Delete — avg O(log n). 3 cases:
+   * 1. Leaf: simply remove
+   * 2. One child: replace node with child
+   * 3. Two children: replace with in-order successor (min of right subtree)
+   */</span>
+  delete(val: <span class="ty">number</span>): <span class="kw">void</span> {
+    <span class="kw">const</span> del = (node: <span class="ty">TreeNode</span>&lt;<span class="ty">number</span>&gt; | <span class="kw">null</span>): <span class="ty">TreeNode</span>&lt;<span class="ty">number</span>&gt; | <span class="kw">null</span> =&gt; {
+      <span class="kw">if</span> (!node) <span class="kw">return null</span>;
+      <span class="kw">if</span> (val &lt; node.val) { node.left  = del(node.left);  <span class="kw">return</span> node; }
+      <span class="kw">if</span> (val &gt; node.val) { node.right = del(node.right); <span class="kw">return</span> node; }
+      <span class="cm">// Found the node to delete:</span>
+      <span class="kw">if</span> (!node.left)  <span class="kw">return</span> node.right; <span class="cm">// case 1 or 2</span>
+      <span class="kw">if</span> (!node.right) <span class="kw">return</span> node.left;  <span class="cm">// case 2</span>
+      <span class="cm">// Case 3: find in-order successor (min of right subtree)</span>
+      <span class="kw">let</span> successor = node.right;
+      <span class="kw">while</span> (successor.left) successor = successor.left;
+      node.val   = successor.val;             <span class="cm">// copy successor value</span>
+      node.right = del(node.right);           <span class="cm">// delete successor</span>
+      <span class="kw">return</span> node;
+    };
+    <span class="kw">this</span>.root = del(<span class="kw">this</span>.root);
+  }
+
+  <span class="cm">/** Validate BST — pass valid range down — O(n) */</span>
+  isValid(): <span class="ty">boolean</span> {
+    <span class="kw">const</span> check = (
+      node: <span class="ty">TreeNode</span>&lt;<span class="ty">number</span>&gt; | <span class="kw">null</span>,
+      min = -Infinity, max = Infinity
+    ): <span class="ty">boolean</span> =&gt; {
+      <span class="kw">if</span> (!node) <span class="kw">return true</span>;
+      <span class="kw">if</span> (node.val &lt;= min || node.val &gt;= max) <span class="kw">return false</span>;
+      <span class="kw">return</span> check(node.left,  min, node.val) &amp;&amp;
+             check(node.right, node.val, max);
+    };
+    <span class="kw">return</span> check(<span class="kw">this</span>.root);
+  }
+
+  <span class="cm">/** kth Smallest via in-order (BST sorted) — O(k) */</span>
+  kthSmallest(k: <span class="ty">number</span>): <span class="ty">number</span> | <span class="kw">null</span> {
+    <span class="kw">let</span> count = <span class="nu">0</span>, result: <span class="ty">number</span> | <span class="kw">null</span> = <span class="kw">null</span>;
+    <span class="kw">const</span> inOrder = (node: <span class="ty">TreeNode</span>&lt;<span class="ty">number</span>&gt; | <span class="kw">null</span>): <span class="kw">void</span> =&gt; {
+      <span class="kw">if</span> (!node || result !== <span class="kw">null</span>) <span class="kw">return</span>;
+      inOrder(node.left);
+      <span class="kw">if</span> (++count === k) { result = node.val; <span class="kw">return</span>; }
+      inOrder(node.right);
+    };
+    inOrder(<span class="kw">this</span>.root);
+    <span class="kw">return</span> result;
+  }
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ===== HEAP ===== -->
+<div class="subsection" id="heap">
+<div class="subsection-title">Heap / Priority Queue</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Min-Heap (Binary Heap) — Full Implementation with heapify</h3>
+    <div class="tag-row"><span class="badge badge-tag">Critical</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">/**
+ * Binary Min-Heap stored in array.
+ * Parent of i  = Math.floor((i-1)/2)
+ * Left child   = 2*i + 1
+ * Right child  = 2*i + 2
+ *
+ * insert  O(log n) — add to end, bubble up
+ * extractMin O(log n) — swap root with last, remove, bubble down
+ * peek    O(1)
+ * buildHeap O(n) — heapify from bottom
+ */</span>
+<span class="kw">class</span> <span class="ty">MinHeap</span> {
+  <span class="kw">private</span> heap: <span class="ty">number</span>[] = [];
+
+  <span class="kw">get</span> size() { <span class="kw">return this</span>.heap.length; }
+  peek(): <span class="ty">number</span> | <span class="kw">undefined</span> { <span class="kw">return this</span>.heap[<span class="nu">0</span>]; }
+
+  <span class="cm">/** Add element and restore heap property upward */</span>
+  insert(val: <span class="ty">number</span>): <span class="kw">void</span> {
+    <span class="kw">this</span>.heap.push(val);
+    <span class="kw">this</span>.bubbleUp(<span class="kw">this</span>.heap.length - <span class="nu">1</span>);
+  }
+
+  <span class="cm">/** Remove and return minimum element — O(log n) */</span>
+  extractMin(): <span class="ty">number</span> | <span class="kw">undefined</span> {
+    <span class="kw">if</span> (!<span class="kw">this</span>.heap.length) <span class="kw">return undefined</span>;
+    <span class="kw">const</span> min = <span class="kw">this</span>.heap[<span class="nu">0</span>];
+    <span class="kw">const</span> last = <span class="kw">this</span>.heap.pop()!;
+    <span class="kw">if</span> (<span class="kw">this</span>.heap.length) {
+      <span class="kw">this</span>.heap[<span class="nu">0</span>] = last;          <span class="cm">// move last to root</span>
+      <span class="kw">this</span>.bubbleDown(<span class="nu">0</span>);           <span class="cm">// restore heap property</span>
+    }
+    <span class="kw">return</span> min;
+  }
+
+  <span class="kw">private</span> bubbleUp(i: <span class="ty">number</span>): <span class="kw">void</span> {
+    <span class="kw">while</span> (i &gt; <span class="nu">0</span>) {
+      <span class="kw">const</span> parent = Math.floor((i - <span class="nu">1</span>) / <span class="nu">2</span>);
+      <span class="kw">if</span> (<span class="kw">this</span>.heap[parent] &lt;= <span class="kw">this</span>.heap[i]) <span class="kw">break</span>;
+      [<span class="kw">this</span>.heap[parent], <span class="kw">this</span>.heap[i]] = [<span class="kw">this</span>.heap[i], <span class="kw">this</span>.heap[parent]];
+      i = parent;
+    }
+  }
+
+  <span class="kw">private</span> bubbleDown(i: <span class="ty">number</span>): <span class="kw">void</span> {
+    <span class="kw">const</span> n = <span class="kw">this</span>.heap.length;
+    <span class="kw">while</span> (<span class="kw">true</span>) {
+      <span class="kw">let</span> smallest = i;
+      <span class="kw">const</span> L = <span class="nu">2</span> * i + <span class="nu">1</span>, R = <span class="nu">2</span> * i + <span class="nu">2</span>;
+      <span class="kw">if</span> (L &lt; n &amp;&amp; <span class="kw">this</span>.heap[L] &lt; <span class="kw">this</span>.heap[smallest]) smallest = L;
+      <span class="kw">if</span> (R &lt; n &amp;&amp; <span class="kw">this</span>.heap[R] &lt; <span class="kw">this</span>.heap[smallest]) smallest = R;
+      <span class="kw">if</span> (smallest === i) <span class="kw">break</span>;
+      [<span class="kw">this</span>.heap[i], <span class="kw">this</span>.heap[smallest]] = [<span class="kw">this</span>.heap[smallest], <span class="kw">this</span>.heap[i]];
+      i = smallest;
+    }
+  }
+
+  <span class="cm">/** Build heap from array in O(n) using sift-down from bottom-up */</span>
+  buildHeap(arr: <span class="ty">number</span>[]): <span class="kw">void</span> {
+    <span class="kw">this</span>.heap = [...arr];
+    <span class="cm">// Start from last internal node and sift down each</span>
+    <span class="kw">for</span> (<span class="kw">let</span> i = Math.floor(<span class="kw">this</span>.heap.length / <span class="nu">2</span>) - <span class="nu">1</span>; i &gt;= <span class="nu">0</span>; i--) {
+      <span class="kw">this</span>.bubbleDown(i);
+    }
+  }
+}
+
+<span class="cm">// ─── K Largest Elements using MinHeap ─────────────────────</span>
+<span class="kw">function</span> kLargest(nums: <span class="ty">number</span>[], k: <span class="ty">number</span>): <span class="ty">number</span>[] {
+  <span class="kw">const</span> heap = <span class="kw">new</span> <span class="ty">MinHeap</span>();
+  <span class="kw">for</span> (<span class="kw">const</span> n <span class="kw">of</span> nums) {
+    heap.insert(n);
+    <span class="kw">if</span> (heap.size &gt; k) heap.extractMin();  <span class="cm">// keep only k largest</span>
+  }
+  <span class="kw">const</span> result: <span class="ty">number</span>[] = [];
+  <span class="kw">while</span> (heap.size) result.unshift(heap.extractMin()!);
+  <span class="kw">return</span> result;
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ===== TRIE ===== -->
+<div class="subsection" id="trie">
+<div class="subsection-title">Trie (Prefix Tree)</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Trie — Insert, Search, StartsWith, Autocomplete</h3>
+    <div class="tag-row"><span class="badge badge-tag">String</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">/**
+ * Trie (Prefix Tree)
+ * - Each node has up to 26 children (for lowercase English)
+ * - insert   O(m) where m = word length
+ * - search   O(m)
+ * - startsWith O(m)
+ * - Space: O(n * m) in worst case (n words, m avg length)
+ *
+ * Use cases: autocomplete, spell check, IP routing, word search grid
+ */</span>
+<span class="kw">class</span> <span class="ty">TrieNode</span> {
+  children: <span class="ty">Map</span>&lt;<span class="ty">string</span>, <span class="ty">TrieNode</span>&gt; = <span class="kw">new</span> Map();
+  isEnd = <span class="kw">false</span>;
+  count = <span class="nu">0</span>;  <span class="cm">// how many words pass through this node</span>
+}
+
+<span class="kw">class</span> <span class="ty">Trie</span> {
+  <span class="kw">private</span> root = <span class="kw">new</span> <span class="ty">TrieNode</span>();
+
+  <span class="cm">/** Insert word — O(m) */</span>
+  insert(word: <span class="ty">string</span>): <span class="kw">void</span> {
+    <span class="kw">let</span> node = <span class="kw">this</span>.root;
+    <span class="kw">for</span> (<span class="kw">const</span> ch <span class="kw">of</span> word) {
+      <span class="kw">if</span> (!node.children.has(ch)) node.children.set(ch, <span class="kw">new</span> <span class="ty">TrieNode</span>());
+      node = node.children.get(ch)!;
+      node.count++;
+    }
+    node.isEnd = <span class="kw">true</span>;
+  }
+
+  <span class="cm">/** Exact match search — O(m) */</span>
+  search(word: <span class="ty">string</span>): <span class="ty">boolean</span> {
+    <span class="kw">const</span> node = <span class="kw">this</span>.traverse(word);
+    <span class="kw">return</span> !!node?.isEnd;
+  }
+
+  <span class="cm">/** Prefix check — O(m) */</span>
+  startsWith(prefix: <span class="ty">string</span>): <span class="ty">boolean</span> {
+    <span class="kw">return</span> <span class="kw">this</span>.traverse(prefix) !== <span class="kw">null</span>;
+  }
+
+  <span class="kw">private</span> traverse(str: <span class="ty">string</span>): <span class="ty">TrieNode</span> | <span class="kw">null</span> {
+    <span class="kw">let</span> node: <span class="ty">TrieNode</span> | <span class="kw">undefined</span> = <span class="kw">this</span>.root;
+    <span class="kw">for</span> (<span class="kw">const</span> ch <span class="kw">of</span> str) {
+      node = node.children.get(ch);
+      <span class="kw">if</span> (!node) <span class="kw">return null</span>;
+    }
+    <span class="kw">return</span> node;
+  }
+
+  <span class="cm">/** Autocomplete: get all words with given prefix — O(m + k) */</span>
+  autocomplete(prefix: <span class="ty">string</span>): <span class="ty">string</span>[] {
+    <span class="kw">const</span> node = <span class="kw">this</span>.traverse(prefix);
+    <span class="kw">if</span> (!node) <span class="kw">return</span> [];
+    <span class="kw">const</span> results: <span class="ty">string</span>[] = [];
+    <span class="kw">const</span> dfs = (curr: <span class="ty">TrieNode</span>, path: <span class="ty">string</span>): <span class="kw">void</span> =&gt; {
+      <span class="kw">if</span> (curr.isEnd) results.push(prefix + path);
+      <span class="kw">for</span> (<span class="kw">const</span> [ch, child] <span class="kw">of</span> curr.children) dfs(child, path + ch);
+    };
+    dfs(node, <span class="st">""</span>);
+    <span class="kw">return</span> results;
+  }
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ===== GRAPH ===== -->
+<div class="subsection" id="graph">
+<div class="subsection-title">Graph — BFS, DFS, Dijkstra, Topological Sort</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Graph Representations + BFS + DFS + Dijkstra + Topological Sort + Union-Find</h3>
+    <div class="tag-row"><span class="badge badge-tag">Critical</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">/**
+ * Graph Representations:
+ * Adjacency List  — O(V+E) space, O(1) add edge, O(degree) neighbors
+ * Adjacency Matrix — O(V²) space, O(1) edge check, good for dense graphs
+ */</span>
+<span class="kw">class</span> <span class="ty">Graph</span> {
+  <span class="kw">private</span> adj: <span class="ty">Map</span>&lt;<span class="ty">number</span>, { node: <span class="ty">number</span>; weight: <span class="ty">number</span> }[]&gt; = <span class="kw">new</span> Map();
+
+  addEdge(u: <span class="ty">number</span>, v: <span class="ty">number</span>, weight = <span class="nu">1</span>, directed = <span class="kw">false</span>): <span class="kw">void</span> {
+    <span class="kw">if</span> (!<span class="kw">this</span>.adj.has(u)) <span class="kw">this</span>.adj.set(u, []);
+    <span class="kw">if</span> (!<span class="kw">this</span>.adj.has(v)) <span class="kw">this</span>.adj.set(v, []);
+    <span class="kw">this</span>.adj.get(u)!.push({ node: v, weight });
+    <span class="kw">if</span> (!directed) <span class="kw">this</span>.adj.get(v)!.push({ node: u, weight });
+  }
+
+  <span class="cm">/**
+   * BFS — O(V+E)
+   * Uses a queue. Explores level by level.
+   * Best for: shortest path in UNWEIGHTED graph, level-order, nearest neighbors
+   */</span>
+  bfs(start: <span class="ty">number</span>): <span class="ty">number</span>[] {
+    <span class="kw">const</span> visited = <span class="kw">new</span> Set&lt;<span class="ty">number</span>&gt;([start]);
+    <span class="kw">const</span> queue = [start], order: <span class="ty">number</span>[] = [];
+    <span class="kw">while</span> (queue.length) {
+      <span class="kw">const</span> node = queue.shift()!;
+      order.push(node);
+      <span class="kw">for</span> (<span class="kw">const</span> { node: nb } <span class="kw">of</span> <span class="kw">this</span>.adj.get(node) ?? []) {
+        <span class="kw">if</span> (!visited.has(nb)) { visited.add(nb); queue.push(nb); }
+      }
+    }
+    <span class="kw">return</span> order;
+  }
+
+  <span class="cm">/**
+   * DFS — O(V+E)
+   * Explores as deep as possible before backtracking.
+   * Best for: cycle detection, topological sort, connected components, maze
+   */</span>
+  dfs(start: <span class="ty">number</span>): <span class="ty">number</span>[] {
+    <span class="kw">const</span> visited = <span class="kw">new</span> Set&lt;<span class="ty">number</span>&gt;();
+    <span class="kw">const</span> order: <span class="ty">number</span>[] = [];
+    <span class="kw">const</span> explore = (node: <span class="ty">number</span>): <span class="kw">void</span> =&gt; {
+      visited.add(node);
+      order.push(node);
+      <span class="kw">for</span> (<span class="kw">const</span> { node: nb } <span class="kw">of</span> <span class="kw">this</span>.adj.get(node) ?? []) {
+        <span class="kw">if</span> (!visited.has(nb)) explore(nb);
+      }
+    };
+    explore(start);
+    <span class="kw">return</span> order;
+  }
+
+  <span class="cm">/**
+   * Dijkstra — O((V+E) log V) with min-heap
+   * Shortest path in WEIGHTED graph (non-negative weights only).
+   * Negative weights → use Bellman-Ford instead.
+   */</span>
+  dijkstra(start: <span class="ty">number</span>): <span class="ty">Map</span>&lt;<span class="ty">number</span>, <span class="ty">number</span>&gt; {
+    <span class="kw">const</span> dist = <span class="kw">new</span> Map&lt;<span class="ty">number</span>, <span class="ty">number</span>&gt;();
+    <span class="kw">for</span> (<span class="kw">const</span> node <span class="kw">of</span> <span class="kw">this</span>.adj.keys()) dist.set(node, Infinity);
+    dist.set(start, <span class="nu">0</span>);
+
+    <span class="cm">// Min-heap: [distance, node] — use sorted array for simplicity</span>
+    <span class="cm">// In production use a proper priority queue for O(log n) extract-min</span>
+    <span class="kw">const</span> pq: [<span class="ty">number</span>, <span class="ty">number</span>][] = [[<span class="nu">0</span>, start]];
+
+    <span class="kw">while</span> (pq.length) {
+      pq.sort((a, b) =&gt; a[<span class="nu">0</span>] - b[<span class="nu">0</span>]);   <span class="cm">// O(n log n) — replace with heap</span>
+      <span class="kw">const</span> [d, u] = pq.shift()!;
+      <span class="kw">if</span> (d &gt; dist.get(u)!) <span class="kw">continue</span>;  <span class="cm">// stale entry</span>
+      <span class="kw">for</span> (<span class="kw">const</span> { node: v, weight: w } <span class="kw">of</span> <span class="kw">this</span>.adj.get(u) ?? []) {
+        <span class="kw">const</span> nd = d + w;
+        <span class="kw">if</span> (nd &lt; dist.get(v)!) { dist.set(v, nd); pq.push([nd, v]); }
+      }
+    }
+    <span class="kw">return</span> dist;
+  }
+
+  <span class="cm">/**
+   * Topological Sort — Kahn's Algorithm (BFS-based)
+   * O(V+E). Only works on DAG (Directed Acyclic Graph).
+   * Use case: build systems, course prerequisites, task scheduling.
+   */</span>
+  topologicalSort(nodes: <span class="ty">number</span>[]): <span class="ty">number</span>[] {
+    <span class="kw">const</span> inDegree = <span class="kw">new</span> Map&lt;<span class="ty">number</span>, <span class="ty">number</span>&gt;();
+    <span class="kw">for</span> (<span class="kw">const</span> n <span class="kw">of</span> nodes) inDegree.set(n, <span class="nu">0</span>);
+    <span class="kw">for</span> (<span class="kw">const</span> [, edges] <span class="kw">of</span> <span class="kw">this</span>.adj) {
+      <span class="kw">for</span> (<span class="kw">const</span> { node: v } <span class="kw">of</span> edges) inDegree.set(v, (inDegree.get(v) ?? <span class="nu">0</span>) + <span class="nu">1</span>);
+    }
+    <span class="kw">const</span> queue = nodes.filter(n =&gt; inDegree.get(n) === <span class="nu">0</span>);
+    <span class="kw">const</span> order: <span class="ty">number</span>[] = [];
+    <span class="kw">while</span> (queue.length) {
+      <span class="kw">const</span> u = queue.shift()!;
+      order.push(u);
+      <span class="kw">for</span> (<span class="kw">const</span> { node: v } <span class="kw">of</span> <span class="kw">this</span>.adj.get(u) ?? []) {
+        inDegree.set(v, inDegree.get(v)! - <span class="nu">1</span>);
+        <span class="kw">if</span> (inDegree.get(v) === <span class="nu">0</span>) queue.push(v);
+      }
+    }
+    <span class="kw">return</span> order.length === nodes.length ? order : [];  <span class="cm">// empty if cycle</span>
+  }
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ===== UNION FIND ===== -->
+<div class="subsection" id="union-find">
+<div class="subsection-title">Union-Find (Disjoint Set Union)</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Union-Find — Path Compression + Union by Rank</h3>
+    <div class="tag-row"><span class="badge badge-tag">Graph</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">/**
+ * Union-Find (Disjoint Set Union)
+ * Operations: O(α(n)) ≈ O(1) amortized with path compression + union by rank
+ * α = inverse Ackermann function — effectively constant for all practical n
+ *
+ * Use cases:
+ * - Kruskal's MST algorithm
+ * - Number of connected components
+ * - Detect cycle in undirected graph
+ * - Dynamic connectivity problems
+ */</span>
+<span class="kw">class</span> <span class="ty">UnionFind</span> {
+  <span class="kw">private</span> parent: <span class="ty">number</span>[];
+  <span class="kw">private</span> rank:   <span class="ty">number</span>[];
+  <span class="kw">private</span> _components: <span class="ty">number</span>;
+
+  constructor(n: <span class="ty">number</span>) {
+    <span class="kw">this</span>.parent = Array.from({ length: n }, (_, i) =&gt; i);  <span class="cm">// each is own parent</span>
+    <span class="kw">this</span>.rank   = <span class="kw">new</span> Array(n).fill(<span class="nu">0</span>);
+    <span class="kw">this</span>._components = n;
+  }
+
+  <span class="cm">/** Find root with PATH COMPRESSION — O(α(n)) */</span>
+  find(x: <span class="ty">number</span>): <span class="ty">number</span> {
+    <span class="kw">if</span> (<span class="kw">this</span>.parent[x] !== x) {
+      <span class="kw">this</span>.parent[x] = <span class="kw">this</span>.find(<span class="kw">this</span>.parent[x]);  <span class="cm">// flatten path to root</span>
+    }
+    <span class="kw">return this</span>.parent[x];
+  }
+
+  <span class="cm">/** Union two sets by RANK — O(α(n)) */</span>
+  union(x: <span class="ty">number</span>, y: <span class="ty">number</span>): <span class="ty">boolean</span> {
+    <span class="kw">const</span> rx = <span class="kw">this</span>.find(x), ry = <span class="kw">this</span>.find(y);
+    <span class="kw">if</span> (rx === ry) <span class="kw">return false</span>;  <span class="cm">// already connected — would form cycle!</span>
+    <span class="cm">// Attach smaller tree under larger tree to keep depth minimal</span>
+    <span class="kw">if</span> (<span class="kw">this</span>.rank[rx] &lt; <span class="kw">this</span>.rank[ry]) <span class="kw">this</span>.parent[rx] = ry;
+    <span class="kw">else if</span> (<span class="kw">this</span>.rank[rx] &gt; <span class="kw">this</span>.rank[ry]) <span class="kw">this</span>.parent[ry] = rx;
+    <span class="kw">else</span> { <span class="kw">this</span>.parent[ry] = rx; <span class="kw">this</span>.rank[rx]++; }
+    <span class="kw">this</span>._components--;
+    <span class="kw">return true</span>;
+  }
+
+  connected(x: <span class="ty">number</span>, y: <span class="ty">number</span>): <span class="ty">boolean</span> { <span class="kw">return this</span>.find(x) === <span class="kw">this</span>.find(y); }
+  get components(): <span class="ty">number</span> { <span class="kw">return this</span>._components; }
+}
+
+<span class="cm">// Number of islands using Union-Find</span>
+<span class="kw">function</span> numIslands(grid: <span class="ty">string</span>[][]): <span class="ty">number</span> {
+  <span class="kw">const</span> R = grid.length, C = grid[<span class="nu">0</span>].length;
+  <span class="kw">const</span> uf = <span class="kw">new</span> <span class="ty">UnionFind</span>(R * C);
+  <span class="kw">let</span> water = <span class="nu">0</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> r = <span class="nu">0</span>; r &lt; R; r++) <span class="kw">for</span> (<span class="kw">let</span> c = <span class="nu">0</span>; c &lt; C; c++) {
+    <span class="kw">if</span> (grid[r][c] === <span class="st">'0'</span>) { water++; <span class="kw">continue</span>; }
+    <span class="kw">for</span> (<span class="kw">const</span> [dr, dc] <span class="kw">of</span> [[<span class="nu">1</span>,<span class="nu">0</span>],[<span class="nu">0</span>,<span class="nu">1</span>]]) {  <span class="cm">// check down & right only</span>
+      <span class="kw">const</span> nr = r+dr, nc = c+dc;
+      <span class="kw">if</span> (nr &lt; R &amp;&amp; nc &lt; C &amp;&amp; grid[nr][nc] === <span class="st">'1'</span>) uf.union(r*C+c, nr*C+nc);
+    }
+  }
+  <span class="kw">return</span> uf.components - water;
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ===== SORTING ===== -->
+<div class="subsection" id="sorting">
+<div class="subsection-title">Sorting Algorithms</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>QuickSort, MergeSort, HeapSort, CountingSort — All Implemented</h3>
+    <div class="tag-row"><span class="badge badge-tag">Must Know</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">/**
+ * Quick Sort — avg O(n log n), worst O(n²), space O(log n) (call stack)
+ * In-place. Not stable. Best for large arrays in practice.
+ * Partition: choose pivot, rearrange so left < pivot < right, recurse.
+ */</span>
+<span class="kw">function</span> quickSort(arr: <span class="ty">number</span>[], lo = <span class="nu">0</span>, hi = arr.length - <span class="nu">1</span>): <span class="ty">number</span>[] {
+  <span class="kw">if</span> (lo &lt; hi) {
+    <span class="kw">const</span> p = partition(arr, lo, hi);
+    quickSort(arr, lo, p - <span class="nu">1</span>);
+    quickSort(arr, p + <span class="nu">1</span>, hi);
+  }
+  <span class="kw">return</span> arr;
+}
+<span class="kw">function</span> partition(arr: <span class="ty">number</span>[], lo: <span class="ty">number</span>, hi: <span class="ty">number</span>): <span class="ty">number</span> {
+  <span class="kw">const</span> pivot = arr[hi];
+  <span class="kw">let</span> i = lo - <span class="nu">1</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> j = lo; j &lt; hi; j++) {
+    <span class="kw">if</span> (arr[j] &lt;= pivot) { i++; [arr[i], arr[j]] = [arr[j], arr[i]]; }
+  }
+  [arr[i + <span class="nu">1</span>], arr[hi]] = [arr[hi], arr[i + <span class="nu">1</span>]];
+  <span class="kw">return</span> i + <span class="nu">1</span>;
+}
+
+<span class="cm">/**
+ * Merge Sort — O(n log n) always, space O(n), stable
+ * Divide array in half, sort each half, merge.
+ * Preferred when stability matters or for linked lists.
+ */</span>
+<span class="kw">function</span> mergeSort(arr: <span class="ty">number</span>[]): <span class="ty">number</span>[] {
+  <span class="kw">if</span> (arr.length &lt;= <span class="nu">1</span>) <span class="kw">return</span> arr;
+  <span class="kw">const</span> mid = Math.floor(arr.length / <span class="nu">2</span>);
+  <span class="kw">return</span> merge(mergeSort(arr.slice(<span class="nu">0</span>, mid)), mergeSort(arr.slice(mid)));
+}
+<span class="kw">function</span> merge(L: <span class="ty">number</span>[], R: <span class="ty">number</span>[]): <span class="ty">number</span>[] {
+  <span class="kw">const</span> res: <span class="ty">number</span>[] = [];
+  <span class="kw">let</span> i = <span class="nu">0</span>, j = <span class="nu">0</span>;
+  <span class="kw">while</span> (i &lt; L.length &amp;&amp; j &lt; R.length) {
+    res.push(L[i] &lt;= R[j] ? L[i++] : R[j++]);
+  }
+  <span class="kw">return</span> [...res, ...L.slice(i), ...R.slice(j)];
+}
+
+<span class="cm">/**
+ * Counting Sort — O(n + k) where k = value range
+ * Only for integers in known range. Not comparison-based.
+ */</span>
+<span class="kw">function</span> countingSort(arr: <span class="ty">number</span>[], max: <span class="ty">number</span>): <span class="ty">number</span>[] {
+  <span class="kw">const</span> count = <span class="kw">new</span> Array(max + <span class="nu">1</span>).fill(<span class="nu">0</span>);
+  <span class="kw">for</span> (<span class="kw">const</span> n <span class="kw">of</span> arr) count[n]++;
+  <span class="kw">const</span> result: <span class="ty">number</span>[] = [];
+  count.forEach((c, v) =&gt; result.push(...<span class="kw">new</span> Array(c).fill(v)));
+  <span class="kw">return</span> result;
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ===== SEARCHING ===== -->
+<div class="subsection" id="searching">
+<div class="subsection-title">Binary Search Patterns</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Binary Search — Template + Left/Right Boundary + Rotated Array</h3>
+    <div class="tag-row"><span class="badge badge-tag">Must Know</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">/**
+ * Binary Search — O(log n)
+ * TEMPLATE: Always use [lo, hi] inclusive.
+ * Condition check determines which half to go to.
+ */</span>
+
+<span class="cm">// Exact search</span>
+<span class="kw">function</span> binarySearch(arr: <span class="ty">number</span>[], target: <span class="ty">number</span>): <span class="ty">number</span> {
+  <span class="kw">let</span> lo = <span class="nu">0</span>, hi = arr.length - <span class="nu">1</span>;
+  <span class="kw">while</span> (lo &lt;= hi) {
+    <span class="kw">const</span> mid = lo + Math.floor((hi - lo) / <span class="nu">2</span>);  <span class="cm">// avoids overflow vs (lo+hi)/2</span>
+    <span class="kw">if</span>      (arr[mid] === target) <span class="kw">return</span> mid;
+    <span class="kw">else if</span> (arr[mid] &lt;  target) lo = mid + <span class="nu">1</span>;
+    <span class="kw">else</span>                          hi = mid - <span class="nu">1</span>;
+  }
+  <span class="kw">return</span> -<span class="nu">1</span>;
+}
+
+<span class="cm">// Left boundary (first occurrence / leftmost valid position)</span>
+<span class="kw">function</span> lowerBound(arr: <span class="ty">number</span>[], target: <span class="ty">number</span>): <span class="ty">number</span> {
+  <span class="kw">let</span> lo = <span class="nu">0</span>, hi = arr.length;  <span class="cm">// hi = length (exclusive)</span>
+  <span class="kw">while</span> (lo &lt; hi) {
+    <span class="kw">const</span> mid = lo + Math.floor((hi - lo) / <span class="nu">2</span>);
+    <span class="kw">if</span> (arr[mid] &lt; target) lo = mid + <span class="nu">1</span>;
+    <span class="kw">else</span> hi = mid;               <span class="cm">// keep going left</span>
+  }
+  <span class="kw">return</span> lo;  <span class="cm">// insertion point = first index where arr[i] >= target</span>
+}
+
+<span class="cm">// Search in rotated sorted array — O(log n)</span>
+<span class="kw">function</span> searchRotated(arr: <span class="ty">number</span>[], target: <span class="ty">number</span>): <span class="ty">number</span> {
+  <span class="kw">let</span> lo = <span class="nu">0</span>, hi = arr.length - <span class="nu">1</span>;
+  <span class="kw">while</span> (lo &lt;= hi) {
+    <span class="kw">const</span> mid = lo + Math.floor((hi - lo) / <span class="nu">2</span>);
+    <span class="kw">if</span> (arr[mid] === target) <span class="kw">return</span> mid;
+    <span class="cm">// Determine which half is sorted</span>
+    <span class="kw">if</span> (arr[lo] &lt;= arr[mid]) {  <span class="cm">// left half is sorted</span>
+      <span class="kw">if</span> (arr[lo] &lt;= target &amp;&amp; target &lt; arr[mid]) hi = mid - <span class="nu">1</span>;
+      <span class="kw">else</span> lo = mid + <span class="nu">1</span>;
+    } <span class="kw">else</span> {                    <span class="cm">// right half is sorted</span>
+      <span class="kw">if</span> (arr[mid] &lt; target &amp;&amp; target &lt;= arr[hi]) lo = mid + <span class="nu">1</span>;
+      <span class="kw">else</span> hi = mid - <span class="nu">1</span>;
+    }
+  }
+  <span class="kw">return</span> -<span class="nu">1</span>;
+}
+
+<span class="cm">// Binary search on answer (minimize/maximize a value)</span>
+<span class="kw">function</span> minEatingSpeed(piles: <span class="ty">number</span>[], h: <span class="ty">number</span>): <span class="ty">number</span> {
+  <span class="kw">let</span> lo = <span class="nu">1</span>, hi = Math.max(...piles);
+  <span class="kw">while</span> (lo &lt; hi) {
+    <span class="kw">const</span> mid = lo + Math.floor((hi - lo) / <span class="nu">2</span>);
+    <span class="kw">const</span> hoursNeeded = piles.reduce((s, p) =&gt; s + Math.ceil(p / mid), <span class="nu">0</span>);
+    <span class="kw">if</span> (hoursNeeded &lt;= h) hi = mid;  <span class="cm">// mid might work, try smaller</span>
+    <span class="kw">else</span> lo = mid + <span class="nu">1</span>;              <span class="cm">// too slow</span>
+  }
+  <span class="kw">return</span> lo;
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ===== DYNAMIC PROGRAMMING ===== -->
+<div class="subsection" id="dp">
+<div class="subsection-title">Dynamic Programming Patterns</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>DP — Memoization, Tabulation, LCS, Knapsack, Coin Change, LIS</h3>
+    <div class="tag-row"><span class="badge badge-tag">Critical</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">/**
+ * DP Framework:
+ * 1. Define subproblem (what does dp[i] mean?)
+ * 2. Identify recurrence relation
+ * 3. Base case
+ * 4. Iteration order (ensure subproblems are solved before needed)
+ */</span>
+
+<span class="cm">// ─── Fibonacci (memoization vs tabulation) ─────────────────</span>
+<span class="kw">function</span> fib(n: <span class="ty">number</span>, memo = <span class="kw">new</span> Map&lt;<span class="ty">number</span>,<span class="ty">number</span>&gt;()): <span class="ty">number</span> {
+  <span class="kw">if</span> (n &lt;= <span class="nu">1</span>) <span class="kw">return</span> n;
+  <span class="kw">if</span> (memo.has(n)) <span class="kw">return</span> memo.get(n)!;
+  <span class="kw">const</span> res = fib(n - <span class="nu">1</span>, memo) + fib(n - <span class="nu">2</span>, memo);
+  memo.set(n, res); <span class="kw">return</span> res;
+}
+
+<span class="cm">// ─── Coin Change (min coins) ──────────────────────────────</span>
+<span class="cm">// dp[i] = min coins to make amount i</span>
+<span class="kw">function</span> coinChange(coins: <span class="ty">number</span>[], amount: <span class="ty">number</span>): <span class="ty">number</span> {
+  <span class="kw">const</span> dp = <span class="kw">new</span> Array(amount + <span class="nu">1</span>).fill(Infinity);
+  dp[<span class="nu">0</span>] = <span class="nu">0</span>;  <span class="cm">// base: 0 coins to make 0</span>
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="nu">1</span>; i &lt;= amount; i++) {
+    <span class="kw">for</span> (<span class="kw">const</span> coin <span class="kw">of</span> coins) {
+      <span class="kw">if</span> (coin &lt;= i) dp[i] = Math.min(dp[i], dp[i - coin] + <span class="nu">1</span>);
+    }
+  }
+  <span class="kw">return</span> dp[amount] === Infinity ? -<span class="nu">1</span> : dp[amount];
+}
+
+<span class="cm">// ─── Longest Common Subsequence ────────────────────────────</span>
+<span class="cm">// dp[i][j] = LCS of s1[0..i-1] and s2[0..j-1]</span>
+<span class="kw">function</span> lcs(s1: <span class="ty">string</span>, s2: <span class="ty">string</span>): <span class="ty">number</span> {
+  <span class="kw">const</span> m = s1.length, n = s2.length;
+  <span class="kw">const</span> dp = Array.from({ length: m+<span class="nu">1</span> }, () =&gt; <span class="kw">new</span> Array(n+<span class="nu">1</span>).fill(<span class="nu">0</span>));
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="nu">1</span>; i &lt;= m; i++) {
+    <span class="kw">for</span> (<span class="kw">let</span> j = <span class="nu">1</span>; j &lt;= n; j++) {
+      dp[i][j] = s1[i-<span class="nu">1</span>] === s2[j-<span class="nu">1</span>]
+        ? dp[i-<span class="nu">1</span>][j-<span class="nu">1</span>] + <span class="nu">1</span>              <span class="cm">// chars match — extend LCS</span>
+        : Math.max(dp[i-<span class="nu">1</span>][j], dp[i][j-<span class="nu">1</span>]);  <span class="cm">// skip one char</span>
+    }
+  }
+  <span class="kw">return</span> dp[m][n];
+}
+
+<span class="cm">// ─── Longest Increasing Subsequence — O(n log n) ──────────</span>
+<span class="kw">function</span> lis(nums: <span class="ty">number</span>[]): <span class="ty">number</span> {
+  <span class="kw">const</span> tails: <span class="ty">number</span>[] = [];  <span class="cm">// tails[i] = smallest tail of all IS of length i+1</span>
+  <span class="kw">for</span> (<span class="kw">const</span> n <span class="kw">of</span> nums) {
+    <span class="kw">let</span> lo = <span class="nu">0</span>, hi = tails.length;
+    <span class="kw">while</span> (lo &lt; hi) {           <span class="cm">// binary search for insertion position</span>
+      <span class="kw">const</span> mid = (lo + hi) >> <span class="nu">1</span>;
+      tails[mid] &lt; n ? lo = mid + <span class="nu">1</span> : hi = mid;
+    }
+    tails[lo] = n;              <span class="cm">// extend or replace tail</span>
+  }
+  <span class="kw">return</span> tails.length;
+}
+
+<span class="cm">// ─── 0/1 Knapsack ─────────────────────────────────────────</span>
+<span class="cm">// dp[i][w] = max value using first i items with capacity w</span>
+<span class="kw">function</span> knapsack(weights: <span class="ty">number</span>[], values: <span class="ty">number</span>[], W: <span class="ty">number</span>): <span class="ty">number</span> {
+  <span class="kw">const</span> n = weights.length;
+  <span class="kw">const</span> dp = <span class="kw">new</span> Array(W + <span class="nu">1</span>).fill(<span class="nu">0</span>);  <span class="cm">// space-optimized 1D</span>
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="nu">0</span>; i &lt; n; i++) {
+    <span class="kw">for</span> (<span class="kw">let</span> w = W; w &gt;= weights[i]; w--) {   <span class="cm">// reverse to avoid reuse</span>
+      dp[w] = Math.max(dp[w], dp[w - weights[i]] + values[i]);
+    }
+  }
+  <span class="kw">return</span> dp[W];
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ===== SLIDING WINDOW ===== -->
+<div class="subsection" id="sliding-window">
+<div class="subsection-title">Sliding Window &amp; Two Pointers</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Sliding Window + Two Pointers — Templates &amp; Classic Problems</h3>
+    <div class="tag-row"><span class="badge badge-tag">Pattern</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+<div class="ts-code"><span class="cm">// ─── Fixed-size sliding window (max sum of k elements) ─────</span>
+<span class="kw">function</span> maxSumK(arr: <span class="ty">number</span>[], k: <span class="ty">number</span>): <span class="ty">number</span> {
+  <span class="kw">let</span> sum = arr.slice(<span class="nu">0</span>, k).reduce((a, b) =&gt; a + b, <span class="nu">0</span>);
+  <span class="kw">let</span> max = sum;
+  <span class="kw">for</span> (<span class="kw">let</span> i = k; i &lt; arr.length; i++) {
+    sum += arr[i] - arr[i - k];  <span class="cm">// slide: add new, remove old</span>
+    max = Math.max(max, sum);
+  }
+  <span class="kw">return</span> max;
+}
+
+<span class="cm">// ─── Variable-size window (longest substring without repeat) </span>
+<span class="kw">function</span> lengthOfLongestSubstring(s: <span class="ty">string</span>): <span class="ty">number</span> {
+  <span class="kw">const</span> last = <span class="kw">new</span> Map&lt;<span class="ty">string</span>, <span class="ty">number</span>&gt;();
+  <span class="kw">let</span> left = <span class="nu">0</span>, max = <span class="nu">0</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> right = <span class="nu">0</span>; right &lt; s.length; right++) {
+    <span class="kw">const</span> ch = s[right];
+    <span class="cm">// Shrink window if char was seen inside current window</span>
+    <span class="kw">if</span> (last.has(ch) &amp;&amp; last.get(ch)! &gt;= left) left = last.get(ch)! + <span class="nu">1</span>;
+    last.set(ch, right);
+    max = Math.max(max, right - left + <span class="nu">1</span>);
+  }
+  <span class="kw">return</span> max;
+}
+
+<span class="cm">// ─── Two Pointers: Container with Most Water ───────────────</span>
+<span class="kw">function</span> maxWater(height: <span class="ty">number</span>[]): <span class="ty">number</span> {
+  <span class="kw">let</span> lo = <span class="nu">0</span>, hi = height.length - <span class="nu">1</span>, max = <span class="nu">0</span>;
+  <span class="kw">while</span> (lo &lt; hi) {
+    max = Math.max(max, Math.min(height[lo], height[hi]) * (hi - lo));
+    <span class="cm">// Move the shorter side inward — moving taller can't improve area</span>
+    height[lo] &lt; height[hi] ? lo++ : hi--;
+  }
+  <span class="kw">return</span> max;
+}
+
+<span class="cm">// ─── Two Pointers: 3Sum ───────────────────────────────────</span>
+<span class="kw">function</span> threeSum(nums: <span class="ty">number</span>[]): <span class="ty">number</span>[][] {
+  nums.sort((a, b) =&gt; a - b);
+  <span class="kw">const</span> result: <span class="ty">number</span>[][] = [];
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="nu">0</span>; i &lt; nums.length - <span class="nu">2</span>; i++) {
+    <span class="kw">if</span> (i &gt; <span class="nu">0</span> &amp;&amp; nums[i] === nums[i-<span class="nu">1</span>]) <span class="kw">continue</span>;  <span class="cm">// skip duplicates</span>
+    <span class="kw">let</span> lo = i + <span class="nu">1</span>, hi = nums.length - <span class="nu">1</span>;
+    <span class="kw">while</span> (lo &lt; hi) {
+      <span class="kw">const</span> sum = nums[i] + nums[lo] + nums[hi];
+      <span class="kw">if</span>      (sum === <span class="nu">0</span>) { result.push([nums[i], nums[lo], nums[hi]]); lo++; hi--; }
+      <span class="kw">else if</span> (sum &lt;  <span class="nu">0</span>) lo++;
+      <span class="kw">else</span>               hi--;
+      <span class="kw">while</span> (lo &lt; hi &amp;&amp; nums[lo] === nums[lo-<span class="nu">1</span>]) lo++;  <span class="cm">// skip dups</span>
+      <span class="kw">while</span> (lo &lt; hi &amp;&amp; nums[hi] === nums[hi+<span class="nu">1</span>]) hi--;
+    }
+  }
+  <span class="kw">return</span> result;
+}
+</div>
+  </div>
+</div>
+</div>
+
+<!-- ===== COMPLEXITY ===== -->
+<div class="subsection" id="complexity">
+<div class="subsection-title">Big-O Complexity Reference</div>
+<div class="problem-card">
+  <div class="problem-card-header" onclick="toggle(this)">
+    <h3>Complete Big-O Cheatsheet — Data Structures &amp; Algorithms</h3>
+    <div class="tag-row"><span class="badge badge-tag">Reference</span></div><span class="toggle-icon"></span>
+  </div>
+  <div class="problem-card-body">
+    <table class="complexity-table">
+      <tr><th>Data Structure</th><th>Access</th><th>Search</th><th>Insert</th><th>Delete</th><th>Space</th></tr>
+      <tr><td>Array</td><td>O(1)</td><td>O(n)</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+      <tr><td>Linked List</td><td>O(n)</td><td>O(n)</td><td>O(1)</td><td>O(1)*</td><td>O(n)</td></tr>
+      <tr><td>Stack / Queue</td><td>O(n)</td><td>O(n)</td><td>O(1)</td><td>O(1)</td><td>O(n)</td></tr>
+      <tr><td>Hash Table</td><td>—</td><td>O(1)*</td><td>O(1)*</td><td>O(1)*</td><td>O(n)</td></tr>
+      <tr><td>BST (avg)</td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td><td>O(n)</td></tr>
+      <tr><td>BST (worst)</td><td>O(n)</td><td>O(n)</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+      <tr><td>AVL / Red-Black</td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td><td>O(n)</td></tr>
+      <tr><td>Binary Heap</td><td>O(n)</td><td>O(n)</td><td>O(log n)</td><td>O(log n)</td><td>O(n)</td></tr>
+      <tr><td>Trie</td><td>O(m)</td><td>O(m)</td><td>O(m)</td><td>O(m)</td><td>O(n·m)</td></tr>
+      <tr><td>Graph (adj list)</td><td colspan="2">O(V+E)</td><td>O(1)</td><td>O(V+E)</td><td>O(V+E)</td></tr>
+    </table>
+    <table class="complexity-table" style="margin-top:14px">
+      <tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th><th>Stable?</th></tr>
+      <tr><td>Bubble Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>✓</td></tr>
+      <tr><td>Selection Sort</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>✗</td></tr>
+      <tr><td>Insertion Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>✓</td></tr>
+      <tr><td>Merge Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td><td>✓</td></tr>
+      <tr><td>Quick Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td><td>O(log n)</td><td>✗</td></tr>
+      <tr><td>Heap Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(1)</td><td>✗</td></tr>
+      <tr><td>Counting Sort</td><td>O(n+k)</td><td>O(n+k)</td><td>O(n+k)</td><td>O(k)</td><td>✓</td></tr>
+      <tr><td>Binary Search</td><td>O(1)</td><td>O(log n)</td><td>O(log n)</td><td>O(1)</td><td>—</td></tr>
+      <tr><td>BFS / DFS</td><td colspan="3">O(V+E)</td><td>O(V)</td><td>—</td></tr>
+      <tr><td>Dijkstra</td><td colspan="3">O((V+E) log V)</td><td>O(V)</td><td>—</td></tr>
+    </table>
+  </div>
+</div>
+</div>
+
+</div><!-- content-area -->
+</main>
+<script src="main.js"></script>
+<script src="search-data.js"></script>
+<script src="search.js"></script>
+</body>
+</html>
