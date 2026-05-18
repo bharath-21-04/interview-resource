@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>System Design | Alation Prep</title>
+<title>System Design (LLD) | Interview Prep</title>
 <link rel="stylesheet" href="style.css">
 <style>
 .arch-box{background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:16px;font-family:'Courier New',monospace;font-size:11.5px;color:var(--text-secondary);line-height:1.9;margin:12px 0;white-space:pre;overflow-x:auto}
@@ -36,7 +36,8 @@
     <a href="index.html" class="nav-link">Dashboard</a>
     <a href="dsa.html" class="nav-link">DSA — Python</a>
     <a href="oop-lld.html" class="nav-link">OOP &amp; LLD — Java</a>
-    <a href="system-design.html" class="nav-link active">System Design</a>
+    <a href="system-design.html" class="nav-link active">System Design (LLD)</a>
+    <a href="hld.html" class="nav-link">High-Level Design (HLD)</a>
     <a href="kafka.html" class="nav-link">Kafka &amp; Messaging</a>
     <a href="os-concurrency.html" class="nav-link">OS &amp; Concurrency</a>
     <a href="docker-aws.html" class="nav-link">Docker &amp; AWS</a>
@@ -48,12 +49,12 @@
 </nav>
 
 <main class="main">
-<div class="topbar"><h1>System Design Complete Guide</h1>
+<div class="topbar"><h1>System Design — LLD &amp; Component Design</h1>
   <button class="topbar-search-btn" onclick="window._spotlightOpen && window._spotlightOpen()">Search topics... <kbd>Cmd K</kbd></button></div>
 <div class="content-area">
 <div class="section-header">
-  <h1>System Design</h1>
-  <p>Fundamentals Architecture Patterns Real Interview Questions with full answers and trade-offs.</p>
+  <h1>System Design (LLD)</h1>
+  <p>Core concepts, architecture patterns, resilience, caching, databases, and component-level interview questions. For big-infra HLD questions, see <a href="hld.html" style="color:var(--accent-blue)">High-Level Design →</a></p>
 </div>
 
 <div class="topic-jump">
@@ -65,9 +66,8 @@
   <a href="#distributed">Distributed</a>
   <a href="#network">Networking</a>
   <a href="#security">Auth &amp; Security</a>
-  <a href="#hld-concepts">HLD Concepts</a>
   <a href="#interview-qs">Interview Questions</a>
-  <a href="#hld-qs">HLD Questions</a>
+  <a href="hld.html">HLD Questions →</a>
 </div>
 
 <!-- ===== FUNDAMENTALS ===== -->
@@ -783,460 +783,6 @@ Session (Stateful):
 </div>
 </div>
 
-<!-- ===== HLD CONCEPTS ===== -->
-<div class="subsection" id="hld-concepts">
-<div class="subsection-title">High-Level Design (HLD) Concepts</div>
-
-<div class="callout callout-blue">
-  <div class="callout-title">HLD Interview Framework — Always Follow This</div>
-  <strong>Step 1 — Clarify (5 min):</strong> Functional requirements (what features?), Non-functional (scale, latency, consistency, availability). <strong>Step 2 — Estimate (3 min):</strong> DAU, RPS, Storage, Bandwidth. <strong>Step 3 — High-Level (5 min):</strong> Draw major components: clients, LBs, services, DBs, caches, queues. <strong>Step 4 — API Design (3 min):</strong> Endpoints, request/response schema. <strong>Step 5 — Deep Dive (15 min):</strong> Critical components, bottlenecks, tradeoffs. <strong>Step 6 — Wrap Up (3 min):</strong> Failure modes, monitoring, future scaling.
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Back-of-Envelope Estimation Cheat Sheet</h3>
-    <div class="tag-row"><span class="badge badge-tag">Must Know</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <div class="grid-2">
-      <div class="concept-box"><h4>Powers of 2 &amp; Data Sizes</h4>
-        <table>
-          <tr><th>Unit</th><th>Value</th></tr>
-          <tr><td>1 KB</td><td>10³ bytes = 1,000 bytes</td></tr>
-          <tr><td>1 MB</td><td>10⁶ bytes</td></tr>
-          <tr><td>1 GB</td><td>10⁹ bytes</td></tr>
-          <tr><td>1 TB</td><td>10¹² bytes</td></tr>
-          <tr><td>1 PB</td><td>10¹⁵ bytes</td></tr>
-          <tr><td>1 char / 1 UUID</td><td>1 B / 36 B</td></tr>
-          <tr><td>1 image (compressed)</td><td>~300 KB</td></tr>
-          <tr><td>1 video min (720p)</td><td>~50 MB</td></tr>
-        </table>
-      </div>
-      <div class="concept-box"><h4>Latency Numbers Every Engineer Knows</h4>
-        <table>
-          <tr><th>Operation</th><th>Latency</th></tr>
-          <tr><td>L1 cache read</td><td>0.5 ns</td></tr>
-          <tr><td>RAM access</td><td>100 ns</td></tr>
-          <tr><td>SSD random read</td><td>100 µs</td></tr>
-          <tr><td>HDD seek</td><td>10 ms</td></tr>
-          <tr><td>Redis GET (same DC)</td><td>~0.5 ms</td></tr>
-          <tr><td>DB query (indexed)</td><td>~1-5 ms</td></tr>
-          <tr><td>Cross-DC round trip</td><td>~150 ms</td></tr>
-          <tr><td>1 GB network transfer</td><td>~10 ms (10Gbps)</td></tr>
-        </table>
-      </div>
-    </div>
-    <div class="concept-box" style="margin-top:10px"><h4>Quick Estimation Formulas</h4><ul>
-      <li><strong>RPS from DAU:</strong> DAU × avg_requests_per_day / 86,400 (seconds/day)</li>
-      <li><strong>Peak RPS:</strong> avg_RPS × 2–3× (typical peak-to-average ratio)</li>
-      <li><strong>Storage per year:</strong> write_RPS × record_size × 86,400 × 365</li>
-      <li><strong>Bandwidth:</strong> peak_RPS × avg_response_size (bytes/s → MB/s)</li>
-      <li><strong>Rule of thumb:</strong> 1M DAU → ~12 RPS avg for a simple app; 100M DAU → 1,200 RPS avg</li>
-    </ul></div>
-  </div>
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Architecture Styles: Monolith → SOA → Microservices → Serverless → Event-Driven</h3>
-    <div class="tag-row"><span class="badge badge-tag">Architecture</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <table>
-      <tr><th>Style</th><th>Description</th><th>Best For</th><th>Avoid When</th></tr>
-      <tr><td><strong>Monolith</strong></td><td>All modules in one deployable unit</td><td>Early-stage, small team, &lt;100K DAU</td><td>Different components need independent scaling</td></tr>
-      <tr><td><strong>SOA</strong></td><td>Services communicate via ESB/SOAP</td><td>Enterprise with legacy integration</td><td>Greenfield cloud-native projects</td></tr>
-      <tr><td><strong>Microservices</strong></td><td>Small autonomous services, REST/gRPC</td><td>Large teams, independent scaling, different tech stacks</td><td>Small teams (operational overhead kills velocity)</td></tr>
-      <tr><td><strong>Serverless (FaaS)</strong></td><td>Functions triggered by events, no server management</td><td>Irregular traffic, event processing, glue code</td><td>Long-running jobs, latency-critical (cold starts)</td></tr>
-      <tr><td><strong>Event-Driven</strong></td><td>Services communicate via events (Kafka)</td><td>Async workflows, decoupling producers from consumers</td><td>When immediate consistency is required</td></tr>
-    </table>
-    <div class="arch-box">Evolutionary Path:
-Monolith (Day 1)
-      Identify bounded contexts (user service, order service, payment)
-Modular Monolith (extract modules with clear interfaces)
-      When specific module hits scaling limits
-Microservices (extract high-scale components first: search, recommendations)
-      For unpredictable spiky traffic
-Serverless (image resizing, scheduled jobs, webhooks)</div>
-  </div>
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Storage Systems — Object, Block, File Storage</h3>
-    <div class="tag-row"><span class="badge badge-tag">Infrastructure</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <table>
-      <tr><th>Type</th><th>How</th><th>Access</th><th>Use Cases</th><th>Examples</th></tr>
-      <tr><td><strong>Object Storage</strong></td><td>Flat namespace of objects (key=path, value=blob)</td><td>HTTP (GET/PUT), eventual consistency</td><td>Images, videos, backups, static assets, data lake</td><td>S3, GCS, Azure Blob</td></tr>
-      <tr><td><strong>Block Storage</strong></td><td>Raw blocks, like virtual disk; OS mounts as filesystem</td><td>Low-latency I/O (iSCSI, NVMe)</td><td>Database volumes, VMs, boot disks</td><td>AWS EBS, Azure Disk</td></tr>
-      <tr><td><strong>File Storage (NFS)</strong></td><td>Hierarchical filesystem, shared across instances</td><td>NFS/SMB mount</td><td>Shared config, CMS assets, ML training data</td><td>AWS EFS, Azure Files</td></tr>
-      <tr><td><strong>In-Memory</strong></td><td>RAM-based, volatile (or durable with persistence)</td><td>Sub-millisecond</td><td>Cache, sessions, leaderboards, queues</td><td>Redis, Memcached</td></tr>
-      <tr><td><strong>Columnar Store</strong></td><td>Store data column-by-column (efficient for analytics)</td><td>SQL</td><td>OLAP, data warehouse, aggregation queries</td><td>Snowflake, BigQuery, Redshift</td></tr>
-    </table>
-    <div class="callout callout-blue"><div class="callout-title">Rule of Thumb</div>User uploads → Object Storage (S3). Database needs disk → Block Storage (EBS). Shared files between instances → File Storage (EFS). Analytics at scale → Columnar Store (BigQuery/Snowflake).</div>
-  </div>
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Message Queues &amp; Event Streaming — Deep Dive</h3>
-    <div class="tag-row"><span class="badge badge-tag">Critical</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <table>
-      <tr><th></th><th>Kafka</th><th>RabbitMQ</th><th>AWS SQS</th><th>AWS SNS</th></tr>
-      <tr><td>Model</td><td>Pub/Sub + Log (pull)</td><td>AMQP queue (push)</td><td>Queue (pull)</td><td>Topic fan-out (push)</td></tr>
-      <tr><td>Retention</td><td>Days/weeks (log-based)</td><td>Until consumed</td><td>14 days max</td><td>N/A (fire-and-forget)</td></tr>
-      <tr><td>Ordering</td><td>Per partition</td><td>Per queue</td><td>FIFO queue option</td><td>No</td></tr>
-      <tr><td>Throughput</td><td>Millions/sec</td><td>50K–100K/sec</td><td>Managed, high</td><td>Managed</td></tr>
-      <tr><td>Consumer groups</td><td>Yes (replay, multiple)</td><td>Competing consumers</td><td>No (one consumer)</td><td>Multiple subscriptions</td></tr>
-      <tr><td>Best For</td><td>Event streaming, audit log, real-time pipelines</td><td>Task queues, RPC</td><td>Decoupling AWS services</td><td>Fan-out notifications</td></tr>
-    </table>
-    <div class="concept-box" style="margin-top:10px"><h4>Message Delivery Semantics</h4><ul>
-      <li><strong>At-most-once</strong>: fire-and-forget. May lose messages. Best for logging/metrics where loss is OK.</li>
-      <li><strong>At-least-once</strong>: retry until ack. May duplicate. Consumer must be idempotent. Kafka default.</li>
-      <li><strong>Exactly-once</strong>: hardest to achieve. Kafka Transactions + idempotent producer. Use for financial events.</li>
-    </ul></div>
-    <div class="concept-box"><h4>When to Use a Message Queue in HLD</h4><ul>
-      <li><strong>Decouple services:</strong> Order service publishes, Inventory/Email/Notification consume independently</li>
-      <li><strong>Absorb traffic spikes:</strong> Queue acts as buffer; downstream processes at sustainable rate</li>
-      <li><strong>Async workflows:</strong> Video transcoding, report generation, email sending don't block API response</li>
-      <li><strong>Event sourcing:</strong> Kafka as immutable ordered event log</li>
-      <li><strong>Fan-out:</strong> One event triggers multiple downstream consumers in parallel</li>
-    </ul></div>
-  </div>
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Data Processing — Batch vs Stream vs Lambda Architecture</h3>
-    <div class="tag-row"><span class="badge badge-tag">Data Engineering</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <table>
-      <tr><th>Model</th><th>Latency</th><th>Throughput</th><th>Complexity</th><th>Tools</th><th>Use Case</th></tr>
-      <tr><td><strong>Batch Processing</strong></td><td>Hours</td><td>Very High</td><td>Low</td><td>Spark, Hadoop MapReduce</td><td>Daily reports, ML training, ETL</td></tr>
-      <tr><td><strong>Stream Processing</strong></td><td>Seconds–ms</td><td>High</td><td>Medium</td><td>Kafka Streams, Flink, Spark Streaming</td><td>Real-time dashboards, fraud detection, alerting</td></tr>
-      <tr><td><strong>Micro-batch</strong></td><td>Minutes</td><td>High</td><td>Low-Med</td><td>Spark Structured Streaming</td><td>Near-real-time analytics (acceptable delay)</td></tr>
-    </table>
-    <div class="concept-box" style="margin-top:10px"><h4>Lambda Architecture</h4><ul>
-      <li><strong>Batch Layer:</strong> Processes all historical data (S3 → Spark → data warehouse). Accurate but slow.</li>
-      <li><strong>Speed Layer:</strong> Processes real-time stream (Kafka → Flink). Low latency but approximate.</li>
-      <li><strong>Serving Layer:</strong> Merges batch + speed layer results for queries.</li>
-      <li><strong>Kappa Architecture (simpler):</strong> Only stream processing layer; reprocess history by replaying Kafka. Eliminates batch/speed duplication. Preferred modern approach.</li>
-    </ul></div>
-    <div class="arch-box">Data Pipeline (typical modern stack):
-Raw events Kafka (stream)
-         Flink / Spark Streaming (real-time transform, aggregate)
-         Redis (for live dashboards)   ClickHouse / Druid (for OLAP queries)
-         S3 Data Lake (raw + transformed)
-         dbt + Snowflake (daily batch aggregations for BI)
-         Looker / Tableau (dashboards)</div>
-  </div>
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Content Delivery Network (CDN) — Full Architecture</h3>
-    <div class="tag-row"><span class="badge badge-tag">Performance</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <div class="arch-box">CDN Hierarchy:
-User (Mumbai) DNS Anycast IP routes to nearest PoP
-      Edge Node (Mumbai PoP, &lt;10ms away)
-           Cache HIT return immediately (sub-10ms)
-           Cache MISS request to Regional Cache (Singapore)
-                   Cache MISS request to Origin (US)
-                   Response cached at Origin CDN
-           Response cached at Regional  Edge  User
-
-CDN PoP (Point of Presence):
-  SSD Cache + Nginx/Varnish + TLS termination + Anycast routing
-
-Pull CDN: Edge pulls from origin on cache miss, caches result (Cloudflare)
-Push CDN: You push content to CDN upfront (Akamai, good for known assets)
-
-Cache-Control Headers:
-  Cache-Control: public, max-age=86400, s-maxage=604800
-  Surrogate-Control: max-age=2592000 (CDN-specific override)
-  Vary: Accept-Encoding (cache separate version per encoding)</div>
-    <div class="concept-box"><h4>What Goes on CDN vs Origin</h4>
-      <table>
-        <tr><th>CDN (cache at edge)</th><th>Origin only (don't cache)</th></tr>
-        <tr><td>Static: JS, CSS, images, videos</td><td>User-specific API responses</td></tr>
-        <tr><td>Public API responses (product listings)</td><td>Cart, checkout, payment</td></tr>
-        <tr><td>ML model weights, binaries</td><td>Session-dependent pages</td></tr>
-        <tr><td>HLS/DASH video segments</td><td>Real-time data (stock prices)</td></tr>
-      </table>
-    </div>
-    <div class="callout callout-orange"><div class="callout-title">Cache Invalidation Strategies</div>Versioned URLs: /bundle.v2.3.0.js (no invalidation needed — new URL = new cache entry). TTL: set short TTL (5min) for semi-static content. Purge API: POST /purge {urls} to Cloudflare/Fastly on deploy. Surrogate keys (cache tags): tag multiple URLs, purge by tag.</div>
-  </div>
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Distributed Consensus — Raft &amp; Paxos</h3>
-    <div class="tag-row"><span class="badge badge-tag">Advanced</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <div class="concept-box"><h4>Why Consensus Matters in HLD</h4><ul>
-      <li>Multiple nodes must agree on a single value (leader election, config, who owns a lock)</li>
-      <li>Used by: etcd (Kubernetes config), Zookeeper (Kafka broker election), CockroachDB, Consul</li>
-    </ul></div>
-    <div class="arch-box">Raft Consensus (Leader-based, easier to understand than Paxos):
-
-Roles: Leader | Follower | Candidate
-
-1. Leader Election:
-   All nodes start as Followers with random election timeout (150-300ms)
-   If no heartbeat received, node becomes Candidate
-   RequestVote to all peers; majority wins leader for this term
-
-2. Log Replication:
-   Client writes to Leader
-   Leader appends to own log, sends AppendEntries to all followers
-   When majority (quorum) ack, commit entry, apply to state machine
-   Leader sends commit in next heartbeat to followers
-
-3. Safety: a node only votes for candidate with at least as up-to-date log
-
-Quorum = floor(N/2) + 1
-  3 nodes: quorum = 2 (tolerates 1 failure)
-  5 nodes: quorum = 3 (tolerates 2 failures)</div>
-    <div class="callout callout-blue"><div class="callout-title">In Interviews</div>You rarely need to implement Raft. Know: it's used for leader election and replicated state machine. etcd/Zookeeper use it. Quorum = N/2+1. It tolerates at most (N-1)/2 failures. Split-brain prevention: partitioned minority cannot elect a leader.</div>
-  </div>
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Observability: Metrics, Logs, Traces (The Three Pillars)</h3>
-    <div class="tag-row"><span class="badge badge-tag">Operations</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <table>
-      <tr><th>Pillar</th><th>What it captures</th><th>Tools</th><th>Use for</th></tr>
-      <tr><td><strong>Metrics</strong></td><td>Aggregated numeric data over time (RPS, latency p99, error rate, CPU)</td><td>Prometheus + Grafana, DataDog, CloudWatch</td><td>Alerting, capacity planning, SLA monitoring</td></tr>
-      <tr><td><strong>Logs</strong></td><td>Discrete events with context (request logs, error stack traces)</td><td>ELK Stack, Loki, Splunk, Fluentd</td><td>Debugging, audit trail, root cause analysis</td></tr>
-      <tr><td><strong>Traces</strong></td><td>End-to-end request path across microservices with span timings</td><td>Jaeger, Zipkin, AWS X-Ray, OpenTelemetry</td><td>Find bottleneck services, latency breakdown</td></tr>
-    </table>
-    <div class="concept-box" style="margin-top:10px"><h4>SLI / SLO / SLA</h4><ul>
-      <li><strong>SLI (Service Level Indicator):</strong> Measured metric — e.g., p99 latency = 120ms, error rate = 0.1%</li>
-      <li><strong>SLO (Service Level Objective):</strong> Target — e.g., p99 &lt; 200ms, availability &gt; 99.9% ("three nines")</li>
-      <li><strong>SLA (Service Level Agreement):</strong> Contractual commitment with penalty — "99.9% uptime or credit"</li>
-      <li><strong>Error Budget:</strong> 99.9% SLO = 0.1% error budget = 43.8 min/month of allowed downtime</li>
-    </ul></div>
-    <div class="concept-box"><h4>KEY Alerts Every System Needs</h4><ul>
-      <li>Error rate &gt; 1% for 5 min — page on-call</li>
-      <li>p99 latency &gt; 2× baseline for 5 min — alert</li>
-      <li>Queue depth growing (Kafka consumer lag) — scale up consumers</li>
-      <li>DB connection pool saturation — add read replicas</li>
-      <li>Cache hit rate drops below 90% — investigate cold start or eviction</li>
-    </ul></div>
-  </div>
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Service Mesh &amp; Service Discovery</h3>
-    <div class="tag-row"><span class="badge badge-tag">Microservices</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <div class="concept-box"><h4>Service Discovery — How Microservices Find Each Other</h4><ul>
-      <li><strong>Client-side discovery:</strong> Service A queries registry (Consul/Eureka) directly and load-balances itself. More control but coupling to registry library.</li>
-      <li><strong>Server-side discovery:</strong> Client calls LB (ELB, NGINX), LB queries registry. Simpler clients, extra hop.</li>
-      <li><strong>DNS-based (Kubernetes):</strong> Each service gets a stable DNS name (order-service.default.svc.cluster.local). kube-dns resolves to ClusterIP. Most common modern approach.</li>
-    </ul></div>
-    <div class="arch-box">Service Mesh (Istio / Linkerd):
-Each pod gets a sidecar proxy (Envoy)
-All traffic goes: Service A Envoy (sidecar) network Envoy (sidecar) Service B
-
-Control Plane provides:
-  mTLS between all services (zero-trust security)
-  Traffic policies (retries, timeouts, circuit breaker) without code changes
-  Observability (auto-traces, metrics per service pair)
-  Canary deployments (route 5% traffic to v2 via traffic weights)
-
-When to use Service Mesh:
-  Large microservice fleet (&gt;20 services) where cross-cutting concerns
-  (security, observability, traffic management) become unmanageable per-service.</div>
-  </div>
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Geospatial Systems — Geohashing &amp; Quadtrees</h3>
-    <div class="tag-row"><span class="badge badge-tag">Location</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <div class="arch-box">Geohash:
-  Encodes (lat, lng) to a string: (37.7749, -122.4194) "9q8yy"
-  Nearby locations share common prefix: "9q8yy" neighbors share "9q8y"
-  Precision: 6 chars ≈ 1.2km×0.6km, 8 chars ≈ 38m×19m
-  Stored as indexed VARCHAR in DB range query = prefix LIKE '9q8y%'
-
-  Edge case: points near geohash boundary are geographically close
-  but have different prefixes. Solution: also check 8 neighboring cells.
-
-Quadtree:
-  Divide 2D space into 4 quadrants recursively until each cell has
-  ≤ N points (e.g., 100 drivers per cell)
-  Dynamic: densely populated areas get more subdivisions (NYC vs rural)
-  Used by: Google Maps for rendering, Uber for driver partitioning
-
-S2 (Google):
-  Divides sphere into hierarchical cells at 30 levels
-  Level 12 ≈ city block, Level 30 ≈ 1cm²
-  All cells same shape (low distortion)
-  Used by: Google Maps, Foursquare, Uber</div>
-    <div class="concept-box"><h4>Nearby Search Query Patterns</h4><ul>
-      <li><strong>Redis GEORADIUS:</strong> GEORADIUS drivers 37.77 -122.41 5 km → O(N+log M). Best for real-time moving objects (Uber drivers).</li>
-      <li><strong>PostGIS:</strong> SELECT * FROM restaurants WHERE ST_DWithin(location, ST_MakePoint(-122.41, 37.77), 5000). Best for persistent geo data with complex queries.</li>
-      <li><strong>Elasticsearch geo_distance:</strong> Full-text + location combined query. Good for POI search ("coffee near me").</li>
-    </ul></div>
-  </div>
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Operational Transformation &amp; CRDTs (Collaborative Editing)</h3>
-    <div class="tag-row"><span class="badge badge-tag">Real-time Collab</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <div class="concept-box"><h4>The Problem: Concurrent Edits</h4><ul>
-      <li>User A inserts "X" at position 5. User B simultaneously deletes char at position 3.</li>
-      <li>After A's op reaches B and B's op reaches A — both must converge to same document.</li>
-    </ul></div>
-    <div class="arch-box">Operational Transformation (OT) — Google Docs approach:
-  Each op: {type: insert|delete, position, char, clientId, revision}
-
-  Server acts as central authority (serializes all concurrent ops):
-    Op from User A @ revision 5
-    Op from User B @ revision 5 (concurrent)
-    Server receives both, transforms B's op against A's op:
-      transform(opB, opA) adjust position to account for A's insert
-    Server applies both, sends transformed ops to all clients
-
-  Properties: CONVERGENCE (all clients reach same state) + INTENTION PRESERVATION
-
-CRDTs (Conflict-free Replicated Data Types) — newer approach (Figma, Notion):
-  Data structure designed so concurrent ops always merge deterministically
-  No central server needed for conflict resolution (peer-to-peer possible)
-  Text CRDT (e.g., RGA, YATA): each character has unique ID + tombstone for delete
-  Insert: new char gets ID = (clientId, lamportClock), positioned relative to neighbors
-  Merge: union of character sets sorted by unique IDs = deterministic order
-
-  Pros: works offline, peer-to-peer, simpler server
-  Cons: higher memory (tombstones accumulate), harder to implement
-  Used by: Figma (vector graphics), Automerge, Yjs libraries</div>
-    <div class="callout callout-blue"><div class="callout-title">Interview Answer</div>For Google Docs / collaborative editor: use OT with a central server (industry-proven, Google uses it). Server serializes all ops and transforms them against each other. Clients maintain shadow copy + local revision counter. For truly distributed / offline-first: CRDTs (Figma approach). Trade-off: CRDTs have higher memory overhead.</div>
-  </div>
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Search Architecture — Inverted Index &amp; Elasticsearch Internals</h3>
-    <div class="tag-row"><span class="badge badge-tag">Search</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <div class="arch-box">Inverted Index (core of full-text search):
-  Documents:
-    Doc1: "the quick brown fox"
-    Doc2: "the lazy brown dog"
-    Doc3: "quick brown dog"
-
-  Inverted Index:
-    "brown" → [Doc1(pos:3), Doc2(pos:3), Doc3(pos:2)]
-    "quick" → [Doc1(pos:2), Doc3(pos:1)]
-    "fox"   → [Doc1(pos:4)]
-
-  Query "quick brown": intersect posting lists for "quick" AND "brown"
-  Result: Doc1, Doc3 (sorted by TF-IDF or BM25 relevance score)
-
-Elasticsearch Architecture:
-  Index = collection of shards (distributed across nodes)
-  Primary shard: handles writes, routes to replica shards
-  Replica shard: handles reads, provides failover
-
-  Write path:
-    Client Primary shard (write + WAL to translog)
-    Replica shards (parallel replication)
-    Refresh (default 1s): flush to in-memory segment (searchable!)
-    Flush (30min or size): commit segment to disk, clear translog
-
-  Read path:
-    Query broadcast to all shards (scatter-gather)
-    Each shard returns local top-K hits
-    Coordinating node merges, re-ranks, returns global top-K</div>
-    <div class="concept-box"><h4>Relevance Scoring — BM25</h4><ul>
-      <li><strong>TF (Term Frequency):</strong> how often term appears in document (more = more relevant)</li>
-      <li><strong>IDF (Inverse Document Frequency):</strong> how rare the term is across all docs (rare = more distinctive)</li>
-      <li><strong>BM25:</strong> improved TF-IDF, saturates TF (very high TF doesn't dominate) — Elasticsearch default since v5</li>
-      <li><strong>Vector Search (ANN):</strong> embed text to dense vector (BERT/OpenAI), find nearest neighbors by cosine similarity. Used for semantic search. Tools: FAISS, Elasticsearch knn, Pinecone.</li>
-    </ul></div>
-  </div>
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Idempotency &amp; Exactly-Once Semantics</h3>
-    <div class="tag-row"><span class="badge badge-tag">Reliability</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <div class="concept-box"><h4>Why Idempotency Matters</h4><ul>
-      <li>Networks fail. Client retries. Server may have processed request before failure — duplicate operation risk.</li>
-      <li>Idempotent operation: applying it multiple times = same result as applying once.</li>
-      <li>GET, PUT, DELETE are naturally idempotent. POST (create) is NOT.</li>
-    </ul></div>
-    <div class="arch-box">Idempotency Key Pattern:
-  Client generates unique key: X-Idempotency-Key: uuid-v4
-  Server: SET idempotency:{key} processing EX 86400 (Redis, NX)
-  If NX fails (key exists): request already processed, return cached response
-  On success: store result in Redis with TTL
-  On failure: delete key so client can retry
-
-  Useful for: POST /payments, POST /orders, email sending, SMS
-
-Database-level Idempotency:
-  INSERT INTO orders (idempotency_key, ...) ON CONFLICT (idempotency_key) DO NOTHING
-  -- or return existing row
-
-Kafka Idempotent Producer:
-  enable.idempotence=true Producer gets PID, sequence per partition
-  Broker deduplicates messages within session (exactly-once within producer lifetime)
-  For cross-session: Kafka Transactions (atomic multi-partition writes)</div>
-  </div>
-</div>
-
-<div class="problem-card">
-  <div class="problem-card-header" onclick="toggle(this)">
-    <h3>Capacity Planning &amp; Horizontal Scaling Checklist</h3>
-    <div class="tag-row"><span class="badge badge-tag">HLD Process</span></div><span class="toggle-icon"></span>
-  </div>
-  <div class="problem-card-body">
-    <div class="concept-box"><h4>When to Introduce Each Component</h4>
-      <table>
-        <tr><th>Scale Milestone</th><th>Introduce</th></tr>
-        <tr><td>&lt;1K RPS</td><td>Single server, managed DB (RDS), no cache needed</td></tr>
-        <tr><td>1K–10K RPS</td><td>Read replicas, Redis cache, CDN for static assets</td></tr>
-        <tr><td>10K–100K RPS</td><td>Horizontal stateless app servers, LB, DB connection pooling (PgBouncer)</td></tr>
-        <tr><td>100K–1M RPS</td><td>DB sharding or NoSQL, Kafka for async, microservices for hot paths</td></tr>
-        <tr><td>&gt;1M RPS</td><td>Multi-region, global LB (Anycast), custom distributed storage</td></tr>
-      </table>
-    </div>
-    <div class="concept-box"><h4>Stateless Service Design (Required for Horizontal Scaling)</h4><ul>
-      <li>No session stored in memory → store in Redis</li>
-      <li>No uploaded files stored locally → stream to S3</li>
-      <li>No sticky state in app server → any instance can serve any request</li>
-      <li>Config from environment or config service (not baked into binary)</li>
-      <li>Health check endpoint (/health) for load balancer probing</li>
-      <li>Graceful shutdown: drain in-flight requests before terminating on scale-down</li>
-    </ul></div>
-  </div>
-</div>
-
-</div><!-- end hld-concepts -->
 
 <!-- ===== INTERVIEW QUESTIONS ===== -->
 <div class="subsection" id="interview-qs">
@@ -1244,7 +790,14 @@ Kafka Idempotent Producer:
 
 <div class="callout callout-blue">
   <div class="callout-title">Interview Framework</div>
-  1<strong>Clarify Requirements</strong> (functional + non-functional, scale) 2<strong>Estimate Scale</strong> (RPS, storage, bandwidth) 3<strong>High-Level Design</strong> (major components) 4<strong>API Design</strong> (endpoints, data models) 5<strong>Deep Dive</strong> (critical components) 6<strong>Trade-offs</strong> (what you chose and why)
+  <ol style="margin:6px 0 0 18px;padding:0;line-height:2">
+    <li><strong>Clarify Requirements</strong> — functional + non-functional, scale</li>
+    <li><strong>Estimate Scale</strong> — RPS, storage, bandwidth</li>
+    <li><strong>High-Level Design</strong> — draw major components</li>
+    <li><strong>API Design</strong> — endpoints, data models</li>
+    <li><strong>Deep Dive</strong> — critical components &amp; bottlenecks</li>
+    <li><strong>Trade-offs</strong> — what you chose and why</li>
+  </ol>
 </div>
 
 <div class="interview-q">
@@ -1673,16 +1226,12 @@ Lineage:
 
 </div><!-- end interview-qs -->
 
-<!-- ===== HLD INTERVIEW QUESTIONS ===== -->
-<div class="subsection" id="hld-qs">
-<div class="subsection-title">HLD System Design Interview Questions</div>
-
-<div class="callout callout-orange">
-  <div class="callout-title">Big Infrastructure Questions</div>
-  These are the most common HLD questions at top-tier companies (Google, Meta, Amazon, Uber). Each requires a full 45-min design. Know the key components, trade-offs, and deep-dive areas for each.
+<div class="callout callout-blue" style="margin-top:24px">
+  <div class="callout-title">Looking for HLD Questions?</div>
+  Big-infrastructure designs (Google Docs, Maps, Netflix, Drive, Payments, Instagram and more) are in the <a href="hld.html" style="color:var(--accent-blue);font-weight:700">High-Level Design (HLD) →</a> page.
 </div>
 
-<div class="interview-q">
+</div><!-- content-area -->
   <div class="interview-q-header" onclick="toggleIQ(this)">
     <span class="badge badge-tag">HLD-1</span>
     <h3>Design Google Docs (Collaborative Document Editor)</h3>

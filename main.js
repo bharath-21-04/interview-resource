@@ -9,6 +9,14 @@ function toggle(header) {
   icon.textContent = body.classList.contains('open') ? '▼' : '▶';
 }
 
+/* ── Interview-question accordion ───────────────────────────────────────── */
+function toggleIQ(header) {
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+  const icon = header.querySelector('.toggle-icon');
+  icon.textContent = body.classList.contains('open') ? '▼' : '▶';
+}
+
 /* ── Tab switcher ────────────────────────────────────────────────────────── */
 function switchTab(btn) {
   const tabs = btn.parentElement;
